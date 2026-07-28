@@ -1,0 +1,58 @@
+name: Publish staged KSword website
+
+on:
+  push:
+    branches:
+      - agent/publish-site
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/publish-site
+          fetch-depth: 0
+
+      - name: Reconstruct and verify website archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .site-upload2/part-*.txt > website.zip.b64
+          base64 --decode website.zip.b64 > website.zip
+          echo "56309f0831b1762580570b23dfc80a2a5829f6c8fd709b5f3b1b92fe6cf0dfe0  website.zip" | sha256sum --check --strict
+          unzip -t website.zip
+
+      - name: Replace website and remove staging files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf ksword-website
+          unzip -q website.zip -d .
+          test -f ksword-website/index.html
+          test -f ksword-website/styles.css
+          test -f ksword-website/script.js
+          test -f ksword-website/docs/index.html
+          rm -rf .site-upload .site-upload2
+          rm -f website.zip website.zip.b64
+          rm -f .github/workflows/publish-staged-site.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+
+      - name: Commit reconstructed website
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No website changes to publish."
+            exit 0
+          fi
+          git commit -m "Publish current KSword website"
+          git push origin HEAD:agent/publish-site
