@@ -1,15 +1,20 @@
 name: Publish staged KSword website
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/publish-site
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
 
 jobs:
   publish:
+    if: github.head_ref == 'agent/publish-site'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout staging branch
