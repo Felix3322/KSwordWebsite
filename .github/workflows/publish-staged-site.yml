@@ -27,7 +27,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .site-upload2/part-*.txt > website.zip.b64
+          cat \
+            .site-upload3/part-000-0.txt \
+            .site-upload3/part-000-1.txt \
+            .site-upload3/part-000-2.txt \
+            .site-upload2/part-001.txt \
+            .site-upload2/part-002.txt \
+            .site-upload2/part-003.txt \
+            .site-upload2/part-004.txt \
+            .site-upload2/part-005.txt \
+            .site-upload4/part-006-0-0.txt \
+            .site-upload4/part-006-0-1.txt \
+            .site-upload4/part-006-0-2.txt \
+            .site-upload4/part-006-0-3.txt \
+            .site-upload3/part-006-1.txt \
+            .site-upload3/part-007-0.txt \
+            .site-upload3/part-007-1.txt \
+            > website.zip.b64
           base64 --decode website.zip.b64 > website.zip
           echo "56309f0831b1762580570b23dfc80a2a5829f6c8fd709b5f3b1b92fe6cf0dfe0  website.zip" | sha256sum --check --strict
           unzip -t website.zip
@@ -42,7 +58,7 @@ jobs:
           test -f ksword-website/styles.css
           test -f ksword-website/script.js
           test -f ksword-website/docs/index.html
-          rm -rf .site-upload .site-upload2
+          rm -rf .site-upload .site-upload2 .site-upload3 .site-upload4
           rm -f website.zip website.zip.b64
           rm -f .github/workflows/publish-staged-site.yml
           rmdir .github/workflows 2>/dev/null || true
