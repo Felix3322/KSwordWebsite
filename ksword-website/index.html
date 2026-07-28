@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="KSword 是面向 Windows 的开源 ARK、内核调试与系统取证工具集。" name="description"/>
+<title>KSword — Windows ARK 与内核分析工具集</title>
+<link href="styles.css" rel="stylesheet"/>
+<script defer="" src="script.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="wordmark" href="index.html" aria-label="返回首页">KSWORD <span>/ 5.1</span></a>
+    <div class="creator-cards" aria-label="维护者 B 站与 GitHub">
+      <article class="creator-card">
+        <div class="creator-avatars">
+          <a href="https://space.bilibili.com/1627165457" target="_blank" rel="noreferrer" title="wangwei-cm 的 B站主页"><img src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg" alt="wangwei-cm B站头像" loading="lazy"></a>
+          <a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer" title="wangwei-cm 的 GitHub"><img src="https://github.com/wangwei-cm.png" alt="wangwei-cm GitHub 头像" loading="lazy"></a>
+        </div>
+        <div class="creator-info">
+          <strong>wangwei-cm</strong>
+          <div class="creator-links">
+            <a href="https://space.bilibili.com/1627165457" target="_blank" rel="noreferrer"><img class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4=" alt="">B站</a>
+            <a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer">GH ↗</a>
+          </div>
+        </div>
+      </article>
+      <article class="creator-card">
+        <div class="creator-avatars">
+          <a href="https://space.bilibili.com/3493268241254936" target="_blank" rel="noreferrer" title="OB_BUFF 的 B站主页"><img src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg" alt="OB_BUFF B站头像" loading="lazy"></a>
+          <a href="https://github.com/Felix3322" target="_blank" rel="noreferrer" title="Felix3322 的 GitHub"><img src="https://github.com/Felix3322.png" alt="Felix3322 GitHub 头像" loading="lazy"></a>
+        </div>
+        <div class="creator-info">
+          <strong>OB_BUFF</strong>
+          <div class="creator-links">
+            <a href="https://space.bilibili.com/3493268241254936" target="_blank" rel="noreferrer"><img class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4=" alt="">B站</a>
+            <a href="https://github.com/Felix3322" target="_blank" rel="noreferrer">Felix3322 ↗</a>
+          </div>
+        </div>
+      </article>
+    </div>
+    <nav aria-label="主导航">
+      <a href="index.html" aria-current="page">首页</a>
+      <a href="changelog.html">更新日志</a>
+      <a href="docs/index.html">文档</a>
+      <a href="https://github.com/KSwordDEV/KSword" target="_blank" rel="noreferrer">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+<main id="top">
+<section class="hero">
+<div class="wrap hero-content">
+<div>
+<img alt="KSword ARK Logo" class="readme-logo" height="180" src="https://raw.githubusercontent.com/KSwordDEV/KSword/main/Ksword5.1/Ksword5.1/Resource/Logo/KswordHome-En.png" width="520"/>
+<p class="kicker">OPEN SOURCE · WINDOWS X64 · GPL-3.0</p>
+<h1>Windows ARK、内核调试与系统取证工具集</h1>
+<p class="lead">KSword 将用户态与内核态信息集中在同一套工作流中，用于进程、内存、网络、文件、驱动、内核对象和系统安全审计。</p>
+<div class="actions">
+<a class="primary" href="https://github.com/KSwordDEV/KSword/releases/latest" rel="noreferrer" target="_blank">下载最新版本</a>
+<a href="docs/index.html">开始使用</a>
+<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">查看源代码</a>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="section alt">
+<div class="wrap two-column">
+<h2>最新更新</h2>
+<div class="prose">
+<p><strong>5.1.2.4</strong> 修复进程页长期刷新性能、进程树与应用聚合操作、首次启动默认设置、旧版 Windows 驱动兼容、主题颜色、语言回退和本地化启动图，并补齐许可证打包与 GitHub 入口。</p>
+
+<p><a href="changelog.html">查看完整更新日志 →</a></p>
+</div>
+</div>
+</section>
+<section aria-labelledby="screenshots-title" class="screenshot-section">
+<div class="wrap">
+<div class="section-head">
+<div><p class="section-number">SCREENSHOTS</p><h2 id="screenshots-title">界面截图</h2></div>
+<div aria-label="截图控制" class="gallery-controls">
+<button aria-label="上一张截图" class="gallery-button" data-gallery-prev="" type="button">←</button>
+<output aria-live="polite" class="gallery-count">01 / 04</output>
+<button aria-label="下一张截图" class="gallery-button" data-gallery-next="" type="button">→</button>
+</div>
+</div>
+<div aria-label="KSword 截图滚动区域" class="gallery" data-gallery="" tabindex="0">
+<figure class="gallery-item" data-gallery-item=""><a href="https://github.com/user-attachments/assets/25a3b2e2-4ee0-49aa-bd90-ee6e3ba01fe4" rel="noreferrer" target="_blank"><img alt="KSword 中文 README 深色界面" loading="eager" src="https://github.com/user-attachments/assets/25a3b2e2-4ee0-49aa-bd90-ee6e3ba01fe4"/></a><figcaption>主界面 · 深色模式 · 中文 README</figcaption></figure>
+<figure class="gallery-item" data-gallery-item=""><a href="https://github.com/user-attachments/assets/217769a2-0521-41f9-9933-ca7c2fbb1d13" rel="noreferrer" target="_blank"><img alt="KSword 中文 README 浅色界面" loading="lazy" src="https://github.com/user-attachments/assets/217769a2-0521-41f9-9933-ca7c2fbb1d13"/></a><figcaption>主界面 · 浅色模式 · 中文 README</figcaption></figure>
+<figure class="gallery-item" data-gallery-item=""><a href="https://github.com/user-attachments/assets/02085a90-af21-4880-b956-d059a655a4da" rel="noreferrer" target="_blank"><img alt="KSword 英文 README 深色界面" loading="lazy" src="https://github.com/user-attachments/assets/02085a90-af21-4880-b956-d059a655a4da"/></a><figcaption>主界面 · 深色模式 · English README</figcaption></figure>
+<figure class="gallery-item" data-gallery-item=""><a href="https://github.com/user-attachments/assets/aeda0d71-c2c0-4317-abac-0fac811c153d" rel="noreferrer" target="_blank"><img alt="KSword 英文 README 浅色界面" loading="lazy" src="https://github.com/user-attachments/assets/aeda0d71-c2c0-4317-abac-0fac811c153d"/></a><figcaption>主界面 · 浅色模式 · English README</figcaption></figure>
+</div>
+<div aria-label="跳转至指定截图" class="gallery-index">
+<button aria-current="true" aria-label="查看第 1 张截图" data-gallery-index="0" type="button">01</button>
+<button aria-label="查看第 2 张截图" data-gallery-index="1" type="button">02</button>
+<button aria-label="查看第 3 张截图" data-gallery-index="2" type="button">03</button>
+<button aria-label="查看第 4 张截图" data-gallery-index="3" type="button">04</button>
+</div>
+
+</div>
+</section>
+<section class="section">
+<div class="wrap two-column">
+<h2>核心功能</h2>
+<div class="rows">
+<article><h3>进程与对象 Cross-view</h3><p>对照 R3/R0 进程、线程、CID 和句柄视图，检查隐藏对象、结构差异、线程栈和进程详细信息。</p></article>
+<article><h3>内存与页表</h3><p>浏览内存区域、搜索和 Hex 内容，执行内核可执行内存扫描、证据采集与 PTE/VA 翻译。</p></article>
+<article><h3>驱动与内核对象</h3><p>检查 DriverObject、DeviceObject、SSDT、Hook、回调、模块 Cross-view、Unloaded 和 PiDDB 信息。</p></article>
+<article><h3>网络审计</h3><p>提供抓包、连接管理、限速、请求构造、WFP 防火墙事件、NIDS 与多层网络视图。</p></article>
+<article><h3>文件与系统取证</h3><p>整合文件恢复、签名与 PE 分析、文件占用、存储栈、注册表、启动项、服务和设备树。</p></article>
+<article><h3>安全策略诊断</h3><p>查看 AppLocker、WDAC、Code Integrity、Defender、ASR、VBS、Hyper-V 和事件日志状态。</p></article>
+</div>
+</div>
+</section>
+<section class="section alt">
+<div class="wrap two-column">
+<h2>组件</h2>
+<div class="component-table">
+<div class="table-head"><span>组件</span><span>定位</span><span>技术</span></div>
+<div><strong>Ksword5.1</strong><p>完整 ARK、调试与审计工作流</p><span>Qt 6 / ADS</span></div>
+<div><strong>KswordARKLight</strong><p>低资源环境与快速处置</p><span>Native Win32</span></div>
+<div><strong>KswordARKDriver</strong><p>统一承载 R0 审计协议</p><span>WDK / IOCTL</span></div>
+<div><strong>Launcher</strong><p>兼容性检查与入口选择</p><span>Native Win32</span></div>
+<div><strong>KswordCLI</strong><p>自动化、验证与故障排查</p><span>Command line</span></div>
+</div>
+</div>
+</section>
+<section class="notice">
+<div class="wrap two-column"><h2>使用边界</h2><p>KSword 包含系统级调试、审计与管理能力。仅在你拥有合法授权的设备和环境中使用。执行卸载、删除、补丁、磁盘写入或保护位修改前，应确认风险和回滚路径。</p></div>
+</section>
+</main>
+<footer><div class="wrap footer-row"><span>KSWORD / 5.1</span><div class="footer-links"><a href="docs/index.html">文档</a><a href="changelog.html">更新日志</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+</body>
+</html>
