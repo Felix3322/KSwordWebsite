@@ -1,0 +1,84 @@
+name: Add separate English homepage
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/add-english-homepage.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create English homepage
+        shell: python
+        run: |
+          from pathlib import Path
+
+          root = Path('ksword-website')
+          en = root / 'en'
+          en.mkdir(parents=True, exist_ok=True)
+
+          import subprocess
+          def git_show(path):
+              return subprocess.check_output([
+                  'git', 'show',
+                  f'5c8fd8348f3e2b60c66603a9ef1635b2ced195ab:{path}'
+              ], text=True)
+
+          english_html = git_show('ksword-website/index.html')
+          english_js = git_show('ksword-website/script.js')
+
+          english_html = english_html.replace('href="styles.css"', 'href="../styles.css"')
+          english_html = english_html.replace('href="changelog.html"', 'href="../changelog.html"')
+          english_html = english_html.replace('href="docs/index.html"', 'href="../docs/index.html"')
+          english_html = english_html.replace(
+              '<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>',
+              '<a href="../index.html" hreflang="zh-CN">中文</a>\n<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>',
+              1
+          )
+          english_html = english_html.replace(
+              '<link href="../styles.css" rel="stylesheet"/>',
+              '<link href="../styles.css" rel="stylesheet"/>\n<link href="../index.html" hreflang="zh-CN" rel="alternate"/>',
+              1
+          )
+
+          (en / 'index.html').write_text(english_html, encoding='utf-8')
+          (en / 'script.js').write_text(english_js, encoding='utf-8')
+
+          chinese_path = root / 'index.html'
+          chinese = chinese_path.read_text(encoding='utf-8')
+          if 'href="en/index.html"' not in chinese:
+              chinese = chinese.replace(
+                  '<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>',
+                  '<a href="en/index.html" hreflang="en">English</a>\n<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>',
+                  1
+              )
+          if 'hreflang="en" rel="alternate"' not in chinese:
+              chinese = chinese.replace(
+                  '<link href="styles.css" rel="stylesheet"/>',
+                  '<link href="styles.css" rel="stylesheet"/>\n<link href="en/index.html" hreflang="en" rel="alternate"/>',
+                  1
+              )
+          chinese_path.write_text(chinese, encoding='utf-8')
+
+          assert '<html lang="en">' in english_html
+          assert 'href="../index.html" hreflang="zh-CN">中文</a>' in english_html
+          assert 'href="en/index.html" hreflang="en">English</a>' in chinese
+
+      - name: Commit generated pages
+        run: |
+          rm .github/workflows/add-english-homepage.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ksword-website/index.html ksword-website/en/index.html ksword-website/en/script.js .github/workflows/add-english-homepage.yml
+          git commit -m "Add separate English homepage"
+          git push
