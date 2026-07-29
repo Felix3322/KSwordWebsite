@@ -1,5 +1,5 @@
 name: Publish staged KSword website
-# Final trigger after all exact archive chunks were written.
+# Verified final trigger: all exact archive chunks are ancestors of this commit.
 
 on:
   pull_request:
