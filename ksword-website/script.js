@@ -66,24 +66,24 @@
     update(0);
   }
 
-  function initLiveGitTimeline() {
+  function initGitTimeline() {
     const list = document.querySelector('[data-git-timeline-list]');
     const status = document.querySelector('[data-git-timeline-status]');
-    const content = document.querySelector('[data-home-content]');
-    const timelineInner = list?.closest('.git-timeline-inner');
-    if (!list || !content || !timelineInner) return;
+    const timeline = list?.closest('.git-timeline-inner');
+    if (!list || !timeline) return;
 
+    const sectionNumber = timeline.querySelector('.section-number');
+    const title = timeline.querySelector('#git-timeline-title');
     const desktopQuery = window.matchMedia('(min-width: 821px)');
-    const endpoint = 'https://api.github.com/repos/KSwordDEV/KSword/commits';
-    const pageSize = 100;
+    const sourcePage = 'https://github.com/KSwordDEV/KSword/commits/main';
+    const readerEndpoint = `https://r.jina.ai/${sourcePage}`;
     const mobileLimit = 12;
     let commits = [];
-    let renderedCount = 0;
-    let page = 1;
-    let hasMore = true;
-    let fetching = false;
-    let initializedFromApi = false;
-    let resizeTimer = 0;
+    let requestStarted = false;
+
+    if (sectionNumber) sectionNumber.textContent = 'MAIN / LATEST UPDATES';
+    if (title) title.textContent = '最新更新记录';
+    if (status) status.textContent = '正在获取最新更新记录…';
 
     function formatDate(value) {
       const date = new Date(value);
@@ -95,126 +95,118 @@
       }).format(date);
     }
 
-    function createCommitItem(commit) {
-      const sha = typeof commit?.sha === 'string' ? commit.sha : '';
-      const message = String(commit?.commit?.message || '无提交说明').split(/\r?\n/, 1)[0];
-      const date = commit?.commit?.committer?.date || commit?.commit?.author?.date || '';
-      const htmlUrl = commit?.html_url || `https://github.com/KSwordDEV/KSword/commit/${sha}`;
+    function parseDateHeading(value) {
+      if (!value) return '';
+      const date = new Date(`${value} 00:00:00 UTC`);
+      return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+    }
 
+    function cleanMarkdownText(value) {
+      return String(value || '')
+        .replace(/\\([\\`*_{}\[\]()#+\-.!])/g, '$1')
+        .replace(/<[^>]+>/g, '')
+        .trim();
+    }
+
+    function parseCommitPage(markdown) {
+      const parsed = [];
+      const titles = new Map();
+      const seen = new Set();
+      let currentDate = '';
+
+      for (const line of String(markdown || '').split(/\r?\n/)) {
+        const dateHeading = line.match(/^#{2,4}\s+Commits on\s+(.+?)\s*$/i);
+        if (dateHeading) {
+          currentDate = parseDateHeading(dateHeading[1]);
+          continue;
+        }
+
+        const links = line.matchAll(/\[([^\]]+)\]\((https:\/\/github\.com\/KSwordDEV\/KSword\/commit\/([0-9a-f]{7,40})(?:[?#][^)]*)?)\)/gi);
+        for (const match of links) {
+          const label = cleanMarkdownText(match[1]);
+          const sha = match[3].toLowerCase();
+          const htmlUrl = `https://github.com/KSwordDEV/KSword/commit/${sha}`;
+
+          if (/^[0-9a-f]{7,40}$/i.test(label)) {
+            if (seen.has(sha)) continue;
+            const message = titles.get(sha);
+            if (!message) continue;
+            seen.add(sha);
+            parsed.push({ sha, message, date: currentDate, htmlUrl });
+            continue;
+          }
+
+          if (!label.startsWith('Image:') && !label.startsWith('Copy full SHA')) {
+            titles.set(sha, label || '无提交说明');
+          }
+        }
+      }
+
+      return parsed;
+    }
+
+    function createCommitItem(commit) {
       const item = document.createElement('li');
       const link = document.createElement('a');
       const code = document.createElement('code');
       const text = document.createElement('span');
       const time = document.createElement('time');
 
-      link.href = htmlUrl;
+      link.href = commit.htmlUrl;
       link.target = '_blank';
       link.rel = 'noreferrer';
-      code.textContent = sha.slice(0, 7);
-      text.textContent = message;
-      time.dateTime = date;
-      time.textContent = formatDate(date);
+      code.textContent = commit.sha.slice(0, 7);
+      text.textContent = commit.message;
+      time.dateTime = commit.date;
+      time.textContent = formatDate(commit.date);
 
       link.append(code, text, time);
       item.append(link);
       return item;
     }
 
-    async function fetchNextPage() {
-      if (fetching || !hasMore) return;
-      fetching = true;
-      try {
-        const url = new URL(endpoint);
-        url.searchParams.set('sha', 'main');
-        url.searchParams.set('per_page', String(pageSize));
-        url.searchParams.set('page', String(page));
+    function renderCommits() {
+      if (commits.length === 0) return;
+      const visible = desktopQuery.matches ? commits : commits.slice(0, mobileLimit);
+      list.replaceChildren(...visible.map(createCommitItem));
+    }
 
-        const response = await fetch(url, {
+    async function loadCommitsOnce() {
+      if (requestStarted) return;
+      requestStarted = true;
+
+      try {
+        const response = await fetch(readerEndpoint, {
           cache: 'no-store',
-          headers: {
-            Accept: 'application/vnd.github+json',
-            'X-GitHub-Api-Version': '2022-11-28'
-          }
+          headers: { Accept: 'text/plain' }
         });
         if (!response.ok) {
-          throw new Error(`GitHub API ${response.status}`);
-        }
-        const batch = await response.json();
-        if (!Array.isArray(batch)) {
-          throw new Error('GitHub API 返回格式错误');
+          throw new Error(`GitHub page reader ${response.status}`);
         }
 
-        if (!initializedFromApi) {
-          list.replaceChildren();
-          initializedFromApi = true;
+        const markdown = await response.text();
+        const parsed = parseCommitPage(markdown);
+        if (parsed.length === 0) {
+          throw new Error('未从 GitHub 提交网页解析到记录');
         }
-        commits.push(...batch);
-        page += 1;
-        hasMore = batch.length === pageSize;
-        if (status) status.textContent = `实时读取 main · ${formatDate(new Date().toISOString())}`;
+
+        commits = parsed;
+        renderCommits();
+        if (status) {
+          status.textContent = `最新记录 · ${formatDate(new Date().toISOString())}`;
+        }
       } catch (error) {
-        hasMore = false;
-        if (status) status.textContent = initializedFromApi ? '实时读取中断' : '实时读取失败 · 显示页面缓存';
+        if (status) status.textContent = '获取失败 · 显示页面缓存';
         console.warn('KSword Git timeline:', error);
-      } finally {
-        fetching = false;
       }
     }
 
-    function appendOne() {
-      if (renderedCount >= commits.length) return false;
-      list.append(createCommitItem(commits[renderedCount]));
-      renderedCount += 1;
-      return true;
-    }
+    const rerender = () => renderCommits();
+    desktopQuery.addEventListener?.('change', rerender);
 
-    async function fillToContentEnd() {
-      if (!desktopQuery.matches) {
-        while (renderedCount < mobileLimit) {
-          if (!appendOne()) {
-            if (!hasMore) break;
-            await fetchNextPage();
-            if (renderedCount >= commits.length && !hasMore) break;
-          }
-        }
-        return;
-      }
-
-      // The rail itself stretches with the page grid. Add real commits until the
-      // visible timeline content reaches the bottom of the homepage content.
-      const targetHeight = Math.max(0, content.offsetHeight - 112);
-      let safety = 0;
-      while (timelineInner.scrollHeight < targetHeight && safety < 500) {
-        safety += 1;
-        if (appendOne()) continue;
-        if (!hasMore) break;
-        await fetchNextPage();
-        if (renderedCount >= commits.length && !hasMore) break;
-      }
-    }
-
-    async function start() {
-      await fetchNextPage();
-      await fillToContentEnd();
-    }
-
-    const scheduleFill = () => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => void fillToContentEnd(), 120);
-    };
-
-    if ('ResizeObserver' in window) {
-      const observer = new ResizeObserver(scheduleFill);
-      observer.observe(content);
-    } else {
-      window.addEventListener('resize', scheduleFill, { passive: true });
-    }
-    desktopQuery.addEventListener?.('change', scheduleFill);
-    window.addEventListener('load', scheduleFill, { once: true });
-
-    void start();
+    void loadCommitsOnce();
   }
 
   initGallery();
-  initLiveGitTimeline();
+  initGitTimeline();
 })();
