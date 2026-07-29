@@ -77,7 +77,8 @@
     const desktopQuery = window.matchMedia('(min-width: 821px)');
     const sourcePage = 'https://github.com/KSwordDEV/KSword/commits/main';
     const readerEndpoint = `https://r.jina.ai/${sourcePage}`;
-    const mobileLimit = 12;
+    const desktopTrim = 5;
+    const mobileLimit = 7;
     let commits = [];
     let requestStarted = false;
 
@@ -227,7 +228,10 @@
 
     function renderCommits() {
       if (commits.length === 0) return;
-      const visible = desktopQuery.matches ? commits : commits.slice(0, mobileLimit);
+      const desktopLimit = Math.max(0, commits.length - desktopTrim);
+      const visible = desktopQuery.matches
+        ? commits.slice(0, desktopLimit)
+        : commits.slice(0, mobileLimit);
       list.replaceChildren(...visible.map(createCommitItem));
     }
 
