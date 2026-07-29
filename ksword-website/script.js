@@ -103,42 +103,102 @@
 
     function cleanMarkdownText(value) {
       return String(value || '')
+        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
         .replace(/\\([\\`*_{}\[\]()#+\-.!])/g, '$1')
         .replace(/<[^>]+>/g, '')
+        .replace(/^\s*(?:[-*+]\s+)?#{1,6}\s*/, '')
+        .replace(/\s+/g, ' ')
         .trim();
+    }
+
+    function getCommitTarget(value) {
+      const decoded = String(value || '').replace(/&amp;/g, '&').trim();
+      const match = decoded.match(/(?:https?:\/\/github\.com)?\/?KSwordDEV\/KSword\/commit\/([0-9a-f]{7,40})(?:[/?#]|$)/i);
+      if (!match) return null;
+      const sha = match[1].toLowerCase();
+      return {
+        sha,
+        htmlUrl: `https://github.com/KSwordDEV/KSword/commit/${sha}`
+      };
     }
 
     function parseCommitPage(markdown) {
       const parsed = [];
-      const titles = new Map();
       const seen = new Set();
       let currentDate = '';
+      let pendingTitle = '';
 
-      for (const line of String(markdown || '').split(/\r?\n/)) {
-        const dateHeading = line.match(/^#{2,4}\s+Commits on\s+(.+?)\s*$/i);
+      function addCommit(target, message) {
+        if (!target || seen.has(target.sha)) return;
+        const titleText = cleanMarkdownText(message);
+        if (!titleText || /^[0-9a-f]{7,40}$/i.test(titleText)) return;
+        if (/^(?:Image:|Copy full SHA|Show description for)\b/i.test(titleText)) return;
+        seen.add(target.sha);
+        parsed.push({
+          sha: target.sha,
+          message: titleText,
+          date: currentDate,
+          htmlUrl: target.htmlUrl
+        });
+      }
+
+      for (const rawLine of String(markdown || '').split(/\r?\n/)) {
+        const line = rawLine.trim();
+        if (!line) continue;
+
+        const dateHeading = line.match(/(?:^|\s)#{2,4}\s+Commits on\s+(.+?)\s*$/i);
         if (dateHeading) {
           currentDate = parseDateHeading(dateHeading[1]);
+          pendingTitle = '';
           continue;
         }
 
-        const links = line.matchAll(/\[([^\]]+)\]\((https:\/\/github\.com\/KSwordDEV\/KSword\/commit\/([0-9a-f]{7,40})(?:[?#][^)]*)?)\)/gi);
-        for (const match of links) {
-          const label = cleanMarkdownText(match[1]);
-          const sha = match[3].toLowerCase();
-          const htmlUrl = `https://github.com/KSwordDEV/KSword/commit/${sha}`;
+        const markdownLinks = [...line.matchAll(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)];
+        let foundCommitLink = false;
+
+        for (const linkMatch of markdownLinks) {
+          const label = cleanMarkdownText(linkMatch[1]);
+          const target = getCommitTarget(linkMatch[2]);
+          if (!target) continue;
+          foundCommitLink = true;
 
           if (/^[0-9a-f]{7,40}$/i.test(label)) {
-            if (seen.has(sha)) continue;
-            const message = titles.get(sha);
-            if (!message) continue;
-            seen.add(sha);
-            parsed.push({ sha, message, date: currentDate, htmlUrl });
-            continue;
+            addCommit(target, pendingTitle);
+          } else {
+            pendingTitle = label;
+            addCommit(target, label);
           }
+        }
 
-          if (!label.startsWith('Image:') && !label.startsWith('Copy full SHA')) {
-            titles.set(sha, label || '无提交说明');
+        if (foundCommitLink) continue;
+
+        const htmlLink = line.match(/href=["']([^"']*\/?KSwordDEV\/KSword\/commit\/[0-9a-f]{7,40}[^"']*)["'][^>]*>(.*?)<\/a>/i);
+        if (htmlLink) {
+          const target = getCommitTarget(htmlLink[1]);
+          const label = cleanMarkdownText(htmlLink[2]);
+          if (/^[0-9a-f]{7,40}$/i.test(label)) {
+            addCommit(target, pendingTitle);
+          } else {
+            pendingTitle = label;
+            addCommit(target, label);
           }
+          continue;
+        }
+
+        const heading = line.match(/^\s*(?:[-*+]\s+)?#{3,6}\s+(.+?)\s*$/);
+        if (heading) {
+          const candidate = cleanMarkdownText(heading[1]);
+          if (candidate && !/^Commits on\b/i.test(candidate)) pendingTitle = candidate;
+          continue;
+        }
+
+        const plainSha = cleanMarkdownText(line).match(/^([0-9a-f]{7,40})$/i);
+        if (plainSha && pendingTitle) {
+          const sha = plainSha[1].toLowerCase();
+          addCommit({
+            sha,
+            htmlUrl: `https://github.com/KSwordDEV/KSword/commit/${sha}`
+          }, pendingTitle);
         }
       }
 
@@ -187,6 +247,7 @@
         const markdown = await response.text();
         const parsed = parseCommitPage(markdown);
         if (parsed.length === 0) {
+          console.debug('KSword Git timeline response preview:', markdown.slice(0, 2000));
           throw new Error('未从 GitHub 提交网页解析到记录');
         }
 
