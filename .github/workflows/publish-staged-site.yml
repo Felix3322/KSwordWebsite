@@ -1,4 +1,5 @@
 name: Publish staged KSword website
+# Final trigger after all exact archive chunks were written.
 
 on:
   pull_request:
