@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="KSword main 分支相对于 5.1.2.4 的最新开发快照，涵盖系统时间控制、R0 WFP 抓包、扫描器、内核与存储取证、运行时诊断及安全加固。" name="description"/>
+<title>main 分支开发快照 — KSword</title>
+<link href="styles.css" rel="stylesheet"/>
+<link href="en/development.html" hreflang="en" rel="alternate"/>
+</head>
+<body>
+<header class="site-header">
+<div class="wrap header-row">
+<a aria-label="返回首页" class="wordmark" href="index.html">KSWORD <span>/ MAIN</span></a>
+<nav aria-label="主导航">
+<a href="index.html">首页</a>
+<a aria-current="page" href="development.html">开发快照</a>
+<a href="changelog.html">正式版本</a>
+<a href="docs/index.html">文档</a>
+<a href="en/development.html" hreflang="en">English</a>
+<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
+</nav>
+</div>
+</header>
+<main>
+<section class="page-hero compact">
+<div class="wrap">
+<p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT</p>
+<h1>KSword 最新开发变化</h1>
+<p class="lead">基于 <code>KSwordDEV/KSword@f92f0fc</code> 整理。该提交发生于 2026-08-01 03:10 UTC，对应多伦多 2026-07-31 23:10；本页描述的是 <code>main</code>，不是新的 Release。</p>
+<div class="actions">
+<a class="primary" href="https://github.com/KSwordDEV/KSword/commit/f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47" rel="noreferrer" target="_blank">查看快照 HEAD</a>
+<a href="https://github.com/KSwordDEV/KSword/commits/main" rel="noreferrer" target="_blank">继续跟踪 main</a>
+<a href="https://github.com/KSwordDEV/KSword/releases/latest" rel="noreferrer" target="_blank">正式发行资产</a>
+</div>
+</div>
+</section>
+<section class="section compact-section">
+<div class="wrap docs-layout">
+<aside aria-label="本页目录" class="side-index">
+<strong>本页目录</strong>
+<a href="#scope">快照边界</a>
+<a href="#system-time">系统时间控制</a>
+<a href="#network">R0 网络抓包</a>
+<a href="#scanner-kernel">扫描、内核与存储</a>
+<a href="#runtime">运行时与界面</a>
+<a href="#hardening">安全加固</a>
+<a href="#removed">已回滚内容</a>
+<a href="#operator">使用注意</a>
+<a href="#commits">关键提交</a>
+</aside>
+<div class="document-content operator-manual">
+<section id="scope">
+<p class="section-number">01 / SCOPE</p>
+<h2>这是开发快照，不是 5.1.2.5</h2>
+<div class="status-table">
+<div><strong>对比基线</strong><p>网站当前正式版本历史停在 <code>5.1.2.4</code>；本页补充其后的 <code>main</code> 变化，不改写既有 Release 记录。</p></div>
+<div><strong>快照 HEAD</strong><p><code>f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47</code></p></div>
+<div><strong>时间换算</strong><p>Git 提交时间为 2026-08-01 03:10 UTC；在项目维护者常用的 America/Toronto 时区仍是 2026-07-31。</p></div>
+<div><strong>未计入</strong><p>纯 CI 路径、换行和依赖链接修复不会被包装成用户功能；已经回滚的界面卡顿检测器也不列为当前能力。</p></div>
+</div>
+<div class="action-rule">
+<strong>下载按钮仍然指向 Releases，而不是 main 的源码快照。</strong>
+<p>main 可能要求同一提交生成的 EXE、SYS、语言包、DynData profiles 和辅助组件；单独替换一个文件会造成协议不匹配或功能降级。</p>
+</div>
+</section>
+<section id="system-time">
+<p class="section-number">02 / SYSTEM TIME</p>
+<h2>系统级时间加速、减速与校准时钟</h2>
+<p>Miscellaneous 页新增系统时间控制链路，可在驱动侧调整系统性能计数器的时间推进速度，并提供兼容模式与带额外校验的安全模式。安全模式只能降低一部分错误配置风险，仍可能导致冻结或蓝屏。</p>
+<div class="capability-grid">
+<div><strong>控制与恢复</strong><ul><li>系统级加速或减速</li><li>倍率与模式选择</li><li>双重风险确认</li><li>停止变速并恢复原始计数器</li></ul></div>
+<div><strong>时间显示与同步</strong><ul><li>调用 Windows Time 执行重新同步</li><li>15 秒响应超时与错误诊断</li><li>按当前倍率计算校准后时间</li><li>标题栏显示系统时间和 KSword 运行时长</li></ul></div>
+</div>
+<div class="action-rule critical-rule">
+<strong>这不是应用内的“动画倍速”。</strong>
+<p>该功能影响整个系统对时间的观察。网络协议、许可证、定时任务、日志顺序、反作弊、数据库和其他依赖单调时钟的程序都可能出现异常；必须先准备恢复路径。</p>
+</div>
+<p class="source-path">对应提交：<a href="https://github.com/KSwordDEV/KSword/commit/ab93b7ebf116aa5ee4ec02614c959f8200cf8ced" rel="noreferrer" target="_blank">ab93b7e</a>、<a href="https://github.com/KSwordDEV/KSword/commit/5933bda5da40d926e6687536d5899de0af0bf8ae" rel="noreferrer" target="_blank">5933bda</a>、<a href="https://github.com/KSwordDEV/KSword/commit/8a4bd0d68605ef87275e6687a9d78d589a6023db" rel="noreferrer" target="_blank">8a4bd0d</a>、<a href="https://github.com/KSwordDEV/KSword/commit/a7127b366c0353e54c0ab170be54252c44183970" rel="noreferrer" target="_blank">a7127b3</a>、<a href="https://github.com/KSwordDEV/KSword/commit/2260e06f6171432086f5cb3ba8fe14919fce1b97" rel="noreferrer" target="_blank">2260e06</a>。</p>
+</section>
+<section id="network">
+<p class="section-number">03 / NETWORK</p>
+<h2>R0 网络审计进入 WFP 报文层</h2>
+<p>网络页不再只展示连接、端点或 WFP 事件。新协议可以从驱动侧增量读取 WFP IPv4/IPv6 IP packet 层捕获结果，并在用户态严格验证响应头、行大小、序列号、地址族、TCP/UDP 协议、报文边界和有限捕获长度。</p>
+<div class="status-table">
+<div><strong>逐包增量读取</strong><p>客户端通过 <code>afterSequence</code> 游标继续获取新包，避免每次复制完整历史。</p></div>
+<div><strong>丢包与游标诊断</strong><p>响应会区分截断、游标缺口、游标重置、驱动侧丢包和 WFP 不可用。</p></div>
+<div><strong>协议兼容判断</strong><p>旧驱动缺少新 IOCTL 时会明确标为 Unsupported；不能把空表误判为“系统没有流量”。</p></div>
+<div><strong>配套 R0 视图</strong><p>继续整合 TCP、UDP、AFD、NSI、NDIS 与 WFP inventory/cross-view，便于把逐包证据与内核对象视图关联。</p></div>
+</div>
+<div class="action-rule">
+<strong>这一页最依赖客户端与驱动同版。</strong>
+<p>新增 packet ABI、NDIS 依赖和诊断文本在连续提交中补齐。混用旧 SYS 和新 EXE 会直接触发 Unsupported、协议验证失败或字段缺失。</p>
+</div>
+<p class="source-path">对应提交：<a href="https://github.com/KSwordDEV/KSword/commit/eabec0dfd8077ae9dab8d44a73830c70533c7237" rel="noreferrer" target="_blank">eabec0d</a>、<a href="https://github.com/KSwordDEV/KSword/commit/bcb8386086edefe3946232c89f57a99c7b22d33d" rel="noreferrer" target="_blank">bcb8386</a>、<a href="https://github.com/KSwordDEV/KSword/commit/f8710df248ad2b564947202314062623cc6af378" rel="noreferrer" target="_blank">f8710df</a>、<a href="https://github.com/KSwordDEV/KSword/commit/5a46b703cf50ff1a02ff54b6abb9f9209eacd68e" rel="noreferrer" target="_blank">5a46b70</a>。</p>
+</section>
+<section id="scanner-kernel">
+<p class="section-number">04 / FORENSICS</p>
+<h2>结构化扫描、内核基线、原始文件系统与受控 HVM</h2>
+<div class="status-table">
+<div><strong>Scanner Dock</strong><p>后台解析 PE、ELF 与 Mach-O。可选字节编辑器只允许等长修改，写回前重新验证源快照，采用原子替换，并可保留备份。</p></div>
+<div><strong>高级内核取证</strong><p>增加已加载映像与 IDT 干净基线、描述符表和 IOCTL 解码、内核反汇编、系统线程与工作队列视图，以及更完整的回调和对象审计。</p></div>
+<div><strong>存储取证</strong><p>新增默认只读的原始文件系统浏览，可检查目录项、删除记录和底层存储证据；磁盘写入仍需单独解锁与确认。</p></div>
+<div><strong>HVM 诊断</strong><p>提供确认门控的 VMX 自检和一次性测试 guest，并输出 VM-exit telemetry；定位是授权实验室诊断，不是通用虚拟机。</p></div>
+</div>
+<p>这些能力与原有 DriverObject、DeviceObject、SSDT、Hook、回调、模块 Cross-view、Unloaded/PiDDB、PTE 和内存证据形成同一条取证链路。</p>
+<p class="source-path">对应提交：<a href="https://github.com/KSwordDEV/KSword/commit/8ce2b2aa5eb5d2162158eb4d8f6cf9979394ae7e" rel="noreferrer" target="_blank">8ce2b2a</a>、<a href="https://github.com/KSwordDEV/KSword/commit/7ba04ed0969aed8ded2ab33418afa2f499ea204b" rel="noreferrer" target="_blank">7ba04ed</a>、<a href="https://github.com/KSwordDEV/KSword/commit/21cc83f327f0e7a16391ad3dc8a0c0da176eb8f1" rel="noreferrer" target="_blank">21cc83f</a>、<a href="https://github.com/KSwordDEV/KSword/commit/7ff3ee8695ff14ddb7c40fb4cc36228b16c60e3f" rel="noreferrer" target="_blank">7ff3ee8</a>。</p>
+</section>
+<section id="runtime">
+<p class="section-number">05 / RUNTIME</p>
+<h2>运行时 PDB 回退、长期运行诊断与界面控制</h2>
+<ul>
+<li>随包 DynData profile 不匹配时，完整版本与 Light 版本可在串行 DbgHelp 会话中解析精确运行时 PDB；只有 PE/PDB 身份验证成功的结果才会被应用。</li>
+<li>表格新增冻结控制和平滑滚动，避免大表刷新时误选或丢失当前检查位置。</li>
+<li>Core Audio 声音来源检查扩展，便于把正在输出声音的会话关联到进程与设备。</li>
+<li>API Monitor Agent 改为可等待下一次会话、识别新 session ID，并能中断挂起的管道写入，减少停止后无法重启和退出期崩溃。</li>
+<li>磁盘性能监控、异步视图快照与驱动搜索继续修正生命周期和竞态；Release 构建也补齐 Qt runtime 部署。</li>
+</ul>
+<div class="action-rule">
+<strong>运行时 PDB 是精确回退，不是“相近版本偏移猜测”。</strong>
+<p>身份不匹配或字段不完整时，依赖该字段的 R0 能力应继续安全降级，而不是跨 Windows build 套用偏移。</p>
+</div>
+<p class="source-path">对应提交：<a href="https://github.com/KSwordDEV/KSword/commit/6943a1a309cb5332b316db76e3d26dc495f3d4c2" rel="noreferrer" target="_blank">6943a1a</a>、<a href="https://github.com/KSwordDEV/KSword/commit/4d7eb6af348696b53d78f438389d4effe72eb1fd" rel="noreferrer" target="_blank">4d7eb6a</a>、<a href="https://github.com/KSwordDEV/KSword/commit/44b21d0c2834c56e8604b4241358bf15a9eaeda9" rel="noreferrer" target="_blank">44b21d0</a>、<a href="https://github.com/KSwordDEV/KSword/commit/a323cb0c5e174b58ebcdbd902784dc52d358008b" rel="noreferrer" target="_blank">a323cb0</a>。</p>
+</section>
+<section id="hardening">
+<p class="section-number">06 / HARDENING</p>
+<h2>危险操作确认与审计边界继续收紧</h2>
+<div class="status-table">
+<div><strong>进程终止</strong><p>结束进程树、关键目标等破坏性终止动作增加明确确认，降低一次误点影响多个目标的概率。</p></div>
+<div><strong>启动项与永久删除</strong><p>执行前重新验证当前目标；机器级启动项停放、注册表恢复记录和删除动作强化访问控制与恢复事务。</p></div>
+<div><strong>进程与线程身份</strong><p>历史进程记录、线程动作、工作队列审计和异步菜单刷新改为使用更稳定的身份快照，并修复退出/刷新期间的生命周期竞态。</p></div>
+<div><strong>平台与内核基线</strong><p>加载映像、平台安全、目录服务、回调与硬件审计增加边界验证，避免把不可信内核数据直接当作可遍历对象。</p></div>
+</div>
+<p class="source-path">代表提交：<a href="https://github.com/KSwordDEV/KSword/commit/c02d2e07416c18b3c59e1945877404941770a5ed" rel="noreferrer" target="_blank">c02d2e0</a>、<a href="https://github.com/KSwordDEV/KSword/commit/8be550b0e6f8a0223d901a0cc6f8b79d33a8c6c6" rel="noreferrer" target="_blank">8be550b</a>、<a href="https://github.com/KSwordDEV/KSword/commit/82e6264a3b21538c3fa3d5bd1824a7c187ee17ed" rel="noreferrer" target="_blank">82e6264</a>、<a href="https://github.com/KSwordDEV/KSword/commit/cfca4cc2283778ce1ee135656bc1604954534e2f" rel="noreferrer" target="_blank">cfca4cc</a>、<a href="https://github.com/KSwordDEV/KSword/commit/7ef837004e02d32e1c432ed498f977f34609e707" rel="noreferrer" target="_blank">7ef8370</a>。</p>
+</section>
+<section id="removed">
+<p class="section-number">07 / REVERTED</p>
+<h2>界面卡顿检测器已经移除</h2>
+<p><code>cae1cb4</code> 曾加入可取消的 UI 卡顿检测器，但随后 <code>dfc7134</code> 从工程、设置、主窗口和语言包中完整移除该功能。因此本网站不会把它列入当前核心能力。</p>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/commit/cae1cb408e948f2f8ffe521492e9cf3c66c5c953" rel="noreferrer" target="_blank">查看加入提交 ↗</a><a href="https://github.com/KSwordDEV/KSword/commit/dfc7134886024b4538e1894350d1ad7c15b4a8a0" rel="noreferrer" target="_blank">查看移除提交 ↗</a></div>
+</section>
+<section id="operator">
+<p class="section-number">08 / OPERATOR NOTES</p>
+<h2>在 main 上测试前必须知道的事</h2>
+<ol class="procedure numbered-procedure">
+<li><span>1</span><div><strong>整套构建必须来自同一提交。</strong><p>尤其是主程序、KswordARK.sys、共享 IOCTL 头、语言包和 DynData profiles。</p></div></li>
+<li><span>2</span><div><strong>先验证 Driver Status 和 Capability。</strong><p>按钮可见不代表目标 IOCTL、PDB 字段或内核能力已就绪。</p></div></li>
+<li><span>3</span><div><strong>系统时间、HVM、磁盘写入和内核修改只在授权环境中测试。</strong><p>准备虚拟机快照、恢复介质或至少一条可验证的回滚路径。</p></div></li>
+<li><span>4</span><div><strong>要稳定资产就使用 Releases。</strong><p>本页不会把 main 的开发状态伪装成一个不存在的正式版本号。</p></div></li>
+</ol>
+</section>
+<section id="commits">
+<p class="section-number">09 / COMMIT INDEX</p>
+<h2>关键提交索引</h2>
+<div class="link-rows">
+<a href="https://github.com/KSwordDEV/KSword/commit/f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47" rel="noreferrer" target="_blank"><strong>f92f0fc</strong><span>当前快照 HEAD</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/a7127b366c0353e54c0ab170be54252c44183970" rel="noreferrer" target="_blank"><strong>a7127b3</strong><span>时间同步模式与校准时钟</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/bcb8386086edefe3946232c89f57a99c7b22d33d" rel="noreferrer" target="_blank"><strong>bcb8386</strong><span>R0 WFP 报文层抓取</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/eabec0dfd8077ae9dab8d44a73830c70533c7237" rel="noreferrer" target="_blank"><strong>eabec0d</strong><span>Scanner 与 R0 网络 inventories</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/7ba04ed0969aed8ded2ab33418afa2f499ea204b" rel="noreferrer" target="_blank"><strong>7ba04ed</strong><span>高级内核与存储取证</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/21cc83f327f0e7a16391ad3dc8a0c0da176eb8f1" rel="noreferrer" target="_blank"><strong>21cc83f</strong><span>原始文件系统与受控 HVM guest</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/6943a1a309cb5332b316db76e3d26dc495f3d4c2" rel="noreferrer" target="_blank"><strong>6943a1a</strong><span>运行时 PDB offset 回退</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/44b21d0c2834c56e8604b4241358bf15a9eaeda9" rel="noreferrer" target="_blank"><strong>44b21d0</strong><span>运行时诊断与音频检查</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/c02d2e07416c18b3c59e1945877404941770a5ed" rel="noreferrer" target="_blank"><strong>c02d2e0</strong><span>破坏性进程终止确认</span></a>
+</div>
+</section>
+</div>
+</div>
+</section>
+<section class="notice">
+<div class="wrap two-column"><h2>授权与风险边界</h2><p>KSword 包含内核调试、系统时间修改、HVM、磁盘与进程控制能力。仅在你拥有合法授权的设备和环境中使用；任何写入或破坏性动作前都应确认目标身份、影响范围和恢复路径。</p></div>
+</section>
+</main>
+<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">首页</a><a href="changelog.html">正式版本</a><a href="docs/index.html">文档</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+</body>
+</html>

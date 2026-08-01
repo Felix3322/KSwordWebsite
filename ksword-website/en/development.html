@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="A KSword main-branch development snapshot after 5.1.2.4, covering system-time control, R0 WFP capture, scanning, kernel and storage forensics, runtime diagnostics, and safety hardening." name="description"/>
+<title>Main Branch Development Snapshot — KSword</title>
+<link href="../styles.css" rel="stylesheet"/>
+<link href="../development.html" hreflang="zh-CN" rel="alternate"/>
+</head>
+<body>
+<header class="site-header">
+<div class="wrap header-row">
+<a aria-label="Back to homepage" class="wordmark" href="index.html">KSWORD <span>/ MAIN</span></a>
+<nav aria-label="Primary navigation">
+<a href="index.html">Home</a>
+<a aria-current="page" href="development.html">Development</a>
+<a href="changelog.html">Releases</a>
+<a href="docs/index.html">Documentation</a>
+<a href="../development.html" hreflang="zh-CN">中文</a>
+<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
+</nav>
+</div>
+</header>
+<main>
+<section class="page-hero compact">
+<div class="wrap">
+<p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT</p>
+<h1>Latest KSword development changes</h1>
+<p class="lead">Compiled from <code>KSwordDEV/KSword@f92f0fc</code>. The commit was recorded at 2026-08-01 03:10 UTC, which was 2026-07-31 23:10 in Toronto. This page describes <code>main</code>; it is not a new Release.</p>
+<div class="actions">
+<a class="primary" href="https://github.com/KSwordDEV/KSword/commit/f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47" rel="noreferrer" target="_blank">Open snapshot HEAD</a>
+<a href="https://github.com/KSwordDEV/KSword/commits/main" rel="noreferrer" target="_blank">Follow main</a>
+<a href="https://github.com/KSwordDEV/KSword/releases/latest" rel="noreferrer" target="_blank">Formal release assets</a>
+</div>
+</div>
+</section>
+<section class="section compact-section">
+<div class="wrap docs-layout">
+<aside aria-label="Page contents" class="side-index">
+<strong>On this page</strong>
+<a href="#scope">Snapshot boundary</a>
+<a href="#system-time">System-time control</a>
+<a href="#network">R0 network capture</a>
+<a href="#scanner-kernel">Scanner, kernel, storage</a>
+<a href="#runtime">Runtime and UI</a>
+<a href="#hardening">Safety hardening</a>
+<a href="#removed">Removed work</a>
+<a href="#operator">Operator notes</a>
+<a href="#commits">Commit index</a>
+</aside>
+<div class="document-content operator-manual">
+<section id="scope">
+<p class="section-number">01 / SCOPE</p>
+<h2>This is a development snapshot, not 5.1.2.5</h2>
+<div class="status-table">
+<div><strong>Comparison baseline</strong><p>The website's formal history currently ends at <code>5.1.2.4</code>. This page documents later work on <code>main</code> without rewriting existing Release records.</p></div>
+<div><strong>Snapshot HEAD</strong><p><code>f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47</code></p></div>
+<div><strong>Time conversion</strong><p>The Git timestamp is 2026-08-01 03:10 UTC; it was still 2026-07-31 in America/Toronto.</p></div>
+<div><strong>Excluded from highlights</strong><p>CI paths, line-ending changes, and dependency-link fixes are not presented as user features. The UI stall detector was later removed and is not advertised as current functionality.</p></div>
+</div>
+<div class="action-rule">
+<strong>The download button still points to Releases, not a main-branch source snapshot.</strong>
+<p>A main build may require the EXE, SYS, language packs, DynData profiles, and helpers produced from the same commit. Replacing one file can cause protocol mismatches or partial capability loss.</p>
+</div>
+</section>
+<section id="system-time">
+<p class="section-number">02 / SYSTEM TIME</p>
+<h2>System-wide acceleration, slowdown, and a calibrated clock</h2>
+<p>The Miscellaneous workspace now contains a system-time control path that changes how the system performance counter advances. It offers a compatibility mode and a guarded mode with extra validation. Guarded mode reduces some configuration risk but can still freeze or crash the system.</p>
+<div class="capability-grid">
+<div><strong>Control and recovery</strong><ul><li>System-wide acceleration or slowdown</li><li>Selectable factor and implementation mode</li><li>Two-stage risk confirmation</li><li>Stop and restore the original counter</li></ul></div>
+<div><strong>Display and synchronization</strong><ul><li>Request a Windows Time resynchronization</li><li>15-second timeout and error diagnostics</li><li>Show time calibrated against the current factor</li><li>Display system time and KSword runtime in the title bar</li></ul></div>
+</div>
+<div class="action-rule critical-rule">
+<strong>This is not an in-app animation-speed control.</strong>
+<p>It changes the entire system's observation of time. Network protocols, licensing, scheduled tasks, logs, anti-cheat systems, databases, and software that depends on monotonic clocks may fail. Prepare a tested recovery path first.</p>
+</div>
+<p class="source-path">Related commits: <a href="https://github.com/KSwordDEV/KSword/commit/ab93b7ebf116aa5ee4ec02614c959f8200cf8ced" rel="noreferrer" target="_blank">ab93b7e</a>, <a href="https://github.com/KSwordDEV/KSword/commit/5933bda5da40d926e6687536d5899de0af0bf8ae" rel="noreferrer" target="_blank">5933bda</a>, <a href="https://github.com/KSwordDEV/KSword/commit/8a4bd0d68605ef87275e6687a9d78d589a6023db" rel="noreferrer" target="_blank">8a4bd0d</a>, <a href="https://github.com/KSwordDEV/KSword/commit/a7127b366c0353e54c0ab170be54252c44183970" rel="noreferrer" target="_blank">a7127b3</a>, and <a href="https://github.com/KSwordDEV/KSword/commit/2260e06f6171432086f5cb3ba8fe14919fce1b97" rel="noreferrer" target="_blank">2260e06</a>.</p>
+</section>
+<section id="network">
+<p class="section-number">03 / NETWORK</p>
+<h2>R0 network auditing now reaches WFP packet layers</h2>
+<p>The Network workspace is no longer limited to connections, endpoints, or WFP events. A new protocol incrementally reads WFP IPv4/IPv6 IP-packet-layer captures from the driver, while user mode validates response headers, row sizes, sequences, address families, TCP/UDP protocols, packet bounds, and bounded capture lengths.</p>
+<div class="status-table">
+<div><strong>Incremental packet retrieval</strong><p>The client advances an <code>afterSequence</code> cursor instead of copying the complete history on each refresh.</p></div>
+<div><strong>Drop and cursor diagnostics</strong><p>Responses distinguish truncation, cursor gaps, cursor resets, driver-side drops, and WFP unavailability.</p></div>
+<div><strong>Protocol compatibility</strong><p>An older driver without the new IOCTL is reported as Unsupported. An empty table must not be interpreted as proof that the system has no traffic.</p></div>
+<div><strong>Related R0 inventories</strong><p>TCP, UDP, AFD, NSI, NDIS, and WFP inventory/cross-view pages remain available to correlate packet evidence with kernel objects.</p></div>
+</div>
+<div class="action-rule">
+<strong>This is one of the features most sensitive to client/driver version mixing.</strong>
+<p>The packet ABI, NDIS dependencies, and diagnostics were completed across consecutive commits. A new EXE with an old SYS can produce Unsupported results, protocol-validation errors, or missing fields.</p>
+</div>
+<p class="source-path">Related commits: <a href="https://github.com/KSwordDEV/KSword/commit/eabec0dfd8077ae9dab8d44a73830c70533c7237" rel="noreferrer" target="_blank">eabec0d</a>, <a href="https://github.com/KSwordDEV/KSword/commit/bcb8386086edefe3946232c89f57a99c7b22d33d" rel="noreferrer" target="_blank">bcb8386</a>, <a href="https://github.com/KSwordDEV/KSword/commit/f8710df248ad2b564947202314062623cc6af378" rel="noreferrer" target="_blank">f8710df</a>, and <a href="https://github.com/KSwordDEV/KSword/commit/5a46b703cf50ff1a02ff54b6abb9f9209eacd68e" rel="noreferrer" target="_blank">5a46b70</a>.</p>
+</section>
+<section id="scanner-kernel">
+<p class="section-number">04 / FORENSICS</p>
+<h2>Structured scanning, kernel baselines, raw filesystems, and controlled HVM</h2>
+<div class="status-table">
+<div><strong>Scanner Dock</strong><p>Background parsing covers PE, ELF, and Mach-O. The optional byte editor accepts only length-preserving changes, revalidates the source snapshot, performs an atomic replacement, and can retain a backup.</p></div>
+<div><strong>Advanced kernel forensics</strong><p>Loaded-image and IDT clean baselines, descriptor-table and IOCTL decoding, kernel disassembly, system-thread and work-queue views, and broader callback/object auditing have been added.</p></div>
+<div><strong>Storage forensics</strong><p>A read-only-by-default raw-filesystem browser can inspect directory entries, deleted records, and low-level storage evidence. Disk writes remain separately locked and confirmation-gated.</p></div>
+<div><strong>HVM diagnostics</strong><p>A confirmation-gated VMX self-test and one-shot test guest produce VM-exit telemetry. This is an authorized-lab diagnostic path, not a general-purpose virtual machine.</p></div>
+</div>
+<p>These capabilities extend the existing DriverObject, DeviceObject, SSDT, hook, callback, module cross-view, Unloaded/PiDDB, PTE, and memory-evidence workflow.</p>
+<p class="source-path">Related commits: <a href="https://github.com/KSwordDEV/KSword/commit/8ce2b2aa5eb5d2162158eb4d8f6cf9979394ae7e" rel="noreferrer" target="_blank">8ce2b2a</a>, <a href="https://github.com/KSwordDEV/KSword/commit/7ba04ed0969aed8ded2ab33418afa2f499ea204b" rel="noreferrer" target="_blank">7ba04ed</a>, <a href="https://github.com/KSwordDEV/KSword/commit/21cc83f327f0e7a16391ad3dc8a0c0da176eb8f1" rel="noreferrer" target="_blank">21cc83f</a>, and <a href="https://github.com/KSwordDEV/KSword/commit/7ff3ee8695ff14ddb7c40fb4cc36228b16c60e3f" rel="noreferrer" target="_blank">7ff3ee8</a>.</p>
+</section>
+<section id="runtime">
+<p class="section-number">05 / RUNTIME</p>
+<h2>Runtime PDB fallback, long-running diagnostics, and interaction controls</h2>
+<ul>
+<li>When packaged DynData does not match, the full and Light applications can resolve an exact runtime PDB in a serialized DbgHelp session. Results are applied only after PE/PDB identity validation succeeds.</li>
+<li>Tables gain freeze controls and smooth scrolling to reduce accidental selection changes and preserve the current inspection point during large refreshes.</li>
+<li>Core Audio source inspection has expanded so active audio sessions can be correlated with processes and devices.</li>
+<li>The API Monitor Agent can wait for another session, detect a new session ID, and interrupt pending pipe writes, reducing failed restarts and shutdown-time crashes.</li>
+<li>Disk-performance monitoring, asynchronous view snapshots, and driver search received further lifetime and race fixes; Release output also deploys the Qt runtime.</li>
+</ul>
+<div class="action-rule">
+<strong>Runtime PDB is an exact fallback, not a “nearby Windows build” offset guess.</strong>
+<p>When identity or required fields do not match, dependent R0 capabilities must remain safely degraded instead of borrowing offsets across builds.</p>
+</div>
+<p class="source-path">Related commits: <a href="https://github.com/KSwordDEV/KSword/commit/6943a1a309cb5332b316db76e3d26dc495f3d4c2" rel="noreferrer" target="_blank">6943a1a</a>, <a href="https://github.com/KSwordDEV/KSword/commit/4d7eb6af348696b53d78f438389d4effe72eb1fd" rel="noreferrer" target="_blank">4d7eb6a</a>, <a href="https://github.com/KSwordDEV/KSword/commit/44b21d0c2834c56e8604b4241358bf15a9eaeda9" rel="noreferrer" target="_blank">44b21d0</a>, and <a href="https://github.com/KSwordDEV/KSword/commit/a323cb0c5e174b58ebcdbd902784dc52d358008b" rel="noreferrer" target="_blank">a323cb0</a>.</p>
+</section>
+<section id="hardening">
+<p class="section-number">06 / HARDENING</p>
+<h2>Destructive-action confirmation and audit boundaries keep tightening</h2>
+<div class="status-table">
+<div><strong>Process termination</strong><p>Destructive tree and critical-target termination paths now require explicit confirmation, reducing the blast radius of a single mistaken action.</p></div>
+<div><strong>Startup and permanent deletion</strong><p>Targets are revalidated immediately before execution. Machine-level startup parking, registry recovery records, and delete operations have stronger access control and recovery transactions.</p></div>
+<div><strong>Process and thread identity</strong><p>Historical processes, thread actions, work-queue auditing, and asynchronous context-menu refreshes use more stable identity snapshots and close refresh/shutdown lifetime races.</p></div>
+<div><strong>Platform and kernel baselines</strong><p>Loaded-image, platform-security, directory-service, callback, and hardware audits validate trust boundaries before traversing kernel-provided data.</p></div>
+</div>
+<p class="source-path">Representative commits: <a href="https://github.com/KSwordDEV/KSword/commit/c02d2e07416c18b3c59e1945877404941770a5ed" rel="noreferrer" target="_blank">c02d2e0</a>, <a href="https://github.com/KSwordDEV/KSword/commit/8be550b0e6f8a0223d901a0cc6f8b79d33a8c6c6" rel="noreferrer" target="_blank">8be550b</a>, <a href="https://github.com/KSwordDEV/KSword/commit/82e6264a3b21538c3fa3d5bd1824a7c187ee17ed" rel="noreferrer" target="_blank">82e6264</a>, <a href="https://github.com/KSwordDEV/KSword/commit/cfca4cc2283778ce1ee135656bc1604954534e2f" rel="noreferrer" target="_blank">cfca4cc</a>, and <a href="https://github.com/KSwordDEV/KSword/commit/7ef837004e02d32e1c432ed498f977f34609e707" rel="noreferrer" target="_blank">7ef8370</a>.</p>
+</section>
+<section id="removed">
+<p class="section-number">07 / REVERTED</p>
+<h2>The UI stall detector has been removed</h2>
+<p><code>cae1cb4</code> introduced a cancellable UI stall detector, but <code>dfc7134</code> subsequently removed it from the project, settings, main window, and language packs. The website therefore does not list it as a current capability.</p>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/commit/cae1cb408e948f2f8ffe521492e9cf3c66c5c953" rel="noreferrer" target="_blank">Open introduction commit ↗</a><a href="https://github.com/KSwordDEV/KSword/commit/dfc7134886024b4538e1894350d1ad7c15b4a8a0" rel="noreferrer" target="_blank">Open removal commit ↗</a></div>
+</section>
+<section id="operator">
+<p class="section-number">08 / OPERATOR NOTES</p>
+<h2>What to know before testing main</h2>
+<ol class="procedure numbered-procedure">
+<li><span>1</span><div><strong>Build the complete package from one commit.</strong><p>This especially applies to the main application, KswordARK.sys, shared IOCTL headers, language packs, and DynData profiles.</p></div></li>
+<li><span>2</span><div><strong>Check Driver Status and Capability first.</strong><p>A visible control does not prove that the target IOCTL, PDB field, or kernel capability is available.</p></div></li>
+<li><span>3</span><div><strong>Test system time, HVM, disk writes, and kernel mutation only in an authorized environment.</strong><p>Prepare a VM snapshot, recovery media, or another tested rollback path.</p></div></li>
+<li><span>4</span><div><strong>Use Releases when you need stable assets.</strong><p>This page does not disguise main-branch development as a formal version number that does not exist.</p></div></li>
+</ol>
+</section>
+<section id="commits">
+<p class="section-number">09 / COMMIT INDEX</p>
+<h2>Key commit index</h2>
+<div class="link-rows">
+<a href="https://github.com/KSwordDEV/KSword/commit/f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47" rel="noreferrer" target="_blank"><strong>f92f0fc</strong><span>Current snapshot HEAD</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/a7127b366c0353e54c0ab170be54252c44183970" rel="noreferrer" target="_blank"><strong>a7127b3</strong><span>Time synchronization modes and calibrated clock</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/bcb8386086edefe3946232c89f57a99c7b22d33d" rel="noreferrer" target="_blank"><strong>bcb8386</strong><span>R0 WFP packet-layer capture</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/eabec0dfd8077ae9dab8d44a73830c70533c7237" rel="noreferrer" target="_blank"><strong>eabec0d</strong><span>Scanner and R0 network inventories</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/7ba04ed0969aed8ded2ab33418afa2f499ea204b" rel="noreferrer" target="_blank"><strong>7ba04ed</strong><span>Advanced kernel and storage forensics</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/21cc83f327f0e7a16391ad3dc8a0c0da176eb8f1" rel="noreferrer" target="_blank"><strong>21cc83f</strong><span>Raw filesystem browsing and controlled HVM guest</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/6943a1a309cb5332b316db76e3d26dc495f3d4c2" rel="noreferrer" target="_blank"><strong>6943a1a</strong><span>Runtime PDB offset fallback</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/44b21d0c2834c56e8604b4241358bf15a9eaeda9" rel="noreferrer" target="_blank"><strong>44b21d0</strong><span>Runtime diagnostics and audio inspection</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/c02d2e07416c18b3c59e1945877404941770a5ed" rel="noreferrer" target="_blank"><strong>c02d2e0</strong><span>Destructive process-termination confirmation</span></a>
+</div>
+</section>
+</div>
+</div>
+</section>
+<section class="notice">
+<div class="wrap two-column"><h2>Authorization and risk boundary</h2><p>KSword includes kernel debugging, system-time mutation, HVM, disk, and process-control capabilities. Use it only on systems and environments you are authorized to inspect. Confirm target identity, impact scope, and a recovery path before any write or destructive operation.</p></div>
+</section>
+</main>
+<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">Home</a><a href="changelog.html">Releases</a><a href="docs/index.html">Documentation</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+</body>
+</html>
