@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 全部 Release、patch 与真实 Diff 更新日志。" name="description"/>
+<meta content="KSword 当前 15 个 GitHub Release、版本 Diff 与 main 分支开发快照。" name="description"/>
 <title>完整更新日志 — KSword</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/changelog.html" hreflang="en" rel="alternate"/>
@@ -50,18 +50,48 @@
 </nav>
 </div>
 </header>
-<main>
-<section class="page-hero compact">
-<div class="wrap">
-<p class="kicker">RELEASE HISTORY</p>
-<h1>完整更新日志</h1>
-<p class="lead">包含全部 9 个 GitHub Release。每一项同时参考 Release 描述、当前 patch、上一个 Release patch 的真实 Diff 和相关提交；无法比较的历史断点会明确标注。</p>
-</div>
-</section>
-<section class="section compact-section">
-<div class="wrap docs-layout">
-<aside aria-label="版本目录" class="side-index"><strong>版本</strong><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside>
-<div class="release-history">
+<main><section class="page-hero compact"><div class="wrap"><p class="kicker">RELEASE HISTORY</p><h1>完整更新日志</h1><p class="lead">本页整理当前可见的 15 个 GitHub Release，并保留每个版本的 tag、比较范围和实际更新。2026-08-16 的 main 尚未形成新的 Release，请查看<a href="development.html">主线开发快照</a>。</p></div></section><section class="section compact-section"><div class="wrap docs-layout"><aside aria-label="版本索引" class="side-index"><strong>版本</strong><a href="#release-160944d">5.1.3.0-1</a><a href="#release-9b2b0e6">5.1.3.0-2</a><a href="#release-f477355">5.1.3.0</a><a href="#release-f40fca0">5.1.4.0</a><a href="#release-8f12a6c">5.1.5.0-pre</a><a href="#release-6631344">5.1.4.1-Alpha</a><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside><div class="release-history"><article class="release-entry" id="release-160944d">
+<header class="release-entry-head"><div><p class="section-number">2026-07-22</p><h2>KswordARK 评估版本 5.1.3.0-1 Alpha</h2></div><strong class="release-badge">5.1.3.0-1</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.2.4</strong></div><div><span>当前 tag</span><strong>5.1.3.0-1</strong></div><div><span>Patch</span><code>160944d</code></div><div><span>提交数量</span><strong>43</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>全面优化界面视觉与布局，默认启用文字和界面抗锯齿，主程序默认取消置顶。</li><li>重大优化进程页面卡顿，并覆盖硬盘采样、网络抓包、连接管理、多线程下载、进程追踪、WinAPI、直接内核调用和内存二次扫描等刷新路径。</li><li>修复并优化 R0 注册表相关功能，完善驱动结束线程能力，并优化 Light 版结束进程能力。</li><li>调整 QADS 触发流程，优化测试模式设置、计划任务启动项删除和文件接管所有权操作。</li><li>优化 Release 体积并更新项目说明文档。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>这是 5.1.3.0 系列的首个公开评估版本；后续 -2 与正式版继续在同一主线补充底层枚举、进程动作和性能改进。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0-1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.2.4...5.1.3.0-1" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
+<article class="release-entry" id="release-9b2b0e6">
+<header class="release-entry-head"><div><p class="section-number">2026-07-24</p><h2>KswordARK 评估版本 5.1.3.0-2 Beta</h2></div><strong class="release-badge">5.1.3.0-2</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0-1</strong></div><div><span>当前 tag</span><strong>5.1.3.0-2</strong></div><div><span>Patch</span><code>9b2b0e6</code></div><div><span>提交数量</span><strong>77</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>右键菜单支持结束进程树。</li><li>新增 IPC 枚举、IDT/GDT 枚举、GUI 句柄、窗口定时器和 DPC 相关能力。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>Release 原文以新增功能清单为主；比较链接保留了这一 Beta 与前一 Alpha 的真实 tag 关系。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0-2" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0-1...5.1.3.0-2" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
+<article class="release-entry" id="release-f477355">
+<header class="release-entry-head"><div><p class="section-number">2026-07-25</p><h2>KswordARK 5.1.3.0 正式版</h2></div><strong class="release-badge">5.1.3.0</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0-2</strong></div><div><span>当前 tag</span><strong>5.1.3.0</strong></div><div><span>Patch</span><code>f477355</code></div><div><span>提交数量</span><strong>13</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>增强并重新布局进程详细信息，加入进程历史性能与 CPU 亲和性设置。</li><li>简化 ETW 筛选器，强化 ETW 监控采集 UI，面向高吞吐数据保持响应。</li><li>为所有表格增加历史比对和导出能力。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>Release 原文为简短更新摘要；此处保留其明确列出的功能，不把后续 main 提交倒灌进正式版。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0-2...5.1.3.0" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
+<article class="release-entry" id="release-f40fca0">
+<header class="release-entry-head"><div><p class="section-number">2026-07-29</p><h2>KswordARK 5.1.4.0 正式版</h2></div><strong class="release-badge">5.1.4.0</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0</strong></div><div><span>当前 tag</span><strong>5.1.4.0</strong></div><div><span>Patch</span><code>f40fca0</code></div><div><span>提交数量</span><strong>41</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>新增 Cheat Engine 可执行插件，提供主题化启动、KSword 内存访问桥接、市场安装进度和更新提示。</li><li>增强 HTTPS 分析：展示关联进程、请求/响应事件、内容类型、TLS/ALPN、耗时及上下行流量，并支持筛选、统计、清空和 CSV 导出；停止后可恢复系统代理。</li><li>进程亲和性规则支持按完整程序路径持久化，核心按 P 核、E 核和逻辑线程拓扑标识；新增定向监控的启动后挂起。</li><li>业务表格增加转到进程详情入口；窗口工具增强全局热键查看；新增 Shell 文件关联管理。</li><li>新增全局自定义主题色与字体，接入多项权限提升提示，并修复启动初始化、设置卡顿、浅色主题和 CPU 监控显示问题。</li><li>增加 Windows 自动化验证、驱动构建和发行目录校验，子项目构建改为按变更触发。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>这是当前 GitHub Releases 中的最新正式稳定版本；其后的 Alpha 和 pre 版本以及 main 快照均应按预发行或开发状态理解。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.0" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0...5.1.4.0" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
+<article class="release-entry" id="release-8f12a6c">
+<header class="release-entry-head"><div><p class="section-number">2026-08-08</p><h2>KswordARK 5.1.5.0-pre</h2></div><strong class="release-badge">5.1.5.0-pre</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.4.0</strong></div><div><span>当前 tag</span><strong>5.1.5.0-pre</strong></div><div><span>Patch</span><code>8f12a6c</code></div><div><span>提交数量</span><strong>304</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>新增 R0 线程挂起/实验性终止、系统线程和 Kernel Work Queue 视图，并强化线程、ETHREAD、APC、回调和驱动卸载生命周期。</li><li>增强 R0 强制卸载、卸载驱动证据、PiDDB 清理、内核模块内存转储、驱动加载策略诊断和签名/Trust Validation。</li><li>扩展 HAL、WDF/KMDF、Legacy File System Filter、i8042prt、IDT/GDT、IOCTL 解码和网络 WFP/DNS/HTTPS 审计。</li><li>增强 MFT 恢复、Shell 文件关联、Window Band/Z-order/DWM/Window Station 诊断、表格冻结、平滑滚动、主题和字体恢复。</li><li>修复高频表格、代理恢复、插件许可证变化、ETW 筛选导入、PID 复用、R0 错误回调和多项内核并发问题。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>这是预发行快照，不是稳定版；Release 描述还保留了冻结窗格实验性、个别 Error 31 和部分字段提示等已知限制。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.5.0-pre" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.4.0...5.1.5.0-pre" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
+<article class="release-entry" id="release-6631344">
+<header class="release-entry-head"><div><p class="section-number">2026-08-10</p><h2>KswordARK 评估版本 5.1.4.1-Alpha</h2></div><strong class="release-badge">5.1.4.1-Alpha</strong></header>
+<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.5.0-pre</strong></div><div><span>当前 tag</span><strong>5.1.4.1-Alpha</strong></div><div><span>Patch</span><code>6631344</code></div><div><span>提交数量</span><strong>124</strong></div></div>
+<h3>实际变更</h3><ul class="update-list"><li>新增 IDT、代码完整性、VBS/HVCI 姿态、页保护、SLAT/IOMMU、EPT/NPT、Hypervisor CPUID 和 DMAR/IVRS 交叉审计。</li><li>新增 HAL、WDF/KMDF、i8042prt、对象类型、特殊回调、IoTimer、系统线程、工作队列、描述符表和 IOCTL 解码能力。</li><li>新增 MFT/IRP、R0 目录、五档删除、原始文件系统、物理扇区读取和文件恢复实时筛选。</li><li>增强进程列与自定义视图、进程保护、窗口 DWM 合成、剪贴板/捕获保护/层级诊断/热键探测。</li><li>新增 WFP 报文捕获与控制、系统时间和校准时钟、转储归因、BugCheck 保护、CPU 电源控制、渲染基准与 Light 模块。</li><li>补强 METHOD_BUFFERED 快照、驱动卸载、回调、APC、ETW、网络、进程和文件操作的确认、超时、回滚和 fail-closed 语义。</li></ul>
+<div class="release-note"><strong>Release 描述与校正</strong><p>该 Alpha tag 之后 main 仍继续提交；当前主线的新增内容请看开发快照页面。</p></div>
+<div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.1-Alpha" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.5.0-pre...5.1.4.1-Alpha" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
+</article>
 <article class="release-entry" id="release-15b2842">
 <header class="release-entry-head">
 <div><p class="section-number">2026-07-16</p><h2>KSwordARK Evaluation Version 5.1.2.4 — Signed R0</h2></div>
@@ -206,10 +236,8 @@
 <div class="release-note"><strong>Release 描述与校正</strong><p>这是发布历史起点，没有更早 Release 可进行比较。</p></div>
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/内部测试发行版" rel="noreferrer" target="_blank">Release ↗</a></div>
 </article>
-</div>
-</div>
-</section>
-</main>
+
+</div></div></section></main>
 <footer><div class="wrap footer-row"><span>KSWORD / 5.1</span><div class="footer-links"><a href="docs/index.html">文档</a><a href="changelog.html">更新日志</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
 </body>
 </html>

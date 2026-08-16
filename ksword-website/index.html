@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 是面向 Windows 的开源 ARK、内核调试与系统取证工具集。" name="description"/>
+<meta content="KSword 是面向 Windows 的源码公开 ARK、内核调试与系统取证工具集；主页同步 main 分支最新开发能力。" name="description"/>
 <title>KSword — Windows ARK 与内核分析工具集</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/index.html" hreflang="en" rel="alternate"/>
@@ -45,6 +45,7 @@
 <nav aria-label="主导航">
 <a aria-current="page" href="index.html">首页</a>
 <a href="changelog.html">更新日志</a>
+<a href="development.html">开发快照</a>
 <a href="docs/index.html">文档</a>
 <a href="en/index.html" hreflang="en">English</a>
 <a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
@@ -55,15 +56,19 @@
 <div class="git-timeline-inner">
 <p class="section-number">MAIN / LIVE PATCHES</p>
 <h2 id="git-timeline-title">实时 Patch</h2>
-<ol class="git-commit-list" data-git-timeline-list="">
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/16bacd6c76fc31c47f0bbeb15ca7436ea7f3d3aa" rel="noreferrer" target="_blank"><code>16bacd6</code><span>增加功能级权限提升提示</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/daff8d0c94d713c792f4d700d528215d8c8062af" rel="noreferrer" target="_blank"><code>daff8d0</code><span>修复表格背景</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/0dfd6ab8765d57843d4f24c5233455477fa558bd" rel="noreferrer" target="_blank"><code>0dfd6ab</code><span>提示功能所需的权限提升</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/9a9517a43359a54bafe1f33c99d5c9d2dd12059d" rel="noreferrer" target="_blank"><code>9a9517a</code><span>验证 Launcher 输出路径</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/22a04ef773a07f83c2359696f9339e8cf04e526d" rel="noreferrer" target="_blank"><code>22a04ef</code><span>补充 Launcher profile 测试数据</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/e11b1e839f209a03ebbfada4f65566a0a732c4e3" rel="noreferrer" target="_blank"><code>e11b1e8</code><span>修复 Qt 6 后缀索引类型</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/5e6704adc2bd295d9ec7211a8eaba3eb5532862d" rel="noreferrer" target="_blank"><code>5e6704a</code><span>新增 Windows CI 验证流程</span></a></li>
-</ol>
+<ol class="git-commit-list" data-git-timeline-list=""><li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank"><code>848b6bb</code><span>更新许可证信息和项目说明</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/f5de4e5fa52479c9e99750ced7e9e4cbdace8308" rel="noreferrer" target="_blank"><code>f5de4e5</code><span>澄清源码公开许可证与第三方归属说明</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/1cd1a8961a7dc4a36a6d2939c366ce2a43b95b9f" rel="noreferrer" target="_blank"><code>1cd1a89</code><span>更新至 KSword Community Source License v1.6</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/db2b6562709d6d83e509a6a89509d4e26caa2884" rel="noreferrer" target="_blank"><code>db2b656</code><span>新增自适应表格搜索范围</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/629fcadafe5c4e456f8788dce65cfbd8b4d81f68" rel="noreferrer" target="_blank"><code>629fcad</code><span>进程页显示目标线程消息钩子</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/d5138325cef820e8d9dfc86fb09031bfb5ba2f12" rel="noreferrer" target="_blank"><code>d513832</code><span>优化任务栏通知展示和筛选</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/1145b37f3f972a34ed84e82308cab8139ae10811" rel="noreferrer" target="_blank"><code>1145b37</code><span>将进程表头排序改为扁平列表</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/72f1030ae5d3964c420f18531f95ae2ec6c185b8" rel="noreferrer" target="_blank"><code>72f1030</code><span>支持表格表头排序并调整蓝屏面板</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/dabe6fb77993849803ed845377468c59589e2a80" rel="noreferrer" target="_blank"><code>dabe6fb</code><span>新增故障闭合的物理机蓝屏面板</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a9c65a20bd804bcbc06c790c4691e20a8e204cd2" rel="noreferrer" target="_blank"><code>a9c65a2</code><span>检测 DLL 劫持候选项</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/ecaeaa335726199bb8d571b33132baea4939c4f3" rel="noreferrer" target="_blank"><code>ecaeaa3</code><span>检测 IFEO 镜像劫持</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/78d899a395ff68f300a9cdb46cfdc0144ea2182b" rel="noreferrer" target="_blank"><code>78d899a</code><span>检测 EXIT GhostSystemDriver 攻击链</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/61edf8a6126f7ee622efc87cd8fbcde0cd50b84c" rel="noreferrer" target="_blank"><code>61edf8a</code><span>新增转储分析崩溃上下文</span></a></li></ol>
 <p class="git-timeline-status" data-git-timeline-status="">正在读取 main…</p><a class="git-history-link" href="https://github.com/KSwordDEV/KSword/commits/main/" rel="noreferrer" target="_blank">全部提交记录 ↗</a>
 </div>
 </aside><div class="home-content" data-home-content="">
@@ -71,7 +76,7 @@
 <div class="wrap hero-content">
 <div>
 <img alt="KSword ARK Logo" class="readme-logo" height="180" src="https://raw.githubusercontent.com/KSwordDEV/KSword/main/Ksword5.1/Ksword5.1/Resource/Logo/KswordHome-En.png" width="520"/>
-<p class="kicker">OPEN SOURCE · WINDOWS X64 · GPL-3.0</p>
+<p class="kicker">SOURCE-AVAILABLE · WINDOWS X64 · KSWORD COMMUNITY SOURCE LICENSE v1.6</p>
 <h1>Windows ARK、内核调试与系统取证工具集</h1>
 <p class="lead">KSword 将用户态与内核态信息集中在同一套工作流中，用于进程、内存、网络、文件、驱动、内核对象和系统安全审计。</p>
 <div class="actions">
@@ -86,8 +91,8 @@
 <div class="wrap two-column">
 <h2>最新更新</h2>
 <div class="prose">
-<p><strong>5.1.2.4</strong> 修复进程页长期刷新性能、进程树与应用聚合操作、首次启动默认设置、旧版 Windows 驱动兼容、主题颜色、语言回退和本地化启动图，并补齐许可证打包与 GitHub 入口。</p>
-<p><a href="changelog.html">查看完整更新日志 →</a></p>
+<p><strong>main / 848b6bb 开发快照</strong>（截至 2026-08-16）：近一个月主仓库共有 653 个提交。主线新增或强化了内核篡改检测、崩溃转储取证、DLL/IFEO 启动链检测、MFT/IRP 与原始存储解析、R0 WFP 抓包控制、进程保护和 Light 工具模块。</p>
+<p>稳定版仍是 <strong>5.1.4.0</strong>；<code>5.1.4.1-Alpha</code> 与 <code>5.1.5.0-pre</code> 属于预发行版本。<a href="development.html">查看主线开发快照 →</a>　<a href="changelog.html">查看完整更新日志 →</a></p>
 </div>
 </div>
 </section>
@@ -120,12 +125,13 @@
 <div class="wrap two-column">
 <h2>核心功能</h2>
 <div class="rows">
-<article><h3>进程与对象 Cross-view</h3><p>对照 R3/R0 进程、线程、CID 和句柄视图，检查隐藏对象、结构差异、线程栈和进程详细信息。</p></article>
-<article><h3>内存与页表</h3><p>浏览内存区域、搜索和 Hex 内容，执行内核可执行内存扫描、证据采集与 PTE/VA 翻译。</p></article>
-<article><h3>驱动与内核对象</h3><p>检查 DriverObject、DeviceObject、SSDT、Hook、回调、模块 Cross-view、Unloaded 和 PiDDB 信息。</p></article>
-<article><h3>网络审计</h3><p>提供抓包、连接管理、限速、请求构造、WFP 防火墙事件、NIDS 与多层网络视图。</p></article>
-<article><h3>文件与系统取证</h3><p>整合文件恢复、签名与 PE 分析、文件占用、存储栈、注册表、启动项、服务和设备树。</p></article>
-<article><h3>安全策略诊断</h3><p>查看 AppLocker、WDAC、Code Integrity、Defender、ASR、VBS、Hyper-V 和事件日志状态。</p></article>
+<article><h3>进程、对象与保护</h3><p>对照 R3/R0 进程、线程、CID 和句柄视图；支持更接近任务管理器的列、自定义视图、进程实例身份绑定和可续期的进程保护。</p></article>
+<article><h3>驱动、内核与动态能力</h3><p>检查驱动、Hook、回调、IDT、代码完整性、VBS/HVCI、页保护、HAL/WDF/i8042、描述符表、IOCTL、PDB/DynData 与内核反汇编。</p></article>
+<article><h3>崩溃转储与系统取证</h3><p>分析转储上下文、triage 数据、符号、Pool Tag、崩溃时间线、二级记录、捕获内存和 BlackBox 证据，并提供故障闭合的 BugCheck 面板。</p></article>
+<article><h3>文件、磁盘与原始存储</h3><p>整合 MFT/IRP 解析、R0 目录、五档删除操作、文件恢复、物理扇区读取、存储栈和默认只读的原始文件系统取证。</p></article>
+<article><h3>网络与安全检测</h3><p>提供 R0 WFP 报文捕获和控制、连接管理、DNS/HTTPS/WFP/NIDS 审计，并检测 DLL 劫持、IFEO 镜像劫持和 EXIT GhostSystemDriver 攻击链。</p></article>
+<article><h3>Light 与系统工具</h3><p>KswordARKLight 接入网络、窗口、性能总线、系统工具、服务、权限、磁盘和驱动恢复等模块；高风险动作保留确认、身份校验和回滚边界。</p></article>
+<article><h3>界面与运行时</h3><p>支持自适应搜索范围、表头排序、冻结行列、平滑滚动、任务栏通知筛选、DWM/透明背景、动态主题和长期运行稳定性诊断。</p></article>
 </div>
 </div>
 </section>

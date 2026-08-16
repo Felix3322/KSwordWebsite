@@ -2,62 +2,60 @@
   const english = document.documentElement.lang.toLowerCase().startsWith('en');
   const repo = 'KSwordDEV/KSword';
   const api = `https://api.github.com/repos/${repo}/commits?sha=main&per_page=20`;
-  const snapshot = 'main/f92f0fc';
+  const snapshot = 'main/848b6bb';
   const fallback = [
-    ['f92f0fc54cfee8b6b00ee1ed5cfa7d136b67bd47', 'refactor(system-time): remove upstream project wording', '2026-08-01T03:10:27Z'],
-    ['c02d2e07416c18b3c59e1945877404941770a5ed', 'feat(process): confirm destructive termination actions', '2026-08-01T03:09:59Z'],
-    ['2846c126493507b885b8e0c638c0301422a6a4dc', 'fix(ci): handle unavailable force-push base commits', '2026-08-01T02:22:46Z'],
-    ['5c99f12f5bad876755d8e2f8e28f719f9331f5e5', 'i18n: translate system time controls and clocks', '2026-08-01T01:51:02Z'],
-    ['2260e06f6171432086f5cb3ba8fe14919fce1b97', 'feat(titlebar): show system time and runtime', '2026-08-01T01:51:02Z'],
-    ['a7127b366c0353e54c0ab170be54252c44183970', 'feat(system-time): add sync modes and calibrated clock', '2026-08-01T01:51:02Z'],
-    ['2e318bf4c2bcd1f4580bcf53ac222cfd276fba92', 'fix(driver): harden system time counter mapping', '2026-08-01T01:51:02Z'],
-    ['a371ff6954ac787b37735f0c21d0451cc2ec328e', 'fix(build): deploy Qt runtime with release output', '2026-08-01T01:51:01Z'],
-    ['12f3d1147a7ffc57aa1a9a626193fc767be76eb2', 'fix: preserve buffered system time request', '2026-07-31T18:00:34Z'],
-    ['5a46b703cf50ff1a02ff54b6abb9f9209eacd68e', 'fix(driver): link packet capture dependencies', '2026-07-31T17:17:04Z'],
-    ['f8710df248ad2b564947202314062623cc6af378', 'fix(driver): include NDIS packet capture ABI', '2026-07-31T17:13:29Z'],
-    ['a8c935b73cfad87fb841d8ee97898704a7baf356', 'fix(i18n): sync R0 traffic protocol diagnostics', '2026-07-31T17:11:55Z'],
-    ['bcb8386086edefe3946232c89f57a99c7b22d33d', 'fix(network): capture R0 traffic at WFP packet layers', '2026-07-31T17:07:53Z']
-  ].map(([sha, message, date]) => ({ sha, message, date, htmlUrl: `https://github.com/${repo}/commit/${sha}` }));
+    ['848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c', 'Update license information and project description', '2026-08-16T06:29:38Z'],
+    ['f5de4e5fa52479c9e99750ced7e9e4cbdace8308', 'Clarify licensing wording for source-available and third-party attributions', '2026-08-16T06:27:42Z'],
+    ['1cd1a8961a7dc4a36a6d2939c366ce2a43b95b9f', 'Update LICENSE to KSword Community Source License v1.6', '2026-08-16T06:17:01Z'],
+    ['db2b6562709d6d83e509a6a89509d4e26caa2884', 'feat(ui): add adaptive table search scopes', '2026-08-16T06:14:55Z'],
+    ['629fcadafe5c4e456f8788dce65cfbd8b4d81f68', 'feat(process): show target thread message hooks', '2026-08-15T16:18:02Z'],
+    ['d5138325cef820e8d9dfc86fb09031bfb5ba2f12', 'feat(taskbar): polish notification presentation and handle filters', '2026-08-15T16:00:38Z'],
+    ['1145b37f3f972a34ed84e82308cab8139ae10811', 'fix(process): use a flat list for header sorting', '2026-08-15T14:31:06Z'],
+    ['72f1030ae5d3964c420f18531f95ae2ec6c185b8', 'feat(ui): add table header sorting and refine the bugcheck panel', '2026-08-15T14:12:59Z'],
+    ['dabe6fb77993849803ed845377468c59589e2a80', 'feat(driver): add fail-closed physical bugcheck panel', '2026-08-14T16:59:19Z'],
+    ['a9c65a20bd804bcbc06c790c4691e20a8e204cd2', 'feat(process): detect DLL hijacking candidates', '2026-08-13T21:59:37Z'],
+    ['ecaeaa335726199bb8d571b33132baea4939c4f3', 'feat(startup): detect IFEO image hijacks', '2026-08-13T20:51:17Z'],
+    ['78d899a395ff68f300a9cdb46cfdc0144ea2182b', 'feat(scanner): detect EXIT GhostSystemDriver attack chain', '2026-08-13T20:04:32Z'],
+    ['61edf8a6126f7ee622efc87cd8fbcde0cd50b84c', 'feat(minidump): add triage crash context', '2026-08-13T14:45:54Z']
+  ].map(([sha, message, date]) => ({ sha, message, date, htmlUrl: 'https://github.com/' + repo + '/commit/' + sha }));
 
   const copy = english ? {
-    description: 'KSword is an open-source Windows ARK, kernel-debugging, and system-forensics suite whose homepage tracks current main-branch development.',
+    description: 'KSword is a source-available Windows ARK, kernel-debugging, and system-forensics suite whose homepage tracks current main-branch development.',
     latest: 'latest update',
     core: 'core capabilities',
-    latestHtml: `<p><strong>${snapshot} development snapshot</strong> (2026-08-01 UTC / 2026-07-31 in Toronto): system-wide time acceleration and slowdown now include selectable modes, Windows Time synchronization, a calibrated clock, and title-bar runtime. Network auditing reaches the R0 WFP IPv4/IPv6 packet layers, while structured binary scanning, raw-filesystem forensics, controlled HVM diagnostics, runtime PDB fallback, and stricter destructive-action confirmations have also landed.</p><p>These changes are on <code>main</code>; they are not a new Release. <a href="development.html">Read the full development snapshot →</a>　<a href="changelog.html">View formal release history →</a></p>`,
+    latestHtml: '<p><strong>${snapshot} development snapshot</strong> (as of 2026-08-16): the repository received 653 commits in the last month. Current main work adds kernel-tamper detection, crash-dump forensics, DLL/IFEO startup-chain detection, MFT/IRP and raw-storage parsing, R0 WFP capture controls, process protection, and Light utilities.</p><p><strong>5.1.4.0</strong> remains the latest stable release; <code>5.1.4.1-Alpha</code> and <code>5.1.5.0-pre</code> are prereleases. <a href="development.html">Read the main-branch snapshot →</a>　<a href="changelog.html">View the complete changelog →</a></p>',
     features: [
-      ['Process and object cross-view', 'Compare R3/R0 process, thread, CID, and handle views. Destructive tree or critical-process termination now requires explicit confirmation.'],
-      ['Memory, PDB, and structured scanning', 'Inspect regions, PTE/VA translations, and kernel executable memory; resolve exact runtime PDB data after identity checks, and scan PE, ELF, and Mach-O files.'],
-      ['Drivers, kernel, and HVM', 'Inspect drivers, hooks, callbacks, system threads, work queues, loaded-image/IDT baselines, descriptor and IOCTL decoding, kernel disassembly, and a controlled HVM self-test.'],
-      ['Network and R0 packet auditing', 'Capture WFP IPv4/IPv6 packet-layer traffic from the driver and diagnose cursor gaps, drops, protocol mismatches, and related TCP/UDP/AFD/NSI/NDIS/WFP inventories.'],
-      ['Files, storage, and raw filesystems', 'Combine recovery, signatures, PE analysis, file-use evidence, storage stacks, disk monitoring, and read-only raw-filesystem/deleted-entry forensics.'],
-      ['System time and runtime state', 'Apply system-wide acceleration or slowdown, synchronize through Windows Time, view a calibrated clock, and show system time plus KSword runtime in the title bar.'],
-      ['Audio and runtime diagnostics', 'Expanded Core Audio source inspection, restartable API Monitor sessions, disk-performance monitoring, and driver search reduce long-running failures and races.'],
-      ['Security policy and recovery boundaries', 'Inspect AppLocker, WDAC, Code Integrity, Defender, ASR, VBS, and platform security; revalidate startup and permanent-delete targets and retain recovery transactions.']
+      ['Processes, objects, and protection', 'Compare R3/R0 process, thread, CID, and handle views with near-Task-Manager columns, custom views, process-instance identity binding, and renewable process protection.'],
+      ['Drivers, kernel, and dynamic capabilities', 'Inspect drivers, hooks, callbacks, IDT, code integrity, VBS/HVCI, page protection, HAL/WDF/i8042, descriptor tables, IOCTLs, PDB/DynData, and kernel disassembly.'],
+      ['Crash dumps and system forensics', 'Analyze dump context, triage data, symbols, pool tags, crash timelines, secondary records, captured memory, and BlackBox evidence with a fail-closed bugcheck panel.'],
+      ['Files, disks, and raw storage', 'Combine MFT/IRP parsing, R0 directory mode, five-tier deletion actions, recovery, physical-sector reads, storage-stack evidence, and read-only-by-default raw-filesystem forensics.'],
+      ['Networking and security detection', 'Use R0 WFP packet capture and controls, connection management, DNS/HTTPS/WFP/NIDS auditing, plus DLL hijack, IFEO image hijack, and EXIT GhostSystemDriver-chain detection.'],
+      ['Light and system utilities', 'KswordARKLight now covers network, window, performance-bus, system, service, privilege, disk, and driver-recovery modules with confirmation, identity, and rollback boundaries for risky actions.'],
+      ['UI and runtime behavior', 'Use adaptive search scopes, table sorting, frozen rows and columns, smooth scrolling, taskbar notification filters, DWM/transparent backgrounds, dynamic themes, and long-running diagnostics.']
     ],
     timelineTitle: 'Latest Updates',
-    syncing: `${snapshot} · Syncing GitHub…`,
+    syncing: '${snapshot} · Syncing GitHub…',
     synced: 'Synced with GitHub',
-    offline: `GitHub unavailable · Showing ${snapshot} snapshot`,
+    offline: 'GitHub unavailable · Showing ${snapshot} snapshot',
     locale: 'en-CA'
   } : {
-    description: 'KSword 是面向 Windows 的开源 ARK、内核调试与系统取证工具集；主页同步 main 分支最新开发能力。',
+    description: 'KSword 是面向 Windows 的源码公开 ARK、内核调试与系统取证工具集；主页同步 main 分支最新开发能力。',
     latest: '最新更新',
     core: '核心功能',
-    latestHtml: `<p><strong>${snapshot} 开发快照</strong>（2026-08-01 UTC，对应多伦多 2026-07-31）：新增系统级时间加速/减速、可选实现模式、Windows 时间服务同步、校准时钟和标题栏运行时长；网络审计扩展到 R0 WFP IPv4/IPv6 报文层；同时加入结构化二进制扫描、原始文件系统取证、受控 HVM 诊断、运行时 PDB 回退，以及更严格的破坏性操作确认。</p><p>这些内容位于 <code>main</code>，不是新的 Release。<a href="development.html">查看完整开发快照 →</a>　<a href="changelog.html">查看正式版本历史 →</a></p>`,
+    latestHtml: '<p><strong>${snapshot} 开发快照</strong>（截至 2026-08-16）：近一个月主仓库共有 653 个提交。主线新增或强化了内核篡改检测、崩溃转储取证、DLL/IFEO 启动链检测、MFT/IRP 与原始存储解析、R0 WFP 抓包控制、进程保护和 Light 工具模块。</p><p>稳定版仍是 <strong>5.1.4.0</strong>；<code>5.1.4.1-Alpha</code> 与 <code>5.1.5.0-pre</code> 属于预发行版本。<a href="development.html">查看主线开发快照 →</a>　<a href="changelog.html">查看完整更新日志 →</a></p>',
     features: [
-      ['进程与对象 Cross-view', '对照 R3/R0 进程、线程、CID 和句柄视图；结束进程树、关键进程等破坏性终止动作现在要求明确确认。'],
-      ['内存、PDB 与结构化扫描', '检查内存、PTE/VA 和内核可执行区域；通过身份校验后解析精确运行时 PDB，并扫描 PE、ELF 与 Mach-O。'],
-      ['驱动、内核与 HVM', '检查驱动、Hook、回调、系统线程和工作队列，并提供已加载映像/IDT 基线、描述符与 IOCTL 解码、内核反汇编及受控 HVM 自检。'],
-      ['网络与 R0 报文审计', '从驱动侧采集 WFP IPv4/IPv6 报文层流量，诊断游标缺口、丢包和协议问题，并关联 TCP/UDP/AFD/NSI/NDIS/WFP 视图。'],
-      ['文件、存储与原始文件系统', '整合恢复、签名、PE、占用、存储栈和磁盘监控；原始文件系统浏览默认只读，可分析目录项与已删除条目。'],
-      ['系统时间与运行状态', '支持系统级加速/减速、Windows 时间服务同步和校准时钟；标题栏可显示系统时间及 KSword 运行时长。'],
-      ['音频与运行时诊断', '扩展 Core Audio 声音来源检查、可重启 API Monitor 会话、磁盘性能监控和驱动搜索，减少长期运行失效与竞态。'],
-      ['安全策略与恢复边界', '检查 AppLocker、WDAC、Code Integrity、Defender、ASR、VBS 与平台安全；启动项和永久删除操作会重新验证目标并保留恢复事务。']
+      ['进程、对象与保护', '对照 R3/R0 进程、线程、CID 和句柄视图；支持更接近任务管理器的列、自定义视图、进程实例身份绑定和可续期的进程保护。'],
+      ['驱动、内核与动态能力', '检查驱动、Hook、回调、IDT、代码完整性、VBS/HVCI、页保护、HAL/WDF/i8042、描述符表、IOCTL、PDB/DynData 与内核反汇编。'],
+      ['崩溃转储与系统取证', '分析转储上下文、triage 数据、符号、Pool Tag、崩溃时间线、二级记录、捕获内存和 BlackBox 证据，并提供故障闭合的 BugCheck 面板。'],
+      ['文件、磁盘与原始存储', '整合 MFT/IRP 解析、R0 目录、五档删除操作、文件恢复、物理扇区读取、存储栈和默认只读的原始文件系统取证。'],
+      ['网络与安全检测', '提供 R0 WFP 报文捕获和控制、连接管理、DNS/HTTPS/WFP/NIDS 审计，并检测 DLL 劫持、IFEO 镜像劫持和 EXIT GhostSystemDriver 攻击链。'],
+      ['Light 与系统工具', 'KswordARKLight 接入网络、窗口、性能总线、系统工具、服务、权限、磁盘和驱动恢复等模块；高风险动作保留确认、身份校验和回滚边界。'],
+      ['界面与运行时', '支持自适应搜索范围、表头排序、冻结行列、平滑滚动、任务栏通知筛选、DWM/透明背景、动态主题和长期运行稳定性诊断。']
     ],
     timelineTitle: '最新更新记录',
-    syncing: `${snapshot} · 正在同步 GitHub…`,
+    syncing: '${snapshot} · 正在同步 GitHub…',
     synced: '已同步 GitHub',
-    offline: `GitHub 暂不可用 · 显示 ${snapshot} 快照`,
+    offline: 'GitHub 暂不可用 · 显示 ${snapshot} 快照',
     locale: 'zh-CN'
   };
 

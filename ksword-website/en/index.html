@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword is an open-source Windows ARK, kernel debugging, and system forensics toolkit." name="description"/>
+<meta content="KSword is a source-available Windows ARK, kernel-debugging, and system-forensics suite; this homepage tracks current main-branch development." name="description"/>
 <title>KSword — Windows ARK and Kernel Analysis Toolkit</title>
 <link href="../styles.css" rel="stylesheet"/>
 <link href="../index.html" hreflang="zh-CN" rel="alternate"/>
@@ -32,6 +32,7 @@
 <nav aria-label="Main navigation">
 <a aria-current="page" href="index.html">Home</a>
 <a href="changelog.html">Changelog</a>
+<a href="development.html">Development</a>
 <a href="docs/index.html">Documentation</a>
 <a href="../index.html" hreflang="zh-CN">中文</a>
 <a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
@@ -42,22 +43,26 @@
 <div class="git-timeline-inner">
 <p class="section-number">MAIN / LATEST UPDATES</p>
 <h2 id="git-timeline-title">Latest Updates</h2>
-<ol class="git-commit-list" data-git-timeline-list="">
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/16bacd6c76fc31c47f0bbeb15ca7436ea7f3d3aa" rel="noreferrer" target="_blank"><code>16bacd6</code><span>Add per-feature elevation prompts</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/daff8d0c94d713c792f4d700d528215d8c8062af" rel="noreferrer" target="_blank"><code>daff8d0</code><span>Fix table backgrounds</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/0dfd6ab8765d57843d4f24c5233455477fa558bd" rel="noreferrer" target="_blank"><code>0dfd6ab</code><span>Indicate required privilege elevation</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/9a9517a43359a54bafe1f33c99d5c9d2dd12059d" rel="noreferrer" target="_blank"><code>9a9517a</code><span>Validate Launcher output path</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/22a04ef773a07f83c2359696f9339e8cf04e526d" rel="noreferrer" target="_blank"><code>22a04ef</code><span>Add Launcher profile test data</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/e11b1e839f209a03ebbfada4f65566a0a732c4e3" rel="noreferrer" target="_blank"><code>e11b1e8</code><span>Fix Qt 6 suffix index type</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/5e6704adc2bd295d9ec7211a8eaba3eb5532862d" rel="noreferrer" target="_blank"><code>5e6704a</code><span>Add Windows CI validation workflow</span></a></li>
-</ol>
+<ol class="git-commit-list" data-git-timeline-list=""><li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank"><code>848b6bb</code><span>Update license information and project description</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/f5de4e5fa52479c9e99750ced7e9e4cbdace8308" rel="noreferrer" target="_blank"><code>f5de4e5</code><span>Clarify source-available licensing and third-party attribution</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/1cd1a8961a7dc4a36a6d2939c366ce2a43b95b9f" rel="noreferrer" target="_blank"><code>1cd1a89</code><span>Update to KSword Community Source License v1.6</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/db2b6562709d6d83e509a6a89509d4e26caa2884" rel="noreferrer" target="_blank"><code>db2b656</code><span>Add adaptive table search scopes</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/629fcadafe5c4e456f8788dce65cfbd8b4d81f68" rel="noreferrer" target="_blank"><code>629fcad</code><span>Show target thread message hooks</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/d5138325cef820e8d9dfc86fb09031bfb5ba2f12" rel="noreferrer" target="_blank"><code>d513832</code><span>Polish taskbar notification presentation and filters</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/1145b37f3f972a34ed84e82308cab8139ae10811" rel="noreferrer" target="_blank"><code>1145b37</code><span>Use a flat list for process header sorting</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/72f1030ae5d3964c420f18531f95ae2ec6c185b8" rel="noreferrer" target="_blank"><code>72f1030</code><span>Add table header sorting and refine the bugcheck panel</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/dabe6fb77993849803ed845377468c59589e2a80" rel="noreferrer" target="_blank"><code>dabe6fb</code><span>Add a fail-closed physical bugcheck panel</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a9c65a20bd804bcbc06c790c4691e20a8e204cd2" rel="noreferrer" target="_blank"><code>a9c65a2</code><span>Detect DLL hijacking candidates</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/ecaeaa335726199bb8d571b33132baea4939c4f3" rel="noreferrer" target="_blank"><code>ecaeaa3</code><span>Detect IFEO image hijacks</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/78d899a395ff68f300a9cdb46cfdc0144ea2182b" rel="noreferrer" target="_blank"><code>78d899a</code><span>Detect the EXIT GhostSystemDriver attack chain</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/61edf8a6126f7ee622efc87cd8fbcde0cd50b84c" rel="noreferrer" target="_blank"><code>61edf8a</code><span>Add triage crash context to dump analysis</span></a></li></ol>
 <p class="git-timeline-status" data-git-timeline-status="">Loading latest commits…</p><a class="git-history-link" href="https://github.com/KSwordDEV/KSword/commits/main/" rel="noreferrer" target="_blank">All commits ↗</a>
 </div>
 </aside><div class="home-content" data-home-content="">
 <section class="hero">
 <div class="wrap hero-content"><div>
 <img alt="KSword ARK Logo" class="readme-logo" height="180" src="https://raw.githubusercontent.com/KSwordDEV/KSword/main/Ksword5.1/Ksword5.1/Resource/Logo/KswordHome-En.png" width="520"/>
-<p class="kicker">OPEN SOURCE · WINDOWS X64 · GPL-3.0</p>
+<p class="kicker">SOURCE-AVAILABLE · WINDOWS X64 · KSWORD COMMUNITY SOURCE LICENSE v1.6</p>
 <h1>Windows ARK, Kernel Debugging, and System Forensics Toolkit</h1>
 <p class="lead">KSword brings user-mode and kernel-mode evidence into one workflow for auditing processes, memory, networking, files, drivers, kernel objects, and system security.</p>
 <div class="actions">
@@ -67,7 +72,8 @@
 </div>
 </div></div>
 </section>
-<section class="section alt"><div class="wrap two-column"><h2>Latest Update</h2><div class="prose"><p><strong>5.1.2.4</strong> improves long-running refresh performance in the Processes page, process-tree and application-group actions, first-run defaults, legacy Windows driver compatibility, theme colours, language fallback, localized splash screens, licence packaging, and GitHub access.</p><p><a href="changelog.html">View the complete changelog →</a></p></div></div></section>
+<section class="section alt"><div class="wrap two-column"><h2>Latest Update</h2><div class="prose"><p><strong>main / 848b6bb development snapshot</strong> (as of 2026-08-16): the main repository received 653 commits in the last month. Current work adds or strengthens kernel-tamper detection, crash-dump forensics, DLL/IFEO startup-chain detection, MFT/IRP and raw-storage parsing, R0 WFP capture control, process protection, and Light utilities.</p>
+<p><strong>5.1.4.0</strong> remains the latest stable release; <code>5.1.4.1-Alpha</code> and <code>5.1.5.0-pre</code> are prereleases. <a href="development.html">Read the main-branch snapshot →</a>　<a href="changelog.html">View the complete changelog →</a></p></div></div></section>
 <section aria-labelledby="screenshots-title" class="screenshot-section">
 <div class="wrap">
 <div class="section-head"><div><p class="section-number">MEDIA</p><h2 id="screenshots-title">Demos and Screenshots</h2></div><div aria-label="Screenshot controls" class="gallery-controls"><button aria-label="Previous screenshot" class="gallery-button" data-gallery-prev="" type="button">←</button><output aria-live="polite" class="gallery-count">01 / 03</output><button aria-label="Next screenshot" class="gallery-button" data-gallery-next="" type="button">→</button></div></div>
@@ -80,12 +86,13 @@
 </div>
 </section>
 <section class="section"><div class="wrap two-column"><h2>Core Capabilities</h2><div class="rows">
-<article><h3>Process and Object Cross-view</h3><p>Compare R3 and R0 process, thread, CID, and handle views to inspect hidden objects, structural differences, thread stacks, and detailed process information.</p></article>
-<article><h3>Memory and Page Tables</h3><p>Browse memory regions, search hexadecimal content, scan executable kernel memory, collect evidence, and translate PTE and virtual addresses.</p></article>
-<article><h3>Drivers and Kernel Objects</h3><p>Inspect DriverObject, DeviceObject, SSDT, hooks, callbacks, module cross-views, unloaded drivers, and PiDDB information.</p></article>
-<article><h3>Network Auditing</h3><p>Use packet capture, connection management, rate limiting, request construction, WFP firewall events, NIDS, and multi-layer network views.</p></article>
-<article><h3>Files and System Forensics</h3><p>Combine file recovery, signature and PE analysis, file-lock inspection, storage stacks, the registry, startup entries, services, and device trees.</p></article>
-<article><h3>Security Policy Diagnostics</h3><p>Inspect AppLocker, WDAC, Code Integrity, Defender, ASR, VBS, Hyper-V, and event-log status.</p></article>
+<article><h3>Processes, objects, and protection</h3><p>Compare R3/R0 process, thread, CID, and handle views with near-Task-Manager columns, custom views, process-instance identity binding, and renewable process protection.</p></article>
+<article><h3>Drivers, kernel, and dynamic capabilities</h3><p>Inspect drivers, hooks, callbacks, IDT, code integrity, VBS/HVCI, page protection, HAL/WDF/i8042, descriptor tables, IOCTLs, PDB/DynData, and kernel disassembly.</p></article>
+<article><h3>Crash dumps and system forensics</h3><p>Analyze dump context, triage data, symbols, pool tags, crash timelines, secondary records, captured memory, and BlackBox evidence with a fail-closed bugcheck panel.</p></article>
+<article><h3>Files, disks, and raw storage</h3><p>Combine MFT/IRP parsing, R0 directory mode, five-tier deletion actions, recovery, physical-sector reads, storage-stack evidence, and read-only-by-default raw-filesystem forensics.</p></article>
+<article><h3>Networking and security detection</h3><p>Use R0 WFP packet capture and controls, connection management, DNS/HTTPS/WFP/NIDS auditing, plus DLL hijack, IFEO image hijack, and EXIT GhostSystemDriver-chain detection.</p></article>
+<article><h3>Light and system utilities</h3><p>KswordARKLight now covers network, window, performance-bus, system, service, privilege, disk, and driver-recovery modules with confirmation, identity, and rollback boundaries for risky actions.</p></article>
+<article><h3>UI and runtime behavior</h3><p>Use adaptive search scopes, table sorting, frozen rows and columns, smooth scrolling, taskbar notification filters, DWM/transparent backgrounds, dynamic themes, and long-running diagnostics.</p></article>
 </div></div></section>
 <section class="section alt"><div class="wrap two-column"><h2>Components</h2><div class="component-table"><div class="table-head"><span>Component</span><span>Role</span><span>Technology</span></div><div><strong>Ksword5.1</strong><p>Complete ARK, debugging, and auditing workflow</p><span>Qt 6 / ADS</span></div><div><strong>KswordARKLight</strong><p>Low-resource environments and rapid response</p><span>Native Win32</span></div><div><strong>KswordARKDriver</strong><p>Unified R0 auditing protocol</p><span>WDK / IOCTL</span></div><div><strong>Launcher</strong><p>Compatibility checks and entry-point selection</p><span>Native Win32</span></div><div><strong>KswordCLI</strong><p>Automation, validation, and troubleshooting</p><span>Command line</span></div></div></div></section>
 <section class="notice"><div class="wrap two-column"><h2>Usage Boundaries</h2><p>KSword includes system-level debugging, auditing, and administrative capabilities. Use it only on devices and environments for which you have explicit authorization. Confirm risks and rollback paths before unloading, deleting, patching, writing to disks, or modifying protection bits.</p></div></section>
