@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 2026-08-16 main-branch development snapshot: kernel audits, crash dumps, startup-chain detection, R0 forensics, Light modules, UI, and license updates." name="description"/>
+<meta content="KSword 2026-09-08 main-branch snapshot: the resident VMM and R-1 layer, EPT split views and execution domains, nested operation and the cross-core TLB fix, the Light investigation workbench, kernel diagnostics, and acceptance status." name="description"/>
 <title>Main Branch Development Snapshot — KSword</title>
 <link href="../styles.css" rel="stylesheet"/>
 <link href="../development.html" hreflang="zh-CN" rel="alternate"/>
@@ -11,12 +11,41 @@
 <body>
 <header class="site-header">
 <div class="wrap header-row">
-<a aria-label="Back to homepage" class="wordmark" href="index.html">KSWORD <span>/ MAIN</span></a>
-<nav aria-label="Primary navigation">
+<a aria-label="Back to homepage" class="wordmark" href="index.html">KSWORD <span>/ 5.1</span></a>
+<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
+</div>
+<div class="creator-info">
+<strong>wangwei-cm</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
+</div>
+</div>
+</article>
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
+</div>
+<div class="creator-info">
+<strong>OB_BUFF</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
+</div>
+</div>
+</article>
+</div>
+<nav aria-label="Main navigation">
 <a href="index.html">Home</a>
+<a href="changelog.html">Changelog</a>
 <a aria-current="page" href="development.html">Development</a>
-<a href="changelog.html">Releases</a>
-<a href="docs/index.html">Documentation</a>
+<a href="hvm-topology.html">HVM topology</a>
+<a href="../learn/index.html?lang=en">Documentation</a>
 <a href="../development.html" hreflang="zh-CN">中文</a>
 <a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
 </nav>
@@ -25,38 +54,128 @@
 <main>
 <section class="page-hero compact"><div class="wrap">
 <p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT</p>
-<h1>Latest main-branch development</h1>
-<p class="lead">As of 2026-08-16, the snapshot is <code>KSwordDEV/KSword@848b6bb</code>. This page describes main development and does not turn unreleased work into a new formal version.</p>
-<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank">View snapshot HEAD</a><a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">View release assets</a><a href="changelog.html">View release history</a></div>
+<h1>Current mainline development</h1>
+<p class="lead">As of 2026-09-08 the snapshot is <code>KSwordDEV/KSword@e3d8106</code>. <strong>297 commits</strong> landed since the previous sync (<code>848b6bb</code>, 2026-08-16), and the large majority of them are hardware virtualization. This page describes the state of main; it does not present unreleased work as a new version.</p>
+<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank">View snapshot HEAD</a><a href="hvm-topology.html">Nested HVM topology demo</a><a href="../learn/index.html?lang=en">Documentation</a><a href="changelog.html">Full release history</a></div>
 </div></section>
 <section class="section compact-section"><div class="wrap docs-layout">
-<aside aria-label="Development snapshot contents" class="side-index"><strong>On this page</strong><a href="#scope">Snapshot boundary</a><a href="#kernel">Kernel and R0 audit</a><a href="#dumps">Dump and crash forensics</a><a href="#process-security">Processes and security detection</a><a href="#forensics">Files, networking, and utilities</a><a href="#light">Light and control actions</a><a href="#ui">UI and runtime</a><a href="#license">License and publication</a><a href="#operator">Operator notes</a><a href="#commits">Commit index</a></aside>
+<aside aria-label="Snapshot contents" class="side-index"><strong>On this page</strong><a href="#scope">Snapshot boundary</a><a href="#hvm">Resident VMM and the R-1 layer</a><a href="#hvm-nested">Nested operation and measurements</a><a href="#hvm-disposition">R-1 disposition and memory channel</a><a href="#kernel">Kernel, driver, diagnostics</a><a href="#light">Light investigation workbench</a><a href="#ui">UI and runtime</a><a href="#evidence">Acceptance status</a><a href="#operator">Operator notes</a><a href="#commits">Key commits</a></aside>
 <div class="document-content operator-manual">
-<section id="scope"><p class="section-number">01 / SCOPE</p><h2>This is main development, not a new version number</h2>
-<div class="status-table"><div><strong>Snapshot HEAD</strong><p><code>848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c</code></p></div><div><strong>Timestamp</strong><p>The GitHub commit was recorded at 2026-08-16 06:29 UTC. This page is based on that commit and its ancestors.</p></div><div><strong>Commits in the last month</strong><p>The GitHub API returned 653 commits from 2026-07-16 through 2026-08-16; the sections below deduplicate them into user-visible capability and safety changes.</p></div><div><strong>Version boundary</strong><p><code>5.1.4.0</code> is the stable release; <code>5.1.4.1-Alpha</code> and <code>5.1.5.0-pre</code> are prereleases. main is 171 commits ahead of <code>5.1.5.0-pre</code>; do not replace one EXE or SYS inside a release package.</p></div></div>
-<div class="action-rule"><strong>Use Releases when you need stable assets.</strong><p>The application, KswordARK.sys, shared IOCTLs, language packs, DynData profiles, Launcher, and plugins must come from the same build chain. Mixing files can produce Unsupported states, protocol mismatches, or missing fields.</p></div></section>
-<section id="kernel"><p class="section-number">02 / KERNEL &amp; R0</p><h2>Kernel audit, dynamic offsets, and fail-closed behavior</h2>
-<div class="capability-grid"><div><strong>Audit additions and expansion</strong><ul><li>IDT, code integrity, VBS/HVCI posture, and page protection.</li><li>SLAT/IOMMU, EPT/NPT, Hypervisor CPUID, and DMAR/IVRS.</li><li>HAL, WDF/KMDF, i8042prt, object types, special callbacks, and IoTimer.</li><li>System threads, work queues, descriptor tables, IOCTL decoding, and kernel disassembly.</li></ul></div><div><strong>Runtime safety</strong><ul><li>PDB-independent runtime signature scanning and offset fallback.</li><li>DynData v4 profiles and Launcher support manifests.</li><li>Safe reads for fallback kernel addresses to reduce DriverEntry crash risk.</li><li>A fail-closed physical bugcheck panel while preserving the VMware display path.</li></ul></div></div>
-<p>These pages remain gated by Driver Status, Capability, DynData, and target identity. A visible control does not prove that its R0 capability is ready.</p></section>
-<section id="dumps"><p class="section-number">03 / DUMP FORENSICS</p><h2>Crash dumps now expose more attribution evidence</h2><p>The dump-analysis workflow now previews triage crash context, triage data blocks, secondary dump records, captured memory, and BlackBox evidence. Together with symbol resolution, pool-tag ownership, and a crash timeline, this gives the operator a richer diagnostic record. Bugcheck display keeps explicit boundaries between physical and VMware paths.</p><div class="action-rule"><strong>Dump evidence is diagnostic material, not an infallible automatic verdict.</strong><p>Missing, Partial, and Unsupported fields must remain visible instead of being filled with a default “normal” value.</p></div></section>
-<section id="process-security"><p class="section-number">04 / PROCESS &amp; SECURITY</p><h2>Process identity, startup chains, and attack-chain detection</h2><div class="status-table"><div><strong>Processes and threads</strong><p>Process tables gain near-Task-Manager columns, custom views, target-thread message-hook visibility, module/thread/token/PEB details, and renewable process protection backed by object-manager callbacks.</p></div><div><strong>Startup and loading</strong><p>New checks cover DLL hijack candidates, IFEO image hijacks, hidden-startup cross-checks, and the EXIT GhostSystemDriver attack chain; startup-location coverage now reaches 187 entries.</p></div><div><strong>Application control</strong><p>AppLocker loading now handles unavailable modules, application-control editors and context actions were added, and global hotkeys support safe editing and deletion. Service enumeration and cleanup continue to be hardened.</p></div></div></section>
-<section id="forensics"><p class="section-number">05 / FORENSICS</p><h2>Files, networking, and system utilities move further into R0</h2><div class="capability-grid"><div><strong>Files and storage</strong><ul><li>MFT, IRP, R0 directory parsing, and resumable scans.</li><li>Five-tier deletion permissions and R0/POSIX deletion backends.</li><li>Physical-sector reads, raw-filesystem browsing, storage, and device evidence.</li></ul></div><div><strong>Networking and system tools</strong><ul><li>R0 WFP packet-capture start/stop, connection management, and network diagnostics.</li><li>DNS, WFP firewall, HTTPS proxy recovery, and NIDS continue to be refined.</li><li>System time, performance monitoring, USB topology, system-bus, and context-menu tools.</li></ul></div></div></section>
-<section id="light"><p class="section-number">06 / LIGHT</p><h2>KswordARKLight gains more read-only pages and reversible controls</h2><p>Light now includes network, window, system-tool, performance-bus, service, and privilege modules. It also wires packet-capture controls, PiDDB-entry deletion, physical-disk reads, and restore-or-abandon actions for driver dispatch, image, and communication records. Writes, deletes, recovery, and abandon actions remain confirmation-gated and generation-checked.</p><div class="action-rule critical-rule"><strong>Abandon does not change kernel state, but permanently discards the recovery record.</strong><p>That makes abandon more dangerous than restore; the website and the program should keep this distinction explicit.</p></div></section>
-<section id="ui"><p class="section-number">07 / UI &amp; RUNTIME</p><h2>Large tables, taskbar behavior, and themes continue to move</h2><p>Main adds adaptive table-search scopes, header sorting, frozen rows and columns, taskbar notification filtering, target-thread hook visibility, bugcheck-panel refinements, dynamic-theme and transparent-background fixes, while continuing to close lifetime issues in file-occupancy scans, asynchronous refresh, driver search, API Monitor, hardware monitoring, and shutdown.</p><p>Many of these commits are reliability fixes or internal experiments; they should not be presented as separate formal releases.</p></section>
-<section id="license"><p class="section-number">08 / LICENSE</p><h2>License updated to v1.6</h2><p>As of 2026-08-16, the main repository uses the <strong>KSword Community Source License v1.6</strong>. It permits use, modification, free distribution, paid services, and hosted/SaaS use, but the software itself may not be sold. Public modified versions must identify themselves as unofficial, disclose significant changes, and provide corresponding source. It is a source-available license, not an OSI-approved open-source license; third-party components and plugins retain their own licenses.</p><p><a href="docs/license.html">Read the website license overview →</a>　<a href="https://github.com/KSwordDEV/KSword/blob/main/LICENSE" rel="noreferrer" target="_blank">Read the repository LICENSE ↗</a></p></section>
-<section id="operator"><p class="section-number">09 / OPERATOR NOTES</p><h2>Minimum checks before testing main</h2><ol class="numbered-procedure"><li><span>1</span><div><strong>Build the complete package from one commit.</strong><p>Do not replace only the EXE, SYS, language packs, profiles, or plugins.</p></div></li><li><span>2</span><div><strong>Check Driver Status, DynData, and Capability first.</strong><p>Unsupported means that the protocol, driver, or capability is unavailable; it does not prove that the page has no data.</p></div></li><li><span>3</span><div><strong>Use authorized, rollback-capable environments for risky actions.</strong><p>System time, HVM, disk writes, driver unloads, kernel changes, process protection, and deletion require a snapshot or tested recovery path.</p></div></li><li><span>4</span><div><strong>Preserve pre-change evidence.</strong><p>Record target identity, address, owning module, configuration, and timestamps; refresh and save the post-change result.</p></div></li></ol></section>
-<section id="commits"><p class="section-number">10 / COMMIT INDEX</p><h2>Key commit index</h2><div class="link-rows">
-<a href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank"><strong>848b6bb</strong><span>Snapshot HEAD, project description, and license information</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/61edf8a6126f7ee622efc87cd8fbcde0cd50b84c" rel="noreferrer" target="_blank"><strong>61edf8a</strong><span>Add triage crash context to dump analysis</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/78d899a395ff68f300a9cdb46cfdc0144ea2182b" rel="noreferrer" target="_blank"><strong>78d899a</strong><span>Detect the EXIT GhostSystemDriver attack chain</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/a9c65a20bd804bcbc06c790c4691e20a8e204cd2" rel="noreferrer" target="_blank"><strong>a9c65a2</strong><span>Detect DLL hijacking candidates</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/ecaeaa335726199bb8d571b33132baea4939c4f3" rel="noreferrer" target="_blank"><strong>ecaeaa3</strong><span>Detect IFEO image hijacks</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/dabe6fb77993849803ed845377468c59589e2a80" rel="noreferrer" target="_blank"><strong>dabe6fb</strong><span>Add the fail-closed physical bugcheck panel</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/a5fbb0e8b68dfa16973c7ff749681312a7a09483" rel="noreferrer" target="_blank"><strong>a5fbb0e</strong><span>Add safe global-hotkey edit and delete support</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/db2b6562709d6d83e509a6a89509d4e26caa2884" rel="noreferrer" target="_blank"><strong>db2b656</strong><span>Add adaptive table-search scopes</span></a>
-</div></section>
+
+<section id="scope"><p class="section-number">01 / SCOPE</p><h2>This is a main-branch snapshot, not a new version number</h2>
+<div class="status-table">
+<div><strong>Snapshot HEAD</strong><p><code>e3d8106e2bdb5bba2421627b52b9491c5c3fdebb</code></p></div>
+<div><strong>Time</strong><p>Committed 2026-09-07 23:20 (-04:00). This page is based on that commit and its ancestors.</p></div>
+<div><strong>Commits in range</strong><p><code>848b6bb..e3d8106</code> contains 297 commits spanning 2026-08-16 to 2026-09-08. Only changes that affect how the tool should be understood are listed below.</p></div>
+<div><strong>Release boundary</strong><p>The newest published assets are <code>5.1.4.3</code> (2026-08-28) and <code>5.1.4.3Pre</code> (2026-08-27). Main is 98 commits ahead of <code>5.1.4.3</code>; you cannot replace a single EXE or SYS inside a release package.</p></div>
+</div>
+<div class="action-rule"><strong>Use Releases when you need stable assets.</strong><p>The main program, KswordARK.sys, the shared IOCTL headers, language packs, DynData profiles, Launcher, and plugins must all come from the same build chain. Mixing files produces Unsupported states, protocol mismatches, or missing fields.</p></div>
+</section>
+
+<section id="hvm"><p class="section-number">02 / VIRTUALIZATION</p><h2>The resident VMM now survives, and the R-1 layer is built on it</h2>
+<p>Before this round, the <code>RESIDENT_VMM</code> capability bit only proved that the driver could enter and leave VMX non-root correctly: the first MSR access after entry revoked the hypervisor. The foundation work closed that gap — an MSR bitmap (primary bit 28 plus VMCS <code>0x2004</code>), an exit engine that treats emulable exits as handled, <code>#UD</code> injection for non-private <code>VMCALL</code> (previously any user-mode code could tear the hypervisor down with one instruction), and a <code>SOAK</code> residency self-test.</p>
+<div class="capability-grid">
+<div><strong>Enforcement and policy</strong><ul>
+<li>EPT rules gained <code>ENFORCE</code>: a hit injects <code>#PF</code> and residency continues, instead of devirtualizing on every hit.</li>
+<li>MSR policy engine: open holes in the bitmap on demand, with log-and-allow, deny via <code>#GP</code>, or a forged read value.</li>
+<li>CR/DR policy: CR0 and CR4 bits pinned through the guest/host masks, covering all four MOV-CR access types including <code>CLTS</code> and <code>LMSW</code>.</li>
+<li>The event ring is now consumed by the UI, row by row.</li>
+</ul></div>
+<div><strong>Hiding and isolation</strong><ul>
+<li>EPT split views: <code>HOOK</code> (execution takes the shadow page, reads see the original bytes) and <code>CLOAK</code> (execution proceeds, reads and writes see the shadow).</li>
+<li>EPTP switching backend — the only workable backend on machines without Monitor Trap Flag.</li>
+<li>Per-processor private EPT hierarchies, forked on demand, which lifts the single-processor restriction on views and rules.</li>
+<li>EPT execution domains and VMFUNC; <code>#VE</code> is implemented but two independent safeties block actual delivery by default.</li>
+</ul></div>
+</div>
+<p>AMD parts are no longer misreported as an unsupported CPU. Capability probing now reports SVM, NPT, nRIP, decode assists, flush-by-ASID, and the <code>VM_CR.SVMDIS</code> firmware lock, and returns <code>BACKEND_NOT_IMPLEMENTED</code> — the hardware is capable, the software is not written yet. The SVM backend itself was deliberately left unwritten: two thousand lines of never-executed hypervisor written on an Intel machine would only produce code that looks complete and has never run.</p>
+<p><a href="../learn/index.html?lang=en&amp;doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">Read the virtualization capability roadmap →</a></p>
+</section>
+
+<section id="hvm-nested"><p class="section-number">03 / NESTED</p><h2>It can run as L1 under nesting, and the downgrade is explicit</h2>
+<p>The original roadmap assumed validation would happen on bare metal. Measurement overturned that: on a development machine with memory integrity enabled, HVCI brings up Hyper-V, and Hyper-V hides <code>CPUID.1:ECX[5]</code> from the root partition. VT-x cannot even be detected, so <code>PREPARE</code> fails outright. Resident start is therefore explicit opt-in: with an outer hypervisor present and no <code>ALLOW_NESTED</code> in the request, the driver refuses; on success it sets <code>RESIDENT_NESTED</code> and the UI states plainly that it is running as L1 with degraded performance and capabilities.</p>
+<div class="action-rule critical-rule"><strong>Cross-core TLB invalidation was the most important fix of this round.</strong><p>Flush hypercalls forwarded to L0 only invalidate the L1 VP that L0 knows about; stale translations on sibling cores are never cleared — a defect that exists only because we sit between Windows and Hyper-V. Using the return semantics of <code>VirtualProtect</code> as a deterministic criterion, the violation rate measured <strong>97%</strong>. After the fix, three repeat runs read zero, and the sample volume fell from 180 million back to 6–7 million, matching the baseline. It also explains three previously unattributed crashes: <code>0x139 (0x1D)</code>, <code>0x0A</code>, and <code>0x50</code>.</p></div>
+<p>The fix is a private VMX-root IDT plus a broadcast NMI — and the private IDT is a <strong>precondition</strong> for sending the NMI, not an optimization: a first attempt with only NMI broadcast hit <code>0x80 NMI_HARDWARE_FAILURE</code>. The fix depends on VPID being disabled; enabling VPID for performance would silently break it, so the two changes must be made together.</p>
+<p><a href="hvm-topology.html">See the Nested HVM topology demo →</a>　<a href="../learn/index.html?lang=en&amp;doc=docs%2Fnext%2F%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md">Read the nested architecture doc →</a></p>
+</section>
+
+<section id="hvm-disposition"><p class="section-number">04 / R-1</p><h2>R-1 process disposition and the memory channel</h2>
+<p>&ldquo;Terminate a process from R-1&rdquo; has no direct counterpart at the hypervisor layer — it does not know about processes, only CR3 values and guest physical pages. What this path actually does is <strong>refuse execution inside the target address space</strong>; the two operations differ only in what gets injected on refusal.</p>
+<div class="status-table">
+<div><strong>Freeze</strong><p>Injects <code>#PF(present)</code>. The faulting instruction never retires, not one byte of process state changes, and release resumes in place. Reversibility is what separates it from termination — a difference in kind, not degree.</p></div>
+<div><strong>Terminate</strong><p>Injects <code>#UD</code>. An unhandled user-mode exception sends Windows down its own process teardown path; no kernel API is called, and the guest reclaims the process itself.</p></div>
+<div><strong>Scope</strong><p>Selected through CR3-load exiting at the hierarchy level rather than per-page CR3 checks. With address-space selection, non-target processes never run under the restricted hierarchy at all.</p></div>
+<div><strong>R-1 memory channel</strong><p>The driver reserves a private window page and rewrites its own page-table entry to point at the target physical page. The value is not &ldquo;it can read memory&rdquo; but that it does not call memory-manager exports that may be hooked. When the window is unavailable, reads fall back to <code>MmCopyMemory</code> and writes are refused, and the response reports which path was taken.</p></div>
+</div>
+<div class="action-rule critical-rule"><strong>None of this is a security boundary.</strong><p>Stealth hooks, split views, and R-1 disposition share one property: they fail open. If the target can move its code page to a different guest physical page, it is no longer on the page being refused. This is a disposition path outside R0, not a defence against an adversary who knows it exists.</p></div>
+</section>
+
+<section id="kernel"><p class="section-number">05 / KERNEL</p><h2>Kernel, driver, and diagnostics</h2>
+<div class="capability-grid">
+<div><strong>Added or strengthened</strong><ul>
+<li>Window layer and Z-order diagnostics, attached to window details.</li>
+<li>Kernel IoTimer inventory and control.</li>
+<li>Process termination that deletes the exact image file.</li>
+<li>A kernel callback monitor page, with matching CLI query and capture-control commands.</li>
+<li>Kernel knowledge center: 12 categories, 71 topics, with R3/R0 live-evidence queries and routing to the matching read-only evidence pages.</li>
+</ul></div>
+<div><strong>Fixes and hardening</strong><ul>
+<li>R0 capture lifecycle control, plus i18n coverage for network protocol validation.</li>
+<li>The sound module now rejects unverifiable process identity.</li>
+<li>System-time reset preserves counter continuity.</li>
+<li>A driver feature-matrix CI gate: every new IOCTL needs a definite disposition, and a crash is a failure.</li>
+<li>70 HVM arithmetic unit tests wired into <code>source-integrity</code>.</li>
+</ul></div>
+</div>
+<p>These pages remain subject to Driver Status, Capability, DynData, and target-identity gating; a visible button does not mean the corresponding R0 capability is ready.</p>
+</section>
+
+<section id="light"><p class="section-number">06 / LIGHT</p><h2>KswordARKLight became an investigation workbench</h2>
+<p>Light moved this round from a set of read-only pages to an investigation workflow with workspace state: an evidence session inspector, a versioned window-state model, a bounded registry search workspace, a static navigation palette, and — for memory — immutable read snapshots, staged write plans, and guarded diff writeback. The window, startup, service, system-tools, handle, driver, and ETW pages gained &ldquo;go to the holder process details&rdquo; routing, and callback file events are now linked to entities.</p>
+<p>Actions that write, delete, restore, or discard records continue to use explicit confirmation, generation checks, and result write-back; export paths are unified as snapshot exports of visible results.</p>
+</section>
+
+<section id="ui"><p class="section-number">07 / UI &amp; RUNTIME</p><h2>UI and runtime</h2>
+<p>A <strong>KVM button</strong> joins the privilege button row in the title bar. It is a three-state indicator of residency and the single entry point for every R-1 capability: left click toggles residency, and the context menu carries the soak self-test, the write-permission gate, memory operations, and fault reset. The button can be renamed to KVM, HVM, or R-1 in settings, and the privilege buttons can be hidden individually.</p>
+<p>Elsewhere: ADS tab bars scroll horizontally and no longer collapse to zero width; detail reports use a unified structured report widget; the process page gained per-core CPU attribution with expandable charts, thread CPU affinity settings, dynamic history snapshots and table snapshot comparison; startup entries support multi-select; and the bugcheck diagnostics page was rebuilt around explicit installation.</p>
+</section>
+
+<section id="evidence"><p class="section-number">08 / EVIDENCE</p><h2>Acceptance status: what has evidence and what does not</h2>
+<p>This round produced the first runtime readings, on a 2 vCPU nested Hyper-V target: cross-core TLB violations 97% → 0; a kernel-mode read in the CLOAK direction transparently redirected to the shadow page by EPTP switching without dropping residency; an R-1 freeze that stopped the heartbeat at tick 15 and held it, then resumed at 16 after release rather than restarting from 0; an R-1 terminate that removed the process; and a routine 30-second <code>SOAK</code> still passing.</p>
+<div class="action-rule"><strong>What is missing is not recorded as PASS.</strong><p>The HOOK direction — execution redirected to the shadow — has not been measured. No hook was placed on a known function. The user-mode <code>ReadProcessMemory</code> path is unverified: a user-mode fail-closed returns to ring 0 carrying the ring-3 RSP/RIP and bugchecks in practice. Bit-for-bit restoration after disabling a hook was not compared. Bare-metal acceptance has not been done at all. The readings above come from a nested target and <strong>cannot be treated as bare-metal conclusions</strong>.</p></div>
+<p>The earlier next-phase acceptance report keeps the same honest counting: 2 of 116 items PASS, 114 NOT_RUN, with none of the six target environments exercised. <a href="../learn/index.html?lang=en&amp;doc=docs%2Fnext%2F%E6%9C%80%E7%BB%88%E6%8A%A5%E5%91%8A.md">Read the acceptance final report →</a></p>
+</section>
+
+<section id="operator"><p class="section-number">09 / OPERATOR NOTES</p><h2>Minimum checks before testing on main</h2>
+<ol class="numbered-procedure">
+<li><span>1</span><div><strong>The whole build must come from one commit.</strong><p>Do not replace only the EXE, SYS, language pack, profiles, or plugins.</p></div></li>
+<li><span>2</span><div><strong>Check Driver Status, DynData, and Capability first.</strong><p>Unsupported means a protocol, driver, or capability mismatch — not that the page has no data.</p></div></li>
+<li><span>3</span><div><strong>Start resident HVM only in an authorized, rollback-capable environment.</strong><p>Save your work before every start. While resident, <code>sc stop</code> returns <code>1052</code> because the unload guard is holding it; residency must be stopped first. EPT rules, split views, and R-1 dispositions can also only be installed while residency is stopped.</p></div></li>
+<li><span>4</span><div><strong>Test high-risk actions only where they can be rolled back.</strong><p>System time, disk writes, driver unload, kernel modification, process protection, and delete actions all need a snapshot or a recovery path.</p></div></li>
+<li><span>5</span><div><strong>Preserve pre-change evidence.</strong><p>Export target identity, addresses, owning module, configuration, and timestamps; refresh afterwards and keep both results.</p></div></li>
+</ol>
+</section>
+
+<section id="commits"><p class="section-number">10 / COMMIT INDEX</p><h2>Key commits</h2>
+<div class="link-rows">
+<a href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank"><strong>e3d8106</strong><span>Snapshot HEAD: split the disposition refusal codes, complete acceptance and crash forensics records</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/8660a560" rel="noreferrer" target="_blank"><strong>8660a56</strong><span>R-1 process freeze and terminate, refusing execution by address space</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/66050557" rel="noreferrer" target="_blank"><strong>6605055</strong><span>Restore the cross-core invalidation dropped by forwarded flushes, 97% → 0</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/dad3a97e" rel="noreferrer" target="_blank"><strong>dad3a97</strong><span>Resident mode requests NMI exiting and catches the NMI</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/ad767a8e" rel="noreferrer" target="_blank"><strong>ad767a8</strong><span>EPTP switching backend; split views work in nested environments without MTF</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/7bb73ce1" rel="noreferrer" target="_blank"><strong>7bb73ce</strong><span>Per-processor private EPT hierarchies</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/462032c1" rel="noreferrer" target="_blank"><strong>462032c</strong><span>EPT split views: stealth hooks and memory cloaking</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/b1a55023" rel="noreferrer" target="_blank"><strong>b1a5502</strong><span>Keep the resident VMM alive and wire R-1 to the title-bar KVM button</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/239e4fcb" rel="noreferrer" target="_blank"><strong>239e4fc</strong><span>Allow running nested as L1, with the SDM basis recorded</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/c64e2e76" rel="noreferrer" target="_blank"><strong>c64e2e7</strong><span>Report SVM capabilities honestly on AMD instead of claiming an unsupported CPU</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/46c44326" rel="noreferrer" target="_blank"><strong>46c4432</strong><span>Kernel knowledge center: complete R0/R3 research chain</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/d26639a3" rel="noreferrer" target="_blank"><strong>d26639a</strong><span>Window layer and Z-order diagnostics</span></a>
+</div>
+</section>
+
 </div></div></section>
 </main>
-<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">Home</a><a href="changelog.html">Releases</a><a href="docs/index.html">Documentation</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">Home</a><a href="changelog.html">Releases</a><a href="hvm-topology.html">HVM topology</a>
+<a href="../learn/index.html?lang=en">Documentation</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
 </body>
 </html>

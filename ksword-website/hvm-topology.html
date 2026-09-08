@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="KSword Nested HVM 拓扑变化演示：从开着 VBS 的物理机走不通，到嵌套靶机里 VMLAUNCH 之后 KSword 成为 L1、同一个 Windows 原地降为 L2，再到停止常驻后整层消失。" name="description"/>
+<title>Nested HVM 拓扑变化 — KSword</title>
+<link href="styles.css" rel="stylesheet"/>
+<link href="en/hvm-topology.html" hreflang="en" rel="alternate"/>
+<style>
+/* ── 演示台 ───────────────────────────────────────────── */
+.hvm-demo { border: 1px solid #111; background: #111; color: #e9e9e9; }
+
+.hvm-demo-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap;
+  padding: 14px 18px; border-bottom: 1px solid #3a3a3a;
+}
+.hvm-step-label { display: grid; gap: 3px; min-width: 0; }
+.hvm-step-label .idx {
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #9a9a9a;
+  font-family: Consolas, "SFMono-Regular", monospace;
+}
+.hvm-step-label strong { font-size: 18px; line-height: 1.25; }
+
+.hvm-controls { display: flex; align-items: center; gap: 0; border: 1px solid #6a6a6a; flex: 0 0 auto; }
+.hvm-controls button {
+  height: 40px; min-width: 46px; padding: 0 14px;
+  border: 0; background: #111; color: #e9e9e9; cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.hvm-controls button + button { border-left: 1px solid #6a6a6a; }
+.hvm-controls button:hover:not(:disabled),
+.hvm-controls button:focus-visible { background: #e9e9e9; color: #111; }
+.hvm-controls button:disabled { color: #5c5c5c; cursor: default; }
+.hvm-controls .hvm-count { min-width: 74px; text-align: center; font-family: Consolas, monospace; }
+
+/* ── 步骤刻度 ─────────────────────────────────────────── */
+.hvm-track { display: flex; border-bottom: 1px solid #3a3a3a; }
+.hvm-track button {
+  flex: 1 1 0; min-width: 0;
+  display: grid; gap: 4px; justify-items: start;
+  padding: 9px 10px 10px;
+  border: 0; border-right: 1px solid #3a3a3a; border-top: 3px solid #3a3a3a;
+  background: #111; color: #9a9a9a; cursor: pointer; text-align: left;
+}
+.hvm-track button:last-child { border-right: 0; }
+.hvm-track button b { font-family: Consolas, monospace; font-size: 11px; font-weight: 700; }
+.hvm-track button span {
+  font-size: 12px; line-height: 1.3;
+  overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+}
+.hvm-track button:hover, .hvm-track button:focus-visible { color: #e9e9e9; border-top-color: #9a9a9a; }
+.hvm-track button[aria-current="true"] { color: #fff; border-top-color: #e8b04b; background: #1b1b1b; }
+
+/* ── 拓扑树 ───────────────────────────────────────────── */
+.hvm-body { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); }
+.hvm-tree-pane { padding: 26px 18px 30px; border-right: 1px solid #3a3a3a; min-width: 0; }
+.hvm-tree { display: grid; }
+
+.hvm-node {
+  --depth: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  margin-left: calc(var(--depth) * 26px);
+  padding: 10px 12px;
+  border: 1px solid #4a4a4a; background: #171717;
+  overflow: hidden;
+  transition: margin-left .5s ease, max-height .45s ease, opacity .3s ease,
+              padding .45s ease, border-color .3s ease, background-color .3s ease;
+  max-height: 90px;
+}
+.hvm-node + .hvm-node { margin-top: -1px; }
+.hvm-node[data-hidden="true"] {
+  max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
+  border-top-width: 0; border-bottom-width: 0; pointer-events: none;
+}
+.hvm-node-main { min-width: 0; display: grid; gap: 3px; }
+.hvm-node-main strong { font-size: 15px; line-height: 1.25; }
+.hvm-node-main span { font-size: 12px; color: #9a9a9a; line-height: 1.35; }
+.hvm-node-mode {
+  flex: 0 0 auto; font-family: Consolas, monospace; font-size: 11px;
+  padding: 3px 8px; border: 1px solid #4a4a4a; color: #9a9a9a; white-space: nowrap;
+}
+
+.hvm-node[data-tone="hw"]     { border-color: #6a6a6a; }
+.hvm-node[data-tone="l0"]     { border-color: #8a8a8a; background: #1c1c1c; }
+.hvm-node[data-tone="guest"]  { border-color: #5aa9e6; }
+.hvm-node[data-tone="guest"] .hvm-node-mode { border-color: #5aa9e6; color: #8ec7f0; }
+.hvm-node[data-tone="ksword"] { border-color: #e8b04b; background: #1f1a10; }
+.hvm-node[data-tone="ksword"] .hvm-node-mode { border-color: #e8b04b; color: #e8b04b; }
+.hvm-node[data-tone="ksword"] strong { color: #e8b04b; }
+.hvm-node[data-tone="blocked"] { border-color: #e05c5c; background: #1f1212; }
+.hvm-node[data-tone="blocked"] strong { color: #e88; }
+.hvm-node[data-tone="blocked"] .hvm-node-mode { border-color: #e05c5c; color: #e88; }
+
+.hvm-node[data-flash="true"] { animation: hvm-flash 1.1s ease-out 1; }
+@keyframes hvm-flash {
+  0%   { background: #e8b04b; border-color: #e8b04b; }
+  100% { background: #1f1a10; border-color: #e8b04b; }
+}
+
+.hvm-callout {
+  margin-top: 22px; padding: 13px 15px;
+  border: 1px solid #4a4a4a; border-left: 4px solid #e8b04b;
+  background: #171717; font-size: 14px; line-height: 1.55;
+}
+.hvm-callout[data-kind="blocked"] { border-left-color: #e05c5c; }
+.hvm-callout[data-kind="plain"]   { border-left-color: #6a6a6a; }
+.hvm-callout b { color: #fff; }
+
+/* ── 右侧仪表 ─────────────────────────────────────────── */
+.hvm-meta { display: grid; align-content: start; min-width: 0; }
+.hvm-meta section { padding: 16px 18px; border-bottom: 1px solid #3a3a3a; }
+.hvm-meta section:last-child { border-bottom: 0; }
+.hvm-meta h3 {
+  margin: 0 0 11px; font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; color: #9a9a9a;
+}
+
+.hvm-gauges { display: grid; gap: 0; border-top: 1px solid #3a3a3a; }
+.hvm-gauges > div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 8px 0; border-bottom: 1px solid #2b2b2b;
+}
+.hvm-gauges dt, .hvm-gauges dd { margin: 0; }
+.hvm-gauges dt { font-size: 12px; color: #9a9a9a; }
+.hvm-gauges dd { font-family: Consolas, monospace; font-size: 13px; color: #e9e9e9; white-space: nowrap; }
+.hvm-gauges dd[data-live="on"] { color: #7fd39b; }
+.hvm-gauges dd[data-live="off"] { color: #6a6a6a; }
+
+.hvm-flags { display: flex; flex-wrap: wrap; gap: 5px; }
+.hvm-flags span {
+  font-family: Consolas, monospace; font-size: 11px; line-height: 1.5;
+  padding: 3px 7px; border: 1px solid #3a3a3a; color: #5c5c5c;
+  transition: color .3s ease, border-color .3s ease, background-color .3s ease;
+}
+.hvm-flags span[data-on="true"] { color: #111; background: #e9e9e9; border-color: #e9e9e9; }
+.hvm-flags span[data-on="true"][data-accent="warn"] { background: #e8b04b; border-color: #e8b04b; }
+
+.hvm-caps { display: grid; gap: 5px; }
+.hvm-caps span {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 12px; padding: 5px 8px; border: 1px solid #3a3a3a; color: #5c5c5c;
+  transition: color .3s ease, border-color .3s ease;
+}
+.hvm-caps span::before { content: "○"; font-family: Consolas, monospace; }
+.hvm-caps span[data-on="true"] { color: #e8b04b; border-color: #e8b04b; }
+.hvm-caps span[data-on="true"]::before { content: "●"; }
+
+.hvm-foot {
+  padding: 11px 18px; border-top: 1px solid #3a3a3a;
+  font-size: 12px; color: #9a9a9a; line-height: 1.5;
+}
+.hvm-foot code { color: #c9c9c9; }
+
+@media (max-width: 900px) {
+  .hvm-body { grid-template-columns: minmax(0, 1fr); }
+  .hvm-tree-pane { border-right: 0; border-bottom: 1px solid #3a3a3a; }
+  .hvm-track button span { display: none; }
+  .hvm-track button { justify-items: center; padding: 10px 4px; }
+  .hvm-node { margin-left: calc(var(--depth) * 14px); }
+}
+
+/* ── 页面内的数据表 ───────────────────────────────────── */
+.compare-table { border-top: 1px solid #111; margin: 20px 0 0; }
+.compare-table > div {
+  display: grid; grid-template-columns: minmax(150px, .8fr) 1.1fr 1.1fr; gap: 26px;
+  padding: 14px 0; border-bottom: 1px solid #999;
+}
+.compare-table p { margin: 0; }
+.compare-table .compare-head { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.reading-table { border-top: 1px solid #111; margin: 20px 0 0; }
+.reading-table > div {
+  display: grid; grid-template-columns: minmax(140px, .7fr) repeat(3, 1fr); gap: 22px;
+  padding: 13px 0; border-bottom: 1px solid #999;
+  font-variant-numeric: tabular-nums;
+}
+.reading-table p { margin: 0; }
+.reading-table .reading-head { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+@media (max-width: 760px) {
+  .compare-table > div, .reading-table > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+<div class="wrap header-row">
+<a aria-label="返回首页" class="wordmark" href="index.html">KSWORD <span>/ 5.1</span></a>
+<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
+</div>
+<div class="creator-info">
+<strong>wangwei-cm</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
+</div>
+</div>
+</article>
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
+</div>
+<div class="creator-info">
+<strong>OB_BUFF</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
+</div>
+</div>
+</article>
+</div>
+<nav aria-label="主导航">
+<a href="index.html">首页</a>
+<a href="changelog.html">更新日志</a>
+<a href="development.html">开发快照</a>
+<a aria-current="page" href="hvm-topology.html">HVM 拓扑</a>
+<a href="learn/index.html">文档</a>
+<a href="en/hvm-topology.html" hreflang="en">English</a>
+<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
+</nav>
+</div>
+</header>
+<main>
+
+<section class="page-hero compact"><div class="wrap">
+<p class="kicker">KERNEL VIRTUALIZATION / NESTED HVM</p>
+<h1>Nested HVM 拓扑变化</h1>
+<p class="lead">KSword HVM 不引导第二个 Windows。它对<strong>已经在跑的</strong>那个系统做一次后期接管：<code>VMLAUNCH</code> 之后，同一个执行上下文原地继续，只是从此运行在 VMX non-root，而 KSword 在 VMX root 处理它产生的每一次 VM exit。下面这台演示机逐步走完这个过程。</p>
+<div class="actions">
+<a class="primary" href="https://github.com/KSwordDEV/KSword/blob/main/docs/next/%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md" rel="noreferrer" target="_blank">嵌套虚拟化架构文档 ↗</a>
+<a href="https://github.com/KSwordDEV/KSword/blob/main/docs/%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md" rel="noreferrer" target="_blank">虚拟化能力路线图 ↗</a>
+<a href="development.html">主线开发快照</a>
+</div>
+</div></section>
+
+<section class="section compact-section"><div class="wrap">
+
+<div class="section-head">
+<div><p class="section-number">DEMO</p><h2 id="demo-title">七步拓扑演示</h2></div>
+</div>
+
+<div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
+  <div class="hvm-demo-head">
+    <div class="hvm-step-label">
+      <span class="idx" data-hvm-index="">STEP 01 / 07</span>
+      <strong data-hvm-title="">前置：开着 VBS 的物理机</strong>
+    </div>
+    <div aria-label="演示控制" class="hvm-controls">
+      <button data-hvm-prev="" type="button" aria-label="上一步">←</button>
+      <span aria-live="polite" class="hvm-count" data-hvm-count="">01 / 07</span>
+      <button data-hvm-next="" type="button" aria-label="下一步">→</button>
+      <button data-hvm-play="" type="button">自动播放</button>
+      <button data-hvm-reset="" type="button">重置</button>
+    </div>
+  </div>
+
+  <div aria-label="演示步骤" class="hvm-track" data-hvm-track="" role="tablist"></div>
+
+  <div class="hvm-body">
+    <div class="hvm-tree-pane">
+      <div class="hvm-tree" data-hvm-tree="">
+        <div class="hvm-node" data-node="cpu" data-tone="hw" style="--depth:0">
+          <div class="hvm-node-main"><strong>物理 CPU</strong><span>Intel VT-x / EPT</span></div>
+          <span class="hvm-node-mode">硬件</span>
+        </div>
+        <div class="hvm-node" data-node="l0" data-tone="l0" style="--depth:1">
+          <div class="hvm-node-main"><strong>Hyper-V（L0）</strong><span data-node-sub="">物理层 hypervisor，独占 VMX root</span></div>
+          <span class="hvm-node-mode">VMX root</span>
+        </div>
+        <div class="hvm-node" data-node="root" data-tone="l0" style="--depth:2">
+          <div class="hvm-node-main"><strong>根分区</strong><span>宿主 Windows · VBS / HVCI / 内核隔离</span></div>
+          <span class="hvm-node-mode">non-root</span>
+        </div>
+        <div class="hvm-node" data-node="rootdrv" data-tone="blocked" style="--depth:3">
+          <div class="hvm-node-main"><strong>KswordARK 驱动（根分区内）</strong><span data-node-sub="">探测不到 CPUID.1:ECX[5]，PREPARE 直接失败</span></div>
+          <span class="hvm-node-mode">被挡住</span>
+        </div>
+        <div class="hvm-node" data-node="child" data-tone="l0" style="--depth:2">
+          <div class="hvm-node-main"><strong>Hyper-V 子分区</strong><span>KSword-HVM-Target 虚拟机 · 已开启嵌套虚拟化</span></div>
+          <span class="hvm-node-mode">non-root</span>
+        </div>
+        <div class="hvm-node" data-node="ksword" data-tone="ksword" style="--depth:3">
+          <div class="hvm-node-main"><strong>KSword HVM（L1）</strong><span data-node-sub="">VMX root · 处理来自 L2 的每一次 VM exit</span></div>
+          <span class="hvm-node-mode">VMX root</span>
+        </div>
+        <div class="hvm-node" data-node="guest" data-tone="guest" style="--depth:3">
+          <div class="hvm-node-main"><strong data-node-title="">来宾 Windows</strong><span data-node-sub="">靶机里唯一那个 Windows，直接跑在子分区上</span></div>
+          <span class="hvm-node-mode" data-node-mode="">ring 0 / 3</span>
+        </div>
+      </div>
+      <p class="hvm-callout" data-hvm-callout="" data-kind="blocked"></p>
+    </div>
+
+    <div class="hvm-meta">
+      <section>
+        <h3>本步发生了什么</h3>
+        <p data-hvm-detail="" style="margin:0;font-size:14px;line-height:1.6;"></p>
+      </section>
+      <section>
+        <h3>权威判据</h3>
+        <dl class="hvm-gauges">
+          <div><dt>CR4.VMXE（bit 13）</dt><dd data-gauge="vmxe">0</dd></div>
+          <div><dt>residentProcessorCount</dt><dd data-gauge="rpc">0</dd></div>
+          <div><dt>VM-exit 累计</dt><dd data-gauge="exits">—</dd></div>
+          <div><dt>sc stop 卸载</dt><dd data-gauge="unload">允许</dd></div>
+        </dl>
+      </section>
+      <section>
+        <h3>KSWORD_ARK_HVM_STATE_*</h3>
+        <div class="hvm-flags" data-hvm-flags=""></div>
+      </section>
+      <section>
+        <h3>依赖这一层的能力</h3>
+        <div class="hvm-caps" data-hvm-caps=""></div>
+      </section>
+    </div>
+  </div>
+
+  <p class="hvm-foot">演示按 <code>KSwordDEV/KSword@main</code> 的 HVM 协议与嵌套架构文档编排。读数取自文档记录的 2 vCPU 嵌套 Hyper-V 靶机实测，<b>不是裸机结论</b>；本页不执行任何真实虚拟化操作。</p>
+</div>
+
+</div></section>
+
+<section class="section alt"><div class="wrap two-column">
+<h2>它不启动第二个 Windows</h2>
+<div class="prose">
+<p>这是最容易读反的一点。<code>VMLAUNCH</code> 之后没有重启、没有第二个内核、桌面上什么都不会发生——原本那个 Windows 的执行上下文<strong>原地</strong>往下跑，只是从此处在 VMX non-root 模式。演示里那一行「Windows」自始至终是同一个节点，第 5 步只是往它上面插了一层。</p>
+<p>正因为看不见，它也最容易被误判成「没生效」。所以判据不能靠肉眼：<code>RESIDENT_ACTIVE</code> 是状态位不是心跳，权威判据是 <code>residentProcessorCount &gt; 0</code>，更硬的判据是 <code>CR4.VMXE</code>——蓝屏转储里这一位为 0，就意味着崩溃时这一层根本没在跑。</p>
+</div>
+</div></section>
+
+<section class="section"><div class="wrap two-column">
+<h2>一次性来宾 vs 常驻</h2>
+<div class="document-narrow" style="width:100%">
+<p>驱动里有两种进入 VMX 的方式，差别不是程度而是种类。</p>
+<div class="compare-table">
+<div class="compare-head"><p>维度</p><p>一次性来宾（one-shot guest）</p><p>常驻（resident）</p></div>
+<div><p><strong>谁在 non-root 里跑</strong></p><p>驱动自己造的一小段测试代码</p><p><strong>正在运行的这个 Windows</strong></p></div>
+<div><p><strong>持续多久</strong></p><p>几条指令，立刻 VMXOFF</p><p>一直，直到显式停止</p></div>
+<div><p><strong>能观测什么</strong></p><p>只有那段测试代码</p><p>全机器的每一次 VM exit</p></div>
+<div><p><strong>用途</strong></p><p>证明 VMX 能进能出</p><p>真正的监控与拦截</p></div>
+</div>
+<div class="action-rule critical-rule" style="margin-top:26px">
+<strong>只有常驻期间，这一层才存在。</strong>
+<p>停掉常驻之后 CPU 回到 VMX 关闭状态，EPT 不再被硬件遵守，所有基于 EPT 的能力——隐蔽 Hook、分离视图、执行域、R-1 进程处置——<strong>全部同时失效</strong>。不是降级，是那一层不在了。</p>
+</div>
+<p>这也解释了两件反直觉的事：EPT 规则、分离视图和 R-1 处置<strong>只能在常驻停着时安装</strong>（常驻期间退出路径不持锁就在读这些表），所以界面上「装一条处置」实际是 <code>停常驻 → 装 → 重启常驻</code>；而 <code>sc stop</code> 在常驻期间返回 <code>1052</code>，因为卸载守卫在拦——映像正在 VMX root 里被执行，卸载它等于把机器打死。</p>
+</div>
+</div></section>
+
+<section class="section alt"><div class="wrap two-column">
+<h2>嵌套带来的三条硬约束</h2>
+<div class="document-narrow" style="width:100%">
+<p>嵌套不是「和裸机一样，只是慢一点」。外层决定了内层能看见什么，下面三条都是在靶机上实测撞出来的。</p>
+<div class="definition-list">
+<div>
+<p><strong>没有 Monitor Trap Flag</strong></p>
+<p>嵌套 Hyper-V 不向来宾通告 MTF。默认那套「写叶 + monitor-trap 恢复」的隐蔽 Hook 后端因此根本装不上，只有 <strong>EPTP 切换后端</strong>能工作——它只要求 execute-only EPT 叶（<code>IA32_VMX_EPT_VPID_CAP</code> bit 0），而那一位在同一台机器上可用。这是选那套后端的唯一理由：<em>能力，不是性能</em>。</p>
+</div>
+<div>
+<p><strong>跨核 TLB 失效要自己做</strong></p>
+<p>转发给 L0 的 flush hypercall 只让 L0 去失效它认为的那个 L1 VP，而那个 VP 正在跑我们的 L2，兄弟核上的陈旧翻译不会被清掉。这个缺陷<strong>只在「我们插在 Windows 和 Hyper-V 中间」时存在</strong>。修法是私有 VMX-root IDT + 广播 NMI，并且私有 IDT 是发 NMI 的<em>前提</em>而不是优化——第一次只加 NMI 广播就撞了 <code>0x80 NMI_HARDWARE_FAILURE</code>。</p>
+</div>
+<div>
+<p><strong>必须显式声明允许嵌套</strong></p>
+<p>检测到外层已有 hypervisor 而请求里没带 <code>ALLOW_NESTED</code> 时，驱动直接拒绝启动常驻，而不是静默降级——静默降级出来的东西没人能判断它到底在保护什么。常驻成功时会打上 <code>RESIDENT_NESTED</code>，界面明确显示「作为 L1 运行，性能与可用能力均降级」。</p>
+</div>
+</div>
+</div>
+</div></section>
+
+<section class="section"><div class="wrap two-column">
+<h2>跨核失效：开关一次，现象跟着开关一次</h2>
+<div class="document-narrow" style="width:100%">
+<p>判据不用「跑很久没崩」那种统计实验，而是确定性的：<code>VirtualProtect</code> 返回的语义就是「所有处理器都已看到新保护」。主线程把一页改成 <code>PAGE_NOACCESS</code> 并等它返回，之后绑在别的处理器上的线程再去读——读<strong>成功</strong>就是用了一条本该已被失效的映射。</p>
+<div class="reading-table">
+<div class="reading-head"><p>轮次</p><p>常驻核数</p><p>窗口内取样</p><p>违规</p></div>
+<div><p>基线</p><p>0</p><p>10,429,398</p><p><strong>0</strong></p></div>
+<div><p>常驻（修复前）</p><p>2</p><p>180,208,570</p><p><strong>174,787,358（97%）</strong></p></div>
+<div><p>基线</p><p>0</p><p>10,644,062</p><p><strong>0</strong></p></div>
+<div><p>常驻（修复后）×3</p><p>2</p><p>6,434,264 / 6,952,434 / 6,782,150</p><p><strong>0 / 0 / 0</strong></p></div>
+</div>
+<p class="source-path">除了违规计数归零，取样量级也从 1.8 亿掉回 600–700 万、与基线同量级——读会正常触发访问违例才会这么慢。只看「违规 = 0」可能是探针失灵，<strong>量级一起对上</strong>才说明真的在走页表。这个缺陷同时解释了此前三种没有归因的崩溃：<code>0x139 (0x1D)</code>、<code>0x0A</code> 与 <code>0x50</code>。</p>
+<div class="action-rule" style="margin-top:26px">
+<strong>这条修法依赖「我们没有启用 VPID」。</strong>
+<p>未启用 VPID 时 VM entry 会失效与 VPID 0000H 关联的线性映射，广播 NMI 才能治好跨核失效。一旦为了性能启用 VPID，那次 entry 什么都不刷，修法会<strong>静默失效</strong>——失效形态就是上表那个 97%，不会有任何报错。所以这两件事必须一起改。</p>
+</div>
+</div>
+</div></section>
+
+<section class="section alt"><div class="wrap two-column">
+<h2>为什么开着 VBS 的物理机走不通</h2>
+<div class="prose">
+<p>这不是策略问题，是一条硬事实。开着内存完整性或 Credential Guard 任一项就会拉起 Hyper-V；Hyper-V 独占 VMX root，并且对根分区<strong>隐藏 <code>CPUID.1:ECX[5]</code></strong>。于是连「这台机器有 VT-x」都探测不到，<code>PREPARE</code> 就失败了——根本走不到任何一处 <code>HYPERVISOR_PRESENT</code> 判断。</p>
+<p>关键在于<strong>根分区拿不到嵌套 VMX</strong>。Hyper-V 确实支持把虚拟化扩展暴露给 guest（<code>Set-VMProcessor -ExposeVirtualizationExtensions</code>），但那是给它的 <em>guest 分区</em>用的，根分区不在其列——而 KswordARK 驱动就跑在根分区。</p>
+<p>因此可选项只有两条，都需要重启，都由使用者自己决定：关掉内存完整性并 <code>bcdedit /set hypervisorlaunchtype off</code> 在本机跑（代价是失去 HVCI 与 Credential Guard），或者保留 VBS、在开了 <code>ExposeVirtualizationExtensions</code> 的子分区里跑。产品侧维持 fail-closed，并把原因如实报出：<code>NestedNotAllowed</code> 与 <code>HypervisorConflict</code> 是分开的两态，因为前者用户自己能解决。</p>
+<p><strong>不做的是</strong>：探测到 VBS 就尝试抢占 VMX root，或者绕过 CPUID 隐藏去猜 VMX 是否真的存在。两者都是拿使用者的机器去赌一个无法验证的假设。</p>
+</div>
+</div></section>
+
+<section class="notice"><div class="wrap two-column">
+<h2>边界</h2>
+<div>
+<p>常驻 HVM 是实验性后端，仅适用于已获授权的实验与诊断环境。启动前请保存工作：VMCS、EPT、固件、Hyper-V/VBS、嵌套虚拟化或处理器实现异常都可能导致系统不稳定、蓝屏或必须重启。</p>
+<p style="margin-top:14px">隐蔽 Hook、分离视图与 R-1 进程处置<strong>不是安全边界</strong>：它们失败即放行，目标若能让代码页换一个客户物理页，就不在被拒绝的那一页上了。这是 R0 之外的一条处置通路，不是用来对抗一个知道它存在的对手。上面的读数来自嵌套靶机，路线图中多项裸机验收仍未完成。</p>
+</div>
+</div></section>
+
+</main>
+<footer><div class="wrap footer-row"><span>KSWORD / NESTED HVM</span><div class="footer-links"><a href="index.html">首页</a><a href="development.html">开发快照</a><a href="docs/index.html">文档</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+
+<script>
+(function () {
+  var root = document.querySelector('[data-hvm]');
+  if (!root) { return; }
+
+  var FLAGS = [
+    'INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED',
+    'UNLOAD_GUARD_ARMED', 'RESIDENT_STARTING', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED',
+    'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE', 'RESIDENT_STOPPING'
+  ];
+  var CAPS = [
+    'EPT ENFORCE 持久拒绝',
+    '分离视图 HOOK / CLOAK',
+    'MSR / CR 策略引擎',
+    'EPT 执行域 · VMFUNC',
+    'R-1 进程冻结与结束',
+    'R-1 内存通道'
+  ];
+
+  var STEPS = [
+    {
+      tag: 'VBS',
+      short: '开着 VBS 的物理机',
+      title: '前置：开着 VBS 的物理机',
+      nodes: { cpu: 0, l0: 1, root: 2, rootdrv: 3 },
+      l0sub: '物理层 hypervisor，独占 VMX root；对根分区隐藏 CPUID.1:ECX[5]',
+      calloutKind: 'blocked',
+      callout: '<b>这条路走不通。</b>HVCI 拉起 Hyper-V，Hyper-V 隐藏了 VMX 位，于是连「这台机器有 VT-x」都探测不到——<code>PREPARE</code> 在能力探测阶段就失败，根本走不到 <code>HYPERVISOR_PRESENT</code> 那道检查。根分区也拿不到嵌套 VMX。',
+      detail: '结论是「没有共存方案」，不是「还没做」。要么关掉内存完整性并 hypervisorlaunchtype off，要么换到开了嵌套的子分区里跑。',
+      flags: [],
+      gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
+    },
+    {
+      tag: 'TARGET',
+      short: '嵌套靶机就位',
+      title: '靶机：嵌套已开启的子分区',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
+      l0sub: '物理层 hypervisor，独占 VMX root',
+      guestTitle: '来宾 Windows',
+      guestSub: '靶机里唯一那个 Windows，直接跑在子分区上',
+      guestMode: 'ring 0 / 3',
+      calloutKind: 'plain',
+      callout: '宿主可以继续开着 VBS/HVCI——那些保护由<b>外层</b> Hyper-V 环境拥有。但<b>目标来宾自己</b>不能再跑一套 Hyper-V/VBS，所以靶机前置里的 <code>bcdedit /set hypervisorlaunchtype off</code> 不是可选项。',
+      detail: '能力探测这一步读到：VMX ✓、HYPERVISOR_PRESENT ✓、NESTED_VMX_EXPOSED ✓。此刻还没有分配任何 VMX 资源。',
+      flags: [],
+      gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
+    },
+    {
+      tag: 'PREPARE',
+      short: '分配 VMX 资源与 EPT',
+      title: 'PREPARE：准备资源，还没虚拟化任何东西',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
+      guestTitle: '来宾 Windows',
+      guestSub: '照常运行，完全不知道下面发生了什么',
+      guestMode: 'ring 0 / 3',
+      calloutKind: 'plain',
+      callout: '每 CPU 的 VMXON / VMCS 区域、MTRR-aware 的 EPT 恒等映射（2 MiB leaf + 4 KiB 拆分账本）、MSR bitmap 与<b>私有 VMX-root IDT</b> 都在这一步分配。全程 PASSIVE_LEVEL，因为要分页。',
+      detail: '私有 IDT 从运行中的表整份拷贝，只改 vector 2 的偏移，选择子 / IST 索引 / type-DPL-P 全部保留。分配失败则不安装，VMX root 沿用来宾的表，只是之后不再发 NMI。',
+      flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY'],
+      gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
+    },
+    {
+      tag: 'SELFTEST',
+      short: '每核 VMXON / VMXOFF',
+      title: 'SELF_TEST：证明进得去也出得来',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
+      guestTitle: '来宾 Windows',
+      guestSub: '照常运行；自检窗口只有几条指令宽',
+      guestMode: 'ring 0 / 3',
+      calloutKind: 'plain',
+      callout: '在每个逻辑处理器上短暂执行一次 VMXON / VMXOFF，固定当前处理器、提升到 DISPATCH_LEVEL，清理 VMX 与 CR4 后再恢复原 IRQL 与线程 affinity。',
+      detail: '准备完成或自检通过都<b>不等于</b>虚拟机已经启动。要求准备数、自检通过数与活动 CPU 数完全一致，且 EPT 不能是 EPT_TRUNCATED，否则常驻硬门不放行。',
+      flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
+      gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
+    },
+    {
+      tag: 'VMLAUNCH',
+      short: '拓扑在这里改变',
+      title: 'START_RESIDENT：VMLAUNCH，拓扑在这里改变',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
+      flash: 'ksword',
+      guestTitle: '同一个 Windows（L2）',
+      guestSub: '没有重启，没有第二个内核——执行上下文原地继续，只是从此在 VMX non-root',
+      guestMode: 'VMX non-root',
+      calloutKind: 'warn',
+      callout: '全核 rendezvous 之后每核各执行一次 <code>VMLAUNCH</code>。<b>「Windows」还是同一个节点</b>，只是上面插进了一层：KSword 进入 VMX root 成为 L1，从此处理来自 L2 的每一次 VM exit。',
+      detail: '请求里必须显式带 ALLOW_NESTED，否则检测到外层 hypervisor 时直接拒绝而不是静默降级。成功后打上 RESIDENT_NESTED，界面显示「作为 L1 运行，性能与可用能力均降级」。',
+      flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
+      accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
+      gauges: { vmxe: '1', rpc: '2', exits: '0', unload: 'sc stop → 1052' }
+    },
+    {
+      tag: 'RESIDENT',
+      short: '常驻期能力上线',
+      title: '常驻期：依赖这一层的能力全部上线',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
+      kswordSub: 'VMX root · EPT 规则、分离视图、策略引擎与 R-1 处置都由这一层兑现',
+      guestTitle: '同一个 Windows（L2）',
+      guestSub: '桌面上什么都不会发生——这正是它容易被误判成「没生效」的原因',
+      guestMode: 'VMX non-root',
+      calloutKind: 'warn',
+      callout: '嵌套靶机上 30 秒实测 <b>34,000～68,000 次退出</b>，最大的一类是 HLT。外层已经在做 VMCS shadowing，所以 VMREAD 并不贵——单次约占一次退出成本的 <b>0.149%</b>。打开 CR3 追踪会让每一次地址空间切换都变成一次退出，Windows 每秒切换数千次，机器会明显变慢，所以它是按需开关。',
+      detail: '这些能力必须在常驻停着时安装：退出路径不持锁就在读这些表，而安装要分页、要改所有处理器都会走的页表。所以界面上「装一条处置」实际是 停常驻 → 装 → 重启常驻。',
+      flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE'],
+      accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE'],
+      caps: [0, 1, 2, 3, 4, 5],
+      gauges: { vmxe: '1', rpc: '2', exits: '34k–68k / 30s', unload: 'sc stop → 1052' }
+    },
+    {
+      tag: 'STOP',
+      short: '整层消失',
+      title: 'STOP_RESIDENT：那一层不在了',
+      nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
+      guestTitle: '来宾 Windows',
+      guestSub: '又是直接跑在子分区上；同样没有重启，同样什么都没发生',
+      guestMode: 'ring 0 / 3',
+      calloutKind: 'blocked',
+      callout: '全核 VMXOFF 之后 CPU 回到 VMX 关闭状态，EPT 不再被硬件遵守。<b>所有基于 EPT 的能力同时失效——不是降级，是那一层不在了。</b>',
+      detail: '卸载守卫这时才解除，sc stop 恢复正常。停止不完整必须保留 host stack、卸载锁与 ROLLBACK_REQUIRED；睡眠/唤醒会清除睡眠前的逐 CPU 自检与 VMXON 证据，要求重新自检后才能再次启动。',
+      flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
+      gauges: { vmxe: '0', rpc: '0', exits: '已归零', unload: '允许' }
+    }
+  ];
+
+  var elIndex = root.querySelector('[data-hvm-index]');
+  var elTitle = root.querySelector('[data-hvm-title]');
+  var elCount = root.querySelector('[data-hvm-count]');
+  var elTrack = root.querySelector('[data-hvm-track]');
+  var elCallout = root.querySelector('[data-hvm-callout]');
+  var elDetail = root.querySelector('[data-hvm-detail]');
+  var elFlags = root.querySelector('[data-hvm-flags]');
+  var elCaps = root.querySelector('[data-hvm-caps]');
+  var btnPrev = root.querySelector('[data-hvm-prev]');
+  var btnNext = root.querySelector('[data-hvm-next]');
+  var btnPlay = root.querySelector('[data-hvm-play]');
+  var btnReset = root.querySelector('[data-hvm-reset]');
+
+  var nodes = {};
+  Array.prototype.forEach.call(root.querySelectorAll('[data-node]'), function (n) {
+    nodes[n.getAttribute('data-node')] = n;
+  });
+  var gauges = {};
+  Array.prototype.forEach.call(root.querySelectorAll('[data-gauge]'), function (n) {
+    gauges[n.getAttribute('data-gauge')] = n;
+  });
+
+  var flagEls = FLAGS.map(function (name) {
+    var s = document.createElement('span');
+    s.textContent = name;
+    s.setAttribute('data-on', 'false');
+    elFlags.appendChild(s);
+    return s;
+  });
+  var capEls = CAPS.map(function (name) {
+    var s = document.createElement('span');
+    s.textContent = name;
+    s.setAttribute('data-on', 'false');
+    elCaps.appendChild(s);
+    return s;
+  });
+
+  var trackBtns = STEPS.map(function (step, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'tab');
+    b.innerHTML = '<b>' + String(i + 1).padStart(2, '0') + ' ' + step.tag + '</b><span>' + step.short + '</span>';
+    b.addEventListener('click', function () { stop(); go(i); });
+    elTrack.appendChild(b);
+    return b;
+  });
+
+  var current = -1;
+  var timer = null;
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+
+  function go(i) {
+    if (i < 0 || i >= STEPS.length || i === current) { return; }
+    var prevIndex = current;
+    current = i;
+    var step = STEPS[i];
+
+    elIndex.textContent = 'STEP ' + pad(i + 1) + ' / ' + pad(STEPS.length);
+    elTitle.textContent = step.title;
+    elCount.textContent = pad(i + 1) + ' / ' + pad(STEPS.length);
+    elCallout.innerHTML = step.callout;
+    elCallout.setAttribute('data-kind', step.calloutKind === 'warn' ? 'warn' : step.calloutKind);
+    elDetail.innerHTML = step.detail;
+
+    Object.keys(nodes).forEach(function (key) {
+      var depth = step.nodes[key];
+      var node = nodes[key];
+      if (typeof depth === 'number') {
+        node.setAttribute('data-hidden', 'false');
+        node.style.setProperty('--depth', depth);
+      } else {
+        node.setAttribute('data-hidden', 'true');
+      }
+      node.removeAttribute('data-flash');
+    });
+
+    if (step.flash && prevIndex >= 0 && prevIndex < i) {
+      var flashNode = nodes[step.flash];
+      if (flashNode) {
+        void flashNode.offsetWidth;
+        flashNode.setAttribute('data-flash', 'true');
+      }
+    }
+
+    var l0sub = nodes.l0.querySelector('[data-node-sub]');
+    if (step.l0sub) { l0sub.textContent = step.l0sub; }
+
+    var kswordSub = nodes.ksword.querySelector('[data-node-sub]');
+    kswordSub.textContent = step.kswordSub || 'VMX root · 处理来自 L2 的每一次 VM exit';
+
+    if (step.guestTitle) {
+      nodes.guest.querySelector('[data-node-title]').textContent = step.guestTitle;
+      nodes.guest.querySelector('[data-node-sub]').textContent = step.guestSub;
+      nodes.guest.querySelector('[data-node-mode]').textContent = step.guestMode;
+    }
+
+    var accent = step.accentFlags || [];
+    flagEls.forEach(function (el, idx) {
+      var name = FLAGS[idx];
+      var on = step.flags.indexOf(name) !== -1;
+      el.setAttribute('data-on', on ? 'true' : 'false');
+      if (on && accent.indexOf(name) !== -1) { el.setAttribute('data-accent', 'warn'); }
+      else { el.removeAttribute('data-accent'); }
+    });
+
+    var caps = step.caps || [];
+    capEls.forEach(function (el, idx) {
+      el.setAttribute('data-on', caps.indexOf(idx) !== -1 ? 'true' : 'false');
+    });
+
+    Object.keys(gauges).forEach(function (key) {
+      var value = step.gauges[key];
+      gauges[key].textContent = value;
+      if (key === 'vmxe' || key === 'rpc') {
+        gauges[key].setAttribute('data-live', value !== '0' ? 'on' : 'off');
+      }
+    });
+
+    trackBtns.forEach(function (b, idx) {
+      b.setAttribute('aria-current', idx === i ? 'true' : 'false');
+    });
+    btnPrev.disabled = i === 0;
+    btnNext.disabled = i === STEPS.length - 1;
+  }
+
+  function stop() {
+    if (timer) { clearInterval(timer); timer = null; }
+    btnPlay.textContent = '自动播放';
+  }
+
+  function play() {
+    if (timer) { stop(); return; }
+    if (current === STEPS.length - 1) { go(0); }
+    btnPlay.textContent = '暂停';
+    timer = setInterval(function () {
+      if (current >= STEPS.length - 1) { stop(); return; }
+      go(current + 1);
+    }, 3600);
+  }
+
+  btnPrev.addEventListener('click', function () { stop(); go(current - 1); });
+  btnNext.addEventListener('click', function () { stop(); go(current + 1); });
+  btnPlay.addEventListener('click', play);
+  btnReset.addEventListener('click', function () { stop(); go(0); });
+
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { stop(); go(current - 1); }
+    else if (e.key === 'ArrowRight') { stop(); go(current + 1); }
+  });
+
+  go(0);
+})();
+</script>
+</body>
+</html>

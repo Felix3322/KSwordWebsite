@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 2026-08-16 main 分支开发快照：内核审计、崩溃转储、启动链检测、R0 取证、Light 模块、界面和许可证更新。" name="description"/>
+<meta content="KSword 2026-09-08 main 分支开发快照：常驻 VMM 与 R-1 层、EPT 分离视图与执行域、嵌套运行与跨核 TLB 失效修复、Light 调查工作台、内核诊断与验收状态。" name="description"/>
 <title>main 分支开发快照 — KSword</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/development.html" hreflang="en" rel="alternate"/>
@@ -11,12 +11,41 @@
 <body>
 <header class="site-header">
 <div class="wrap header-row">
-<a aria-label="返回首页" class="wordmark" href="index.html">KSWORD <span>/ MAIN</span></a>
+<a aria-label="返回首页" class="wordmark" href="index.html">KSWORD <span>/ 5.1</span></a>
+<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
+</div>
+<div class="creator-info">
+<strong>wangwei-cm</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
+</div>
+</div>
+</article>
+<article class="creator-card">
+<div class="creator-avatars">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
+</div>
+<div class="creator-info">
+<strong>OB_BUFF</strong>
+<div class="creator-links">
+<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
+<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
+</div>
+</div>
+</article>
+</div>
 <nav aria-label="主导航">
 <a href="index.html">首页</a>
+<a href="changelog.html">更新日志</a>
 <a aria-current="page" href="development.html">开发快照</a>
-<a href="changelog.html">正式版本</a>
-<a href="docs/index.html">文档</a>
+<a href="hvm-topology.html">HVM 拓扑</a>
+<a href="learn/index.html">文档</a>
 <a href="en/development.html" hreflang="en">English</a>
 <a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
 </nav>
@@ -26,37 +55,127 @@
 <section class="page-hero compact"><div class="wrap">
 <p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT</p>
 <h1>主线最新开发变化</h1>
-<p class="lead">截至 2026-08-16，当前快照为 <code>KSwordDEV/KSword@848b6bb</code>。本页整理 main 的开发状态，不把未发布内容写成新的正式版本。</p>
-<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank">查看快照 HEAD</a><a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">查看正式发行资产</a><a href="changelog.html">查看完整版本历史</a></div>
+<p class="lead">截至 2026-09-08，当前快照为 <code>KSwordDEV/KSword@e3d8106</code>。自上一次同步（<code>848b6bb</code>，2026-08-16）以来主线新增 <strong>297 个提交</strong>，绝大部分集中在硬件虚拟化。本页整理 main 的开发状态，不把未发布内容写成新的正式版本。</p>
+<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank">查看快照 HEAD</a><a href="hvm-topology.html">Nested HVM 拓扑演示</a><a href="learn/index.html">文档中心</a><a href="changelog.html">查看完整版本历史</a></div>
 </div></section>
 <section class="section compact-section"><div class="wrap docs-layout">
-<aside aria-label="开发快照目录" class="side-index"><strong>本页目录</strong><a href="#scope">快照边界</a><a href="#kernel">内核与 R0 审计</a><a href="#dumps">转储与崩溃</a><a href="#process-security">进程与安全检测</a><a href="#forensics">文件、网络与系统工具</a><a href="#light">Light 与控制动作</a><a href="#ui">界面与运行时</a><a href="#license">许可证与发布</a><a href="#operator">使用注意</a><a href="#commits">关键提交</a></aside>
+<aside aria-label="开发快照目录" class="side-index"><strong>本页目录</strong><a href="#scope">快照边界</a><a href="#hvm">常驻 VMM 与 R-1 层</a><a href="#hvm-nested">嵌套运行与实测读数</a><a href="#hvm-disposition">R-1 处置与内存通道</a><a href="#kernel">内核、驱动与诊断</a><a href="#light">Light 调查工作台</a><a href="#ui">界面与运行时</a><a href="#evidence">验收状态</a><a href="#operator">使用注意</a><a href="#commits">关键提交</a></aside>
 <div class="document-content operator-manual">
+
 <section id="scope"><p class="section-number">01 / SCOPE</p><h2>这是 main 开发快照，不是新的版本号</h2>
-<div class="status-table"><div><strong>快照 HEAD</strong><p><code>848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c</code></p></div><div><strong>时间</strong><p>GitHub 提交时间为 2026-08-16 06:29 UTC。当前页面基于该提交及其祖先。</p></div><div><strong>近一个月提交</strong><p>按 2026-07-16 至 2026-08-16 的 GitHub API 提交列表统计，共 653 个提交；下文只整理能影响用户理解的功能和安全变化。</p></div><div><strong>版本边界</strong><p>稳定版为 <code>5.1.4.0</code>；<code>5.1.4.1-Alpha</code> 和 <code>5.1.5.0-pre</code> 是预发行版本。main 比 <code>5.1.5.0-pre</code> 多 171 个提交，不能用单个 EXE 或 SYS 替换发行包。</p></div></div>
-<div class="action-rule"><strong>需要稳定资产时使用 Releases。</strong><p>主程序、KswordARK.sys、共享 IOCTL、语言包、DynData profiles、Launcher 和插件必须来自同一构建链；混用文件会产生 Unsupported、协议不匹配或字段缺失。</p></div></section>
-<section id="kernel"><p class="section-number">02 / KERNEL &amp; R0</p><h2>内核审计、动态偏移与故障闭合</h2>
-<div class="capability-grid"><div><strong>新增或增强审计</strong><ul><li>IDT、代码完整性、VBS/HVCI 姿态、页保护。</li><li>SLAT/IOMMU、EPT/NPT、Hypervisor CPUID、DMAR/IVRS。</li><li>HAL、WDF/KMDF、i8042prt、对象类型、特殊回调和 IoTimer。</li><li>系统线程、工作队列、描述符表、IOCTL 解码与内核反汇编。</li></ul></div><div><strong>运行时安全</strong><ul><li>PDB 无关的运行时签名扫描与偏移回退。</li><li>DynData v4 profile 与 Launcher 支持清单。</li><li>安全读取回退内核地址，降低 DriverEntry 阶段蓝屏风险。</li><li>物理机 BugCheck 面板故障闭合，并保留 VMware 显示路径。</li></ul></div></div>
-<p>这些页面仍然受 Driver Status、Capability、DynData 和目标身份门禁约束；按钮可见不代表对应 R0 能力已就绪。</p></section>
-<section id="dumps"><p class="section-number">03 / DUMP FORENSICS</p><h2>崩溃转储从结构展示扩展到归因证据</h2><p>近期开启独立转储分析工作流：加入 triage 崩溃上下文、triage 数据块、二级转储记录、捕获内存和 BlackBox 证据预览，并结合符号解析、Pool Tag 归属和崩溃时间线给出更完整的诊断材料。BugCheck 相关显示在物理机和 VMware 路径之间保留明确边界。</p><div class="action-rule"><strong>转储内容是诊断证据，不是自动归因的绝对结论。</strong><p>页面展示的缺失字段、Unsupported 和部分记录必须保留，不能用默认值填成“正常”。</p></div></section>
-<section id="process-security"><p class="section-number">04 / PROCESS &amp; SECURITY</p><h2>进程身份、启动链与攻击链检测</h2><div class="status-table"><div><strong>进程与线程</strong><p>进程表补齐接近任务管理器的列，支持自选列、自定义视图、目标线程消息钩子、线程/模块/令牌/PEB 详情，以及基于对象管理器回调的可续期进程保护。</p></div><div><strong>启动与加载</strong><p>新增 DLL 劫持候选检测、IFEO 镜像劫持检测、隐藏启动项交叉比对和 EXIT GhostSystemDriver 攻击链检测；启动位置目录扩展到 187 条。</p></div><div><strong>应用控制</strong><p>补齐 AppLocker 模块加载容错、应用控制编辑器和上下文动作。全局热键支持安全编辑与删除，服务枚举和清理流程也继续加固。</p></div></div></section>
-<section id="forensics"><p class="section-number">05 / FORENSICS</p><h2>文件、网络与系统工具继续下沉到 R0</h2><div class="capability-grid"><div><strong>文件与存储</strong><ul><li>MFT、IRP、R0 目录解析和续扫。</li><li>五档删除权限、R0/POSIX 删除后端。</li><li>物理磁盘扇区读取、原始文件系统浏览、存储和设备证据。</li></ul></div><div><strong>网络与系统</strong><ul><li>R0 WFP 逐包捕获启停、连接管理和网络诊断。</li><li>DNS、WFP 防火墙、HTTPS 代理恢复和 NIDS 继续完善。</li><li>系统时间、性能监控、USB 拓扑、系统总线和右键菜单工具。</li></ul></div></div></section>
-<section id="light"><p class="section-number">06 / LIGHT</p><h2>KswordARKLight 接入更多只读页和可逆控制</h2><p>Light 版本新增网络、窗口、系统工具、性能总线、服务、权限等模块，并接入逐包捕获控制、PiDDB 条目删除、物理磁盘读取，以及驱动派遣/镜像/通信的恢复或放弃动作。涉及写入、删除、恢复或放弃记录的动作继续使用显式确认、代次校验和结果回填。</p><div class="action-rule critical-rule"><strong>“放弃”不改内核状态，但会永久丢失恢复记录。</strong><p>因此放弃动作比恢复动作更危险，网站和程序文案都应保持这个区分。</p></div></section>
-<section id="ui"><p class="section-number">07 / UI &amp; RUNTIME</p><h2>大表格、任务栏和主题体验继续调整</h2><p>主线加入自适应表格搜索范围、表头排序、冻结行列、任务栏通知筛选、目标线程消息钩子展示、蓝屏面板调整、动态主题和透明背景修复；同时继续收敛文件占用扫描、异步刷新、驱动搜索、API Monitor、硬件监控和退出阶段的生命周期问题。</p><p>这些提交中有相当部分是稳定性修复或内部实验，不应被包装成单独的正式功能版本。</p></section>
-<section id="license"><p class="section-number">08 / LICENSE</p><h2>许可证已更新为 v1.6</h2><p>主仓库自 2026-08-16 起使用 <strong>KSword Community Source License v1.6</strong>。它允许使用、修改、免费分发、付费服务和托管/SaaS，但软件本身不得出售；对外提供修改版本时必须标明非官方、披露实质性修改并提供对应源码。该许可证是源码公开许可证，不是 OSI 批准的开放源代码许可证；第三方组件和插件仍适用各自许可证。</p><p><a href="docs/license.html">查看网站许可证说明 →</a>　<a href="https://github.com/KSwordDEV/KSword/blob/main/LICENSE" rel="noreferrer" target="_blank">阅读主仓库 LICENSE ↗</a></p></section>
-<section id="operator"><p class="section-number">09 / OPERATOR NOTES</p><h2>在 main 上测试前的最低检查</h2><ol class="numbered-procedure"><li><span>1</span><div><strong>整套构建必须来自同一提交。</strong><p>不要只替换 EXE、SYS、语言包、profiles 或插件。</p></div></li><li><span>2</span><div><strong>先看 Driver Status、DynData 和 Capability。</strong><p>Unsupported 表示协议、驱动或能力不匹配，不等于页面没有数据。</p></div></li><li><span>3</span><div><strong>高风险动作只在授权和可回滚环境测试。</strong><p>系统时间、HVM、磁盘写入、驱动卸载、内核修改、进程保护和删除动作都应准备快照或恢复路径。</p></div></li><li><span>4</span><div><strong>保留修改前证据。</strong><p>导出目标身份、地址、来源模块、配置和时间戳；动作后刷新并保存新旧结果。</p></div></li></ol></section>
-<section id="commits"><p class="section-number">10 / COMMIT INDEX</p><h2>关键提交索引</h2><div class="link-rows">
-<a href="https://github.com/KSwordDEV/KSword/commit/848b6bb49fcfd8f8d12741ddbb4b4f5c54e66f9c" rel="noreferrer" target="_blank"><strong>848b6bb</strong><span>当前快照 HEAD、项目说明和许可证信息</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/61edf8a6126f7ee622efc87cd8fbcde0cd50b84c" rel="noreferrer" target="_blank"><strong>61edf8a</strong><span>转储分析 triage 崩溃上下文</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/78d899a395ff68f300a9cdb46cfdc0144ea2182b" rel="noreferrer" target="_blank"><strong>78d899a</strong><span>EXIT GhostSystemDriver 攻击链检测</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/a9c65a20bd804bcbc06c790c4691e20a8e204cd2" rel="noreferrer" target="_blank"><strong>a9c65a2</strong><span>DLL 劫持候选检测</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/ecaeaa335726199bb8d571b33132baea4939c4f3" rel="noreferrer" target="_blank"><strong>ecaeaa3</strong><span>IFEO 镜像劫持检测</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/dabe6fb77993849803ed845377468c59589e2a80" rel="noreferrer" target="_blank"><strong>dabe6fb</strong><span>故障闭合的物理机 BugCheck 面板</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/a5fbb0e8b68dfa16973c7ff749681312a7a09483" rel="noreferrer" target="_blank"><strong>a5fbb0e</strong><span>安全编辑和删除全局热键</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/db2b6562709d6d83e509a6a89509d4e26caa2884" rel="noreferrer" target="_blank"><strong>db2b656</strong><span>自适应表格搜索范围</span></a>
-</div></section>
+<div class="status-table">
+<div><strong>快照 HEAD</strong><p><code>e3d8106e2bdb5bba2421627b52b9491c5c3fdebb</code></p></div>
+<div><strong>时间</strong><p>提交时间 2026-09-07 23:20（-04:00）。当前页面基于该提交及其祖先。</p></div>
+<div><strong>本轮提交</strong><p><code>848b6bb..e3d8106</code> 共 297 个提交，时间跨度 2026-08-16 至 2026-09-08。下文只整理能影响用户理解的功能和边界变化。</p></div>
+<div><strong>版本边界</strong><p>已发布的最新资产是 <code>5.1.4.3</code>（2026-08-28）与 <code>5.1.4.3Pre</code>（2026-08-27）；main 比 <code>5.1.4.3</code> 多 98 个提交，不能用单个 EXE 或 SYS 替换发行包。</p></div>
+</div>
+<div class="action-rule"><strong>需要稳定资产时使用 Releases。</strong><p>主程序、KswordARK.sys、共享 IOCTL、语言包、DynData profiles、Launcher 和插件必须来自同一构建链；混用文件会产生 Unsupported、协议不匹配或字段缺失。</p></div>
+</section>
+
+<section id="hvm"><p class="section-number">02 / VIRTUALIZATION</p><h2>常驻 VMM 活下来了，R-1 层的能力建立在它之上</h2>
+<p>这一轮之前，<code>RESIDENT_VMM</code> 能力位证明的只是「能正确进出 VMX non-root」：进入 non-root 后第一次 MSR 访问就会让 hypervisor 自我撤销。地基工作把它补齐了——MSR bitmap 落地（primary bit 28 + VMCS <code>0x2004</code>）、exit 引擎把可代执行的退出直接判为已处理、非私有 <code>VMCALL</code> 注入 <code>#UD</code>（此前任何用户态代码一条指令就能掀掉 hypervisor），再加上 <code>SOAK</code> 保持自检。</p>
+<div class="capability-grid">
+<div><strong>强制与策略</strong><ul>
+<li>EPT 规则新增 <code>ENFORCE</code> 持久拒绝：命中注入 <code>#PF</code> 并继续常驻，不再「命中即撤虚拟化」。</li>
+<li>MSR 策略引擎：按需在位图上开洞，支持记录后放行 / 拒绝 <code>#GP</code> / 伪造读值。</li>
+<li>CR/DR 策略：CR0、CR4 通过 guest/host 掩码钉住，MOV-CR 的四种 access type 全覆盖（含 <code>CLTS</code> 与 <code>LMSW</code>）。</li>
+<li>事件环接入 UI，可逐行读取退出证据。</li>
+</ul></div>
+<div><strong>隐藏与隔离</strong><ul>
+<li>EPT 分离视图：<code>HOOK</code>（执行走影子页、读取见原字节）与 <code>CLOAK</code>（执行照常、读写见影子）。</li>
+<li>EPTP 切换后端：缺 Monitor Trap Flag 的机器上唯一能用的后端。</li>
+<li>每处理器私有 EPT 层次（按需分叉），解除了视图与规则的单处理器限制。</li>
+<li>EPT 执行域与 VMFUNC；<code>#VE</code> 已实现但两道保险默认挡死实际投递。</li>
+</ul></div>
+</div>
+<p>AMD 上不再谎称「不支持的 CPU」：能力探测会如实报告 SVM、NPT、nRIP、decode assists、flush-by-ASID 与 <code>VM_CR.SVMDIS</code> 固件锁，并返回 <code>BACKEND_NOT_IMPLEMENTED</code>——硬件行，是软件还没做。SVM 后端本身刻意未写，因为在 Intel 机器上写两千行永远跑不起来的后端只会制造「看着完整、从没运行过」的代码。</p>
+<p><a href="learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">阅读虚拟化能力路线图 →</a></p>
+</section>
+
+<section id="hvm-nested"><p class="section-number">03 / NESTED</p><h2>可以作为 L1 在嵌套环境里运行，降级是显式的</h2>
+<p>原路线图假设「验证要在裸机上做」。实测推翻了它：开着内存完整性的开发机由 HVCI 拉起 Hyper-V，Hyper-V 对根分区隐藏 <code>CPUID.1:ECX[5]</code>，于是连 VT-x 都探测不到，<code>PREPARE</code> 阶段就失败。所以常驻启动改成显式 opt-in：检测到外层 hypervisor 而请求里没带 <code>ALLOW_NESTED</code> 时直接拒绝，成功时打上 <code>RESIDENT_NESTED</code> 并在界面标注「作为 L1 运行，性能与可用能力均降级」。</p>
+<div class="action-rule critical-rule"><strong>跨核 TLB 失效是本轮最重要的修复。</strong><p>转发给 L0 的 flush hypercall 只失效 L0 认为的那个 L1 VP，兄弟核上的陈旧翻译不会被清掉——这个缺陷只在「我们插在 Windows 和 Hyper-V 中间」时存在。用 <code>VirtualProtect</code> 返回语义做确定性判据量到违规率 <strong>97%</strong>，修复后三轮复测归零，同时取样量级从 1.8 亿回落到与基线同量级的 600–700 万。它还解释了此前三种没有归因的崩溃：<code>0x139 (0x1D)</code>、<code>0x0A</code> 与 <code>0x50</code>。</p></div>
+<p>修法是私有 VMX-root IDT + 广播 NMI，而私有 IDT 是发 NMI 的<strong>前提</strong>不是优化：第一次只加 NMI 广播就撞了 <code>0x80 NMI_HARDWARE_FAILURE</code>。这条修法依赖「未启用 VPID」，一旦为性能启用 VPID 会静默失效，因此两件事必须一起改。</p>
+<p><a href="hvm-topology.html">看 Nested HVM 拓扑变化演示 →</a>　<a href="learn/index.html?doc=docs%2Fnext%2F%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md">阅读嵌套虚拟化架构 →</a></p>
+</section>
+
+<section id="hvm-disposition"><p class="section-number">04 / R-1</p><h2>R-1 进程处置与内存通道</h2>
+<p>「用 R-1 结束进程」在 hypervisor 层没有直接对应物——它不认识进程，只看得见 CR3 与客户物理页。这条通路做的事是<strong>在目标地址空间里拒绝执行</strong>，两个操作的差别只在拒绝时给客户机注入什么。</p>
+<div class="status-table">
+<div><strong>冻结</strong><p>注入 <code>#PF(present)</code>。故障指令永不退休，进程状态一个字节没变，撤销后从原地继续。可逆是它与结束的本质区别，不是程度差别。</p></div>
+<div><strong>结束</strong><p>注入 <code>#UD</code>。用户态未处理异常，Windows 走自己的进程拆除路径——不调任何内核 API，进程是被客户机自己收掉的。</p></div>
+<div><strong>作用域</strong><p>靠 CR3-load exiting 选层次，不是逐页判 CR3。按地址空间选层次之后，非目标进程从不在受限层次下运行。</p></div>
+<div><strong>R-1 内存通道</strong><p>驱动预留一页私有窗口，运行时改写自己的页表项指向目标物理页。价值不在「能读内存」，而在不调用可能被 Hook 的内存管理器导出例程；窗口不可用时读退化为 <code>MmCopyMemory</code>、写直接不可用，响应里如实报告走了哪条路。</p></div>
+</div>
+<div class="action-rule critical-rule"><strong>这些不是安全边界。</strong><p>隐蔽 Hook、分离视图与 R-1 处置同源：失败即放行。目标若能让代码页换一个客户物理页，就不在被拒绝的那一页上了。这是 R0 之外的一条处置通路，不是用来对抗一个知道它存在的对手。</p></div>
+</section>
+
+<section id="kernel"><p class="section-number">05 / KERNEL</p><h2>内核、驱动与诊断</h2>
+<div class="capability-grid">
+<div><strong>新增或增强</strong><ul>
+<li>窗口层与 Z-order 诊断，接入窗口详情。</li>
+<li>内核 IoTimer 清单与控制。</li>
+<li>进程终止时按精确镜像文件删除。</li>
+<li>内核回调监控页与对应的 CLI 查询、启停命令。</li>
+<li>内核知识中心：12 类、71 个专题，含 R3/R0 现场证据查询与只读证据页路由。</li>
+</ul></div>
+<div><strong>修复与加固</strong><ul>
+<li>R0 抓包生命周期控制、网络协议校验的国际化覆盖。</li>
+<li>声音模块拒绝不可验证的进程身份。</li>
+<li>系统时间重置时保持计数器连续性。</li>
+<li>驱动功能矩阵 CI：新 IOCTL 必须有确定处置，崩溃即失败。</li>
+<li>HVM 算术单元测试 70 项接入 <code>source-integrity</code>。</li>
+</ul></div>
+</div>
+<p>这些页面仍然受 Driver Status、Capability、DynData 和目标身份门禁约束；按钮可见不代表对应 R0 能力已就绪。</p>
+</section>
+
+<section id="light"><p class="section-number">06 / LIGHT</p><h2>KswordARKLight 变成一套调查工作台</h2>
+<p>Light 这一轮从「若干只读页」重构为带工作区状态的调查流程：新增证据会话检查器、可版本化的窗口状态、有界的注册表搜索工作区、静态导航面板，以及内存的只读快照、暂存写入计划与受控的差量回写。窗口、启动项、服务、系统工具、句柄、驱动和 ETW 各页补齐了「跳到持有者进程详情」的路由，并把回调文件事件关联到实体。</p>
+<p>涉及写入、删除、恢复或放弃记录的动作继续使用显式确认、代次校验和结果回填；导出路径统一为可见结果的快照导出。</p>
+</section>
+
+<section id="ui"><p class="section-number">07 / UI &amp; RUNTIME</p><h2>界面与运行时</h2>
+<p>标题栏权限按钮排右侧新增 <strong>KVM 按钮</strong>，三态显示常驻状态并作为所有 R-1 能力的统一入口（左键切换常驻，右键菜单含保持自检、写权限门、内存操作与故障重置）；按钮名称可在设置中改叫 KVM / HVM / R-1，权限按钮也可逐级隐藏。</p>
+<p>其余：ADS 标签栏可横向滚动并修复被压成零宽的问题、详情报告改用统一结构化报告组件、进程页新增单核心 CPU 利用率归因与可展开图表、线程 CPU 亲和性设置、动态历史快照与表格快照比对、启动项多选，以及蓝屏诊断页面重构与「显式安装」改造。</p>
+</section>
+
+<section id="evidence"><p class="section-number">08 / EVIDENCE</p><h2>验收状态：哪些有证据，哪些没有</h2>
+<p>本轮在 2 vCPU 嵌套 Hyper-V 靶机上取得了第一批运行期读数：跨核 TLB 违规 97% → 0；CLOAK 方向的内核态读被 EPTP 切换透明重定向到影子页且常驻未掉；R-1 冻结让心跳停在 tick 15 并保持、解除后从 16 继续（不是从 0 重启）；R-1 结束后进程消失；常规 <code>SOAK</code> 30 秒仍 OK。</p>
+<div class="action-rule"><strong>仍然欠缺的部分不记 PASS。</strong><p>HOOK 方向（执行被重定向到影子）未实测；未对已知函数下 hook；用户态 <code>ReadProcessMemory</code> 路径未验证（用户态触发 fail-closed 会带 ring-3 的 RSP/RIP 在 ring 0 返回，实测蓝屏）；「关闭后逐位复原」未比对；裸机验收整体未做。上面的读数来自嵌套靶机，<strong>不能当作裸机结论</strong>。</p></div>
+<p>更早的下一阶段验收报告同样保持诚实计数：116 条里 2 条 PASS、114 条 NOT_RUN，六种目标环境一次都没跑过。<a href="learn/index.html?doc=docs%2Fnext%2F%E6%9C%80%E7%BB%88%E6%8A%A5%E5%91%8A.md">阅读验收最终报告 →</a></p>
+</section>
+
+<section id="operator"><p class="section-number">09 / OPERATOR NOTES</p><h2>在 main 上测试前的最低检查</h2>
+<ol class="numbered-procedure">
+<li><span>1</span><div><strong>整套构建必须来自同一提交。</strong><p>不要只替换 EXE、SYS、语言包、profiles 或插件。</p></div></li>
+<li><span>2</span><div><strong>先看 Driver Status、DynData 和 Capability。</strong><p>Unsupported 表示协议、驱动或能力不匹配，不等于页面没有数据。</p></div></li>
+<li><span>3</span><div><strong>常驻 HVM 只在授权且可回滚的环境启动。</strong><p>每次启动前保存工作。常驻期间 <code>sc stop</code> 会返回 <code>1052</code>——卸载守卫在拦，必须先停常驻。EPT 规则、分离视图和 R-1 处置也只能在常驻停着时安装。</p></div></li>
+<li><span>4</span><div><strong>高风险动作只在授权和可回滚环境测试。</strong><p>系统时间、磁盘写入、驱动卸载、内核修改、进程保护和删除动作都应准备快照或恢复路径。</p></div></li>
+<li><span>5</span><div><strong>保留修改前证据。</strong><p>导出目标身份、地址、来源模块、配置和时间戳；动作后刷新并保存新旧结果。</p></div></li>
+</ol>
+</section>
+
+<section id="commits"><p class="section-number">10 / COMMIT INDEX</p><h2>关键提交索引</h2>
+<div class="link-rows">
+<a href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank"><strong>e3d8106</strong><span>当前快照 HEAD：处置拒绝码拆分，补齐本轮验收与蓝屏取证记录</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/8660a560" rel="noreferrer" target="_blank"><strong>8660a56</strong><span>R-1 层的进程冻结与结束，按地址空间拒绝执行</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/66050557" rel="noreferrer" target="_blank"><strong>6605055</strong><span>补上转发 flush 丢掉的跨核失效，违规率 97% → 0</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/dad3a97e" rel="noreferrer" target="_blank"><strong>dad3a97</strong><span>常驻模式请求 NMI exiting 并接住 NMI</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/ad767a8e" rel="noreferrer" target="_blank"><strong>ad767a8</strong><span>EPTP 切换后端，分离视图在无 MTF 的嵌套环境下可用</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/7bb73ce1" rel="noreferrer" target="_blank"><strong>7bb73ce</strong><span>每处理器私有 EPT 层次</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/462032c1" rel="noreferrer" target="_blank"><strong>462032c</strong><span>EPT 分离视图：隐蔽 Hook 与内存隐藏</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/b1a55023" rel="noreferrer" target="_blank"><strong>b1a5502</strong><span>让常驻 VMM 活下来，并把 R-1 能力接到标题栏 KVM 按钮</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/239e4fcb" rel="noreferrer" target="_blank"><strong>239e4fc</strong><span>允许作为 L1 嵌套运行，并按 SDM 记下规范依据</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/c64e2e76" rel="noreferrer" target="_blank"><strong>c64e2e7</strong><span>AMD 上如实报告 SVM 能力，不再谎称「不支持的 CPU」</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/46c44326" rel="noreferrer" target="_blank"><strong>46c4432</strong><span>内核知识中心：完整 R0/R3 知识研究链</span></a>
+<a href="https://github.com/KSwordDEV/KSword/commit/d26639a3" rel="noreferrer" target="_blank"><strong>d26639a</strong><span>窗口层与 Z-order 诊断</span></a>
+</div>
+</section>
+
 </div></div></section>
 </main>
-<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">首页</a><a href="changelog.html">正式版本</a><a href="docs/index.html">文档</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+<footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">首页</a><a href="changelog.html">正式版本</a><a href="hvm-topology.html">HVM 拓扑</a>
+<a href="learn/index.html">文档</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
 </body>
 </html>
