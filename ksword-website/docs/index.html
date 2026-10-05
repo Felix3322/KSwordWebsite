@@ -57,7 +57,7 @@
 <div class="wrap">
 <p class="kicker">OPERATOR DOCUMENTATION</p>
 <h1>软件使用文档</h1>
-<p class="lead">只写会影响操作结果的前置条件、顺序、降级路径和故障判断。</p>
+<p class="lead">按 2026-10-05 当前源码核对：启动与能力、内存编辑、监控、调试后端、Light 及实验边界。</p>
 </div>
 </section>
 <div class="doc-tabs-shell">
@@ -88,34 +88,23 @@
 <a href="#raw-write">注册表、启动项与磁盘写入</a>
 <a href="#shutdown">退出与恢复顺序</a>
 <a href="#diagnostics">按症状排查</a>
-</aside>
+<a href="#monitor">ETW、Syscall 与 WinAPI 会话</a><a href="#hvm">Intel 与实验性 AMD 虚拟化</a><a href="#light">Light 工作台与证据</a><a href="#clipboard">剪贴板保护会话</a><a href="#compatibility">Windows 与精确偏移支持</a></aside>
 <div class="document-content operator-manual">
 <section id="choose-mode">
 <p class="section-number">01</p>
 <h2>先判断这次操作是否需要 R0</h2>
 <div class="status-table">
 <div><strong>不需要先加载驱动</strong><p>浏览普通进程列表、查看基础文件信息、读取大部分系统配置、查看日志和只读 R3 页面。</p></div>
-<div><strong>必须先加载驱动</strong><p>CE 桥接、R3/R0 Cross-view、内核内存与页表、驱动对象证据、回调操作、受保护进程操作以及任何明确标为 R0 的功能。</p></div>
+<div><strong>必须先加载驱动</strong><p>CE 的 R0/HVM 路径、R3/R0 Cross-view、内核内存与页表、驱动对象证据、回调操作以及任何明确标为 R0 的功能。CE 未连接驱动时仍可保留原生函数表；[KSword Connected] 不表示 R0 已启用。</p></div>
 </div>
 <div class="action-rule critical-rule">
 <strong>不要用“按钮能点”判断功能是否真的走 R0。</strong>
 <p>实际标准是客户端能打开 <code>\\.\KswordARKLog</code>，目标 IOCTL 被当前驱动支持，并且该功能所需的 DynData/Capability 已就绪。</p>
 </div>
 </section>
-<section id="package">
-<p class="section-number">02</p>
-<h2>主程序、驱动、Profiles 和插件必须来自同一套发行包</h2>
-<div class="action-rule critical-rule">
-<strong>不要只替换 EXE，也不要保留旧 SYS。</strong>
-<p>客户端会把部分 <code>ERROR_INVALID_FUNCTION</code>、<code>ERROR_NOT_SUPPORTED</code> 和 <code>ERROR_INVALID_PARAMETER</code> 识别为“驱动过旧或缺少该 IOCTL”。混用时最常见的表现不是完全打不开，而是某些页面空白、Unsupported 或只返回部分字段。</p>
-</div>
-<ol class="procedure numbered-procedure">
-<li><span>1</span><div><strong>退出 KSword、CE 和所有插件进程。</strong><p>仍持有设备句柄的进程会让你误判新驱动是否已经生效。</p></div></li>
-<li><span>2</span><div><strong>卸载旧服务后再替换整套目录。</strong><p>不要让服务 ImagePath 继续指向旧目录里的 SYS。</p></div></li>
-<li><span>3</span><div><strong>从同一目录启动主程序。</strong><p>同时使用该目录下的语言包、profiles、插件和驱动。</p></div></li>
-</ol>
-<p class="source-path">依据：<code>ArkDriverClient.cpp</code> 的旧 IOCTL 分类与统一设备路径。</p>
-</section>
+<section id="package"><p class="section-number">02</p><h2>启动、版本与完整发行包</h2><p>内容按 <strong>2026-10-05</strong> 源码核对；实际包以构建日期和配套版本为准。完整解压 <code>Release/</code>，保留 Qt/ADS DLL、插件、<code>platforms/</code>、<code>profiles/</code>、<code>languages/</code> 与许可证，然后运行 <code>Launcher.exe</code>。</p><p>完整 Qt 版用于全工作流，Light 是原生 Win32 工作台，CLI 适合脚本和有界查询。Launcher 可显式选择目标：</p><pre><code>Launcher.exe --launcher-main
+Launcher.exe --launcher-light
+Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，不启动主程序，也不生成采集包。需要 R0 或受保护模块采集时按提示提升权限。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
 <section id="driver">
 <p class="section-number">03</p>
 <h2>“服务已启动”不等于驱动已可用</h2>
@@ -147,30 +136,7 @@
 </div>
 <p class="source-path">依据：<code>KernelDock.DynData.cpp</code> 的 matched、accepted、missing 和 capability 状态。</p>
 </section>
-<section id="ce">
-<p class="section-number">05</p>
-<h2>Cheat Engine 必须从 KSword 启动</h2>
-<div class="action-rule critical-rule">
-<strong>先加载 R0，再从选中进程的 KSword 操作中启动 CE。</strong>
-<p>集成启动器会先检查设备，设置桥接 DLL、状态文件和目标 PID，然后启动随包 CE。Lua 自动脚本先加载桥接，再延迟打开目标，确保第一次 <code>OpenProcess</code> 就经过 KSword。</p>
-</div>
-<div class="capability-grid">
-<div><strong>桥接接管</strong><ul><li><code>OpenProcess</code></li><li><code>VirtualQueryEx</code></li><li><code>ReadProcessMemory</code></li><li><code>WriteProcessMemory</code></li></ul></div>
-<div><strong>桥接不接管</strong><ul><li>调试器</li><li>远程线程</li><li>远程内存分配</li><li>页面保护修改</li></ul></div>
-</div>
-<ul>
-<li>插件初始化时打不开 <code>\\.\KswordARKLog</code>，会拒绝安装 Hook，不会假装启用后回退普通 Win32 读写。</li>
-<li>读取按最大 1 MiB 分片；写入按最大 256 KiB 分片。</li>
-<li>写入只带 <code>UI_CONFIRMED</code>，不会自动使用 <code>FORCE</code>。</li>
-<li>CE 已经单独打开后再加载驱动，早期建立的句柄和枚举状态不会自动重建；关闭 CE 后从 KSword 重启。</li>
-</ul>
-<div class="status-table">
-<div><code>r0_required</code><p>取消启动，回 KSword 加载驱动。</p></div>
-<div><code>bridge_not_ready</code><p>CE 已创建但桥接没确认 Ready。关闭该 CE，不要继续扫描。</p></div>
-<div><code>launch_failed</code><p>随包 CE、桥接 DLL 或目录结构不完整，重新解压整套插件载荷。</p></div>
-</div>
-<p class="source-path">依据：<code>CheatEngineExecutablePlugin/LauncherMain.cpp</code>、<code>10_ksword_bridge.lua</code>、<code>KswordCeBridge.cpp</code>。</p>
-</section>
+<section id="ce"><p class="section-number">05</p><h2>CE、TitanEngine 与 x64dbg/x96dbg</h2><p>从 KSword 的进程入口启动配套调试器，核对目标身份、桥接就绪与实际后端。公共 <code>DebuggerBackend/</code> 已覆盖内存、上下文、挂起/恢复、分配/保护及 Windows 调试事件适配，旧版“仅接管四个内存 API”的描述已不适用。</p><ul><li>CE 当前有 15 个 SDK Hook；WOW64 上下文、CE VEH/DBVM 不在本版原生 Windows 调试适配范围。</li><li>HVM/EPT 不可用时，是否允许回退由策略控制；实际路径、回退次数与错误单独展示。</li><li>代码 Shadow 修改只改变执行视图，不能把普通数据冻结当作隐形数据修改；活动补丁/断点限制模式切换和退出。</li><li>R0/HVM 与原生路由均应看运行态诊断，不能凭模式名称断言已启用。</li></ul><p>调试会话保留真实 Windows 停止事件；退出时核对自有断点、补丁与资源的还原。</p><p><a href="../learn/index.html?doc=DebuggerBackend%2FREADME.md">完整文档与限制 →</a></p></section>
 <section id="process">
 <p class="section-number">06</p>
 <h2>进程操作不能只看 PID</h2>
@@ -187,21 +153,7 @@
 </ul>
 <p class="source-path">依据：进程 identity、应用聚合批量动作、R0 visibility 记录。</p>
 </section>
-<section id="memory">
-<p class="section-number">07</p>
-<h2>内存读取成功不代表写入条件满足</h2>
-<div class="status-table">
-<div><strong>读正常、写失败</strong><p>页保护、驱动写策略或目标状态拒绝写入。CE 桥接不接管 <code>VirtualProtectEx</code>，也不会自动 FORCE。</p></div>
-<div><strong>Partial Copy</strong><p>某个分片未完整返回。先确认目标没有退出或更换，再缩小地址范围；不要把部分数据当完整扫描结果。</p></div>
-<div><strong>内存区域枚举停住</strong><p>桥接会拒绝零长度、越界或不覆盖查询地址的区域，防止 CE 无限循环。优先检查驱动/客户端是否混版。</p></div>
-<div><strong>PTE/内核内存页面不可用</strong><p>先看对应 DynData item 和 Capability，不要只看设备 Loaded。</p></div>
-</div>
-<ul>
-<li>目标进程重启后，旧地址、旧句柄和旧扫描结果全部作废。</li>
-<li>修改前保存原字节，不要只记修改后的值。</li>
-<li>跨多个区域的大范围读写应关注实际完成字节数，而不是只看函数是否返回。</li>
-</ul>
-</section>
+<section id="memory"><p class="section-number">07</p><h2>读取快照、暂存编辑与实际回读</h2><p>Hex、反汇编、文本和对比视图使用同一份读取快照。修改、汇编、撤销/重做只改变本地缓存；必须通过所属页面显式应用，成功以实际回读为准。</p><ol><li>核对目标身份、R3/R0/R-1/DDMA 后端、地址、CR3 与 x86/x64 位数，再读取。</li><li>选择修改范围，预览旧/新机器码，覆盖完整可解码旧指令。支持常用 Intel 指令和局部标签，不支持 CE alloc/registersymbol 等脚本。</li><li>写前复核原字节和会话，检查每个授权差异块的回读。冲突、partial 或未知回读不得当作整体成功。</li></ol><p>普通进程查看器 DDMA 保持只读。独立 DDMA 入口涉及显式暂存磁盘/LBA、调试器状态、透传和扇区恢复；虚拟机模拟 DMA 不证明绕过宿主翻译。</p><p><a href="../learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md">完整文档与限制 →</a></p></section>
 <section id="file">
 <p class="section-number">08</p>
 <h2>文件 Unlocker 不是“自动关闭所有占用”</h2>
@@ -263,7 +215,7 @@
 </ul>
 <div class="action-rule">
 <strong>CE 插件是 hybrid executable，不是普通扫描插件。</strong>
-<p>它有独立的 driver check、launch、tab 和 info 命令，并维护一条持续的驱动会话。</p>
+<p>它有独立的 driver check、launch、tab 和 info 命令；R0/HVM 已连接时维护驱动会话，未连接时可保留原生路由。</p>
 </div>
 <p class="source-path">依据：<code>PluginHost.cpp</code>、插件 manifest 和 scan-table 协议。</p>
 </section>
@@ -299,7 +251,7 @@
 <div><strong>所有 R0 页面都不可用</strong><p>先查设备句柄、管理员权限、服务和签名，不要先换 profile。</p></div>
 <div><strong>只有部分 R0 页面不可用</strong><p>查该功能的 IOCTL、Missing items 和 Capability，通常不是整个驱动失败。</p></div>
 <div><strong>CE 能启动但没有自动打开目标</strong><p>桥接 DLL 初始化或延迟 <code>openProcess(pid)</code> 失败。关闭后从 KSword 重启。</p></div>
-<div><strong>CE 读正常但写失败</strong><p>写策略或页面条件不满足；桥接不会 FORCE，也不接管改页保护。</p></div>
+<div><strong>CE 读正常但写失败</strong><p>检查驱动策略、页状态、所选后端与实际回退；当前适配器已接入分配/保护接口。</p></div>
 <div><strong>文件仍提示占用</strong><p>刷新占用列表，确认是否还有映射、第二个句柄或新创建的进程实例。</p></div>
 <div><strong>网络工具退出后无法联网</strong><p>先查系统代理、证书和本地代理进程，不要先重置整个网络栈。</p></div>
 <div><strong>插件安装完成但没有结果</strong><p>查看 manifest 入口、插件退出码、stderr 和 JSONL 协议事件。</p></div>
@@ -315,6 +267,11 @@
 </div>
 <p><a href="https://github.com/KSwordDEV/KSword/issues" rel="noreferrer" target="_blank">提交 GitHub Issue ↗</a></p>
 </section>
+<section id="monitor"><p class="section-number">15</p><h2>ETW、Syscall 与 WinAPI 会话</h2><p>监控模块提供进程 ETW、Syscall、x86/x64 API Agent、WMI 和 ETW 会话管理。自动注入按目标位数选 DLL；同一目标的 Agent 会话具有所有权与就绪状态。</p><ul><li>ETW 保留 Provider、事件头 PID/TID 与关联目标身份；映像枚举不伪称加载。</li><li>Syscall 依赖时序/栈关联；兼容桩检测不证明所有直接系统调用均被记录。</li><li>Hook 就绪、版本化覆盖、Raw 入口、异步完成和丢事件分别解读；启动成功不保证所有 API 可观测。</li></ul><p>先选目标与规则，启动后核对覆盖，再解释和导出事件。</p><p><a href="../learn/index.html?doc=APIMonitor_x64%2FREADME.md">完整文档与限制 →</a></p></section>
+<section id="hvm"><p class="section-number">16</p><h2>Intel 与实验性 AMD 虚拟化</h2><p>虚拟化工作区包含 Intel VMX/EPT、嵌套 VMX/EPT 合成、Hook 与 R-1 内存，也接入 AMD SVM/NPT 和嵌套 SVM 的准备、自检、常驻及证据流程。</p><ol><li>先核对硬件、外层 hypervisor、能力与拒绝原因。</li><li>准备 → 全核自检 → 常驻；确认模式、代次和每个 CPU 的实际状态。</li><li>停止后按正常生命周期释放，保留状态和错误。部分常驻不能按完整成功处理。</li></ol><p>AMD 完整内层多核 OS 启动与性能仍待验收。ENFORCE 发布为未实现，不能把策略表存在宣传为全量处置已生效。</p><p><a href="../learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">完整文档与限制 →</a></p></section>
+<section id="light"><p class="section-number">17</p><h2>Light 工作台与证据</h2><p>Light 保持原生 Win32、无 Qt 依赖，提供按需二级页、进程遥测、跨模块实体跳转与证据会话。功能覆盖不承诺与完整版本完全相同。</p><ul><li>命令框默认解释 pid/tid/hwnd/file/reg/net 等导航；前导 <code>!</code> 显式进入命令执行。</li><li>证据会话记录成功导出，支持快照、最近两次行级差异、JSON/TSV 与用户路径脱敏。</li><li>跨进程驱动租约保留预先运行的驱动；只有自行启动且最后租约退出时才请求停止。</li><li>unknown/partial 与真实零值分别保留。</li></ul><p>由 Launcher 选择 Light；实体身份核对与能力状态仍适用。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
+<section id="clipboard"><p class="section-number">18</p><h2>剪贴板保护会话</h2><p>杂项 → 剪贴板保护使用 Agent Hook 与规则热更新。驱动策略表只保存策略，不会单独阻断所有剪贴板访问。</p><ul><li>启动后核对目标位数、注入与 Hook 就绪。</li><li>会话停止、目标退出和规则修订可能改变覆盖范围。</li><li>同目标 Agent 会话互斥，必须保留覆盖/丢事件状态。</li></ul><p>按实际会话覆盖解释阻断与放行结果。</p><p><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">完整文档与限制 →</a></p></section>
+<section id="compatibility"><p class="section-number">19</p><h2>Windows 与精确偏移支持</h2><p>当前 Qt 路径最低 build 17763，R0 启动协议最低 build 16299；两者是不同组件的门槛。产品定位 Windows 10/11 x64。</p><p>2026-10-03 已停用 Launcher 与驱动的 OS build 上限拦截；新系统仍依赖精确 PE/RSDS/PDB profile 及逐功能能力、布局与地址校验。</p><p>collection-only 表示可采集身份，不代表已有完整偏移支持。报告接入先只读校验 valid=true，再进入正式矩阵。</p><p><a href="../learn/index.html?doc=docs%2F%E6%9E%84%E5%BB%BA%E4%B8%8E%E5%8F%91%E5%B8%83.md">完整文档与限制 →</a></p></section>
 </div>
 </div>
 </section>

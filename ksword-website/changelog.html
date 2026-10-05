@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 当前 15 个 GitHub Release、版本 Diff 与 main 分支开发快照。" name="description"/>
+<meta content="KSword 发行历史与 2026-10-05 源码快照 db6f9fd9；区分发行资产、开发功能与验收范围。" name="description"/>
 <title>完整更新日志 — KSword</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/changelog.html" hreflang="en" rel="alternate"/>
@@ -52,7 +52,21 @@
 </nav>
 </div>
 </header>
-<main><section class="page-hero compact"><div class="wrap"><p class="kicker">RELEASE HISTORY</p><h1>完整更新日志</h1><p class="lead">本页整理当前可见的 17 个正式与预发行 GitHub Release，并保留每个版本的 tag、比较范围和实际更新。最新资产是 <code>5.1.4.3</code>（2026-08-28）；此后 main 的虚拟化工作尚未形成新的 Release，请查看<a href="development.html">主线开发快照</a>。仓库另有滚动产出的 <code>ci-build-*</code> 预发行构建，未逐条列入本页。</p></div></section><section class="section compact-section"><div class="wrap docs-layout"><aside aria-label="版本索引" class="side-index"><strong>版本</strong><a href="#release-14cf41b">5.1.4.3</a><a href="#release-8860b64">5.1.4.3Pre</a><a href="#release-160944d">5.1.3.0-1</a><a href="#release-9b2b0e6">5.1.3.0-2</a><a href="#release-f477355">5.1.3.0</a><a href="#release-f40fca0">5.1.4.0</a><a href="#release-8f12a6c">5.1.5.0-pre</a><a href="#release-6631344">5.1.4.1-Alpha</a><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside><div class="release-history">
+<main><section class="page-hero compact"><div class="wrap"><p class="kicker">RELEASE HISTORY</p><h1>完整更新日志</h1><p class="lead">发行历史与 2026-10-05 源码同步说明。本轮开发基线为 <code>db6f9fd9</code>，不为开发功能新增发行版本号。下方历史条目描述各自 tag；当前下载资产和滚动 CI 构建请查看 <a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">GitHub Releases</a>，源码能力见<a href="development.html">开发快照</a>。</p></div></section><section class="section compact-section"><div class="wrap docs-layout"><aside aria-label="版本索引" class="side-index"><strong>版本</strong><a href="#source-snapshot">2026-10-05 源码同步</a><a href="#release-14cf41b">5.1.4.3</a><a href="#release-8860b64">5.1.4.3Pre</a><a href="#release-160944d">5.1.3.0-1</a><a href="#release-9b2b0e6">5.1.3.0-2</a><a href="#release-f477355">5.1.3.0</a><a href="#release-f40fca0">5.1.4.0</a><a href="#release-8f12a6c">5.1.5.0-pre</a><a href="#release-6631344">5.1.4.1-Alpha</a><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside><div class="release-history">
+<article class="release-entry" id="source-snapshot">
+<header class="release-entry-head"><div><p class="section-number">2026-10-05 / SOURCE REVIEW</p><h2>源码同步 · db6f9fd9</h2></div><strong class="release-badge">开发快照</strong></header>
+<div class="release-note"><strong>源码快照，不是新增发行</strong><p>基于 2026-10-03 的源码提交核查。下方 tag 说明保留历史范围；选择构建时须配套主程序、驱动、两个 API Agent、profiles 和插件。</p></div>
+<ul class="update-list">
+<li>统一快照内存查看、x86/x64 Intel 汇编暂存、撤销/重做、差异与实际回读。</li>
+<li>641 项 API 定义、独立 x86/x64 Agent、主程序跨位数注入、覆盖快照与异步 I/O；ETW 身份/布局与 Syscall 证据改进。</li>
+<li>文件元数据事务/备份、签名摘要、全文件字符串查找、偏移 Hex 导航与 R0 删除分阶段回执。</li>
+<li>按行身份的 EX 回调注销、配对公开 API、Minifilter 所属过滤器卸载、回调事件监控与 71 专题知识中心。</li>
+<li>CE/Titan 共享调试后端、按策略的 EPT/Shadow 执行路径、剪贴板会话与 Light 实体/证据流程。</li>
+<li>Intel 嵌套/页租约实现与 AMD SVM/NPT 实验；ENFORCE 仍为 UNIMPLEMENTED，AMD 完整 L2 OS 验收未完成。</li>
+<li>取消 OS build 上限，保留最低版本及逐功能校验；源码准入不代表所有新系统已验证。</li>
+</ul>
+<div class="release-links"><a href="development.html">功能与证据边界</a><a href="https://github.com/KSwordDEV/KSword/commit/db6f9fd96212aca8739cdd9e90ce3d3b0f39cd68" rel="noreferrer" target="_blank">源码快照 ↗</a></div>
+</article>
 <article class="release-entry" id="release-14cf41b">
 <header class="release-entry-head"><div><p class="section-number">2026-08-28</p><h2>KswordARK 5.1.4.3</h2></div><strong class="release-badge">5.1.4.3</strong></header>
 <div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.4.3Pre</strong></div><div><span>当前 tag</span><strong>5.1.4.3</strong></div><div><span>Patch</span><code>14cf41b</code></div><div><span>提交数量</span><strong>63</strong></div></div>
@@ -66,7 +80,7 @@
 <h3>实际变更</h3><ul class="update-list">
 <li>新增「内核知识」中心：覆盖 12 类、71 个 Windows 内核专题，提供中英文内容、全文检索、官方文档参考、R3/R0 现场证据查询，以及跳转至对应只读证据页的路由。</li>
 <li>新增内核回调监控页，支持进程、线程、镜像、注册表、对象、文件等回调事件的实时采集、过滤、暂停与丢失统计；KswordCLI 同步新增查询与启停命令。</li>
-<li>HVM 页面扩展为受生命周期保护的 Intel VT-x/EPT 常驻监控模式，加入电源状态、处理器拓扑、卸载互锁及 VMX 状态保护；AMD、已有 Hypervisor 或保护条件不满足时会拒绝启动。</li>
+<li>HVM 页面扩展为受生命周期保护的 Intel VT-x/EPT 常驻监控模式，加入电源状态、处理器拓扑、卸载互锁及 VMX 状态保护；该 tag 的 HVM 实现会在 AMD、已有 Hypervisor 或保护条件不满足时拒绝启动；后续源码变化见本页开发快照。</li>
 <li>进程页新增单核心 CPU 利用率归因与可展开图表、线程 CPU 亲和性设置、动态历史快照与表格快照比对；启动项表格支持多选。</li>
 <li>KswordARKLight 重整工作区结构（性能与总线归入硬件页、网络与窗口归入对应主功能页），补齐进程视图字段与详情能力，进程列表改为差量刷新并移除刷新遮罩，修复退出时的驱动卸载流程。</li>
 <li>重构蓝屏诊断页面与布局，强化 Stop Code、关键进程、候选模块与可操作证据；改为显式「本次安装」或可配置自动安装，默认不在普通驱动加载时扫描 BGP 私有路径或注册诊断回调。</li>
@@ -100,7 +114,7 @@
 <header class="release-entry-head"><div><p class="section-number">2026-07-29</p><h2>KswordARK 5.1.4.0 正式版</h2></div><strong class="release-badge">5.1.4.0</strong></header>
 <div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0</strong></div><div><span>当前 tag</span><strong>5.1.4.0</strong></div><div><span>Patch</span><code>f40fca0</code></div><div><span>提交数量</span><strong>41</strong></div></div>
 <h3>实际变更</h3><ul class="update-list"><li>新增 Cheat Engine 可执行插件，提供主题化启动、KSword 内存访问桥接、市场安装进度和更新提示。</li><li>增强 HTTPS 分析：展示关联进程、请求/响应事件、内容类型、TLS/ALPN、耗时及上下行流量，并支持筛选、统计、清空和 CSV 导出；停止后可恢复系统代理。</li><li>进程亲和性规则支持按完整程序路径持久化，核心按 P 核、E 核和逻辑线程拓扑标识；新增定向监控的启动后挂起。</li><li>业务表格增加转到进程详情入口；窗口工具增强全局热键查看；新增 Shell 文件关联管理。</li><li>新增全局自定义主题色与字体，接入多项权限提升提示，并修复启动初始化、设置卡顿、浅色主题和 CPU 监控显示问题。</li><li>增加 Windows 自动化验证、驱动构建和发行目录校验，子项目构建改为按变更触发。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是 5.1.4.x 线的第一个正式稳定版本。其后的 <code>5.1.4.1-Alpha</code>、<code>5.1.5.0-pre</code>、<code>5.1.4.3Pre</code> 与 <code>5.1.4.3</code> 以及 main 快照均应按预发行或开发状态理解。</p></div>
+<div class="release-note"><strong>Release 描述与校正</strong><p>本条说明该 tag 的历史稳定版本状态。其后的 <code>5.1.4.1-Alpha</code>、<code>5.1.5.0-pre</code>、<code>5.1.4.3Pre</code> 与 <code>5.1.4.3</code> 以及 main 快照均应按预发行或开发状态理解。</p></div>
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.0" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0...5.1.4.0" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-8f12a6c">

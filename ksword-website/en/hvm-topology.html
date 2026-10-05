@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword Nested HVM topology demo: why a VBS-enabled physical machine is a dead end, how VMLAUNCH on a nested target makes KSword the L1 while the same Windows keeps running in place as L2, and how the whole layer disappears when residency stops." name="description"/>
+<meta content="KSword Intel/Hyper-V seven-step topology example, reviewed 2026-10-05 against db6f9fd9. Current EPT policies and AMD SVM/NPT remain scoped by capability and saved evidence." name="description"/>
 <title>Nested HVM topology — KSword</title>
 <link href="../styles.css" rel="stylesheet"/>
 <link href="../hvm-topology.html" hreflang="zh-CN" rel="alternate"/>
@@ -230,7 +230,7 @@
 <section class="page-hero compact"><div class="wrap">
 <p class="kicker">KERNEL VIRTUALIZATION / NESTED HVM</p>
 <h1>Nested HVM topology</h1>
-<p class="lead">KSword HVM does not boot a second Windows. It performs a late takeover of the system that is <strong>already running</strong>: after <code>VMLAUNCH</code>, the same execution context continues in place — only now in VMX non-root — while KSword handles every VM exit it produces from VMX root. The demo machine below walks through that transition step by step.</p>
+<p class="lead">The seven-step demo illustrates a saved <strong>Intel/Hyper-V</strong> scenario: KSword takes over the running Windows context, which continues in VMX non-root after <code>VMLAUNCH</code>. Content reviewed on 2026-10-05 against <code>db6f9fd9</code>. The animation is a teaching example; its states and readings are not a live probe or a universal hardware guarantee.</p>
 <div class="actions">
 <a class="primary" href="https://github.com/KSwordDEV/KSword/blob/main/docs/next/%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md" rel="noreferrer" target="_blank">Nested architecture doc ↗</a>
 <a href="https://github.com/KSwordDEV/KSword/blob/main/docs/%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md" rel="noreferrer" target="_blank">Capability roadmap ↗</a>
@@ -238,10 +238,18 @@
 </div>
 </div></section>
 
+<section class="section alt" id="current-state"><div class="wrap two-column">
+<h2>Current capability and evidence boundary</h2>
+<div class="prose"><p>Current source includes Intel residency, MSR/CR policies, EPT split views, first-touch monitoring, nested VMX and descendant page/region leases. Lifecycle, hardware, prepared mode and per-CPU evidence decide what can run. Support, preparation, arming and active CPUs are separate states.</p>
+<p><strong>EPT ENFORCE returns UNIMPLEMENTED.</strong> WATCH_ONCE records the first access and opens the page afterwards; it is not durable denial or a complete stream of later writes. The displayed capability chips describe functions that need separate admission.</p>
+<p>AMD SVM/NPT and general nested SVM now have an experimental implementation. Saved short-residency and selected 8-core cycle tests do not prove full concurrent L2 OS operation. Triple-fault/host-crash records and candidates awaiting retest remain in the <a href="../learn/index.html?lang=en&amp;doc=docs%2Fnext%2Fksword-amd-lab-status.md">AMD status</a> and linked evidence. This Intel animation does not demonstrate AMD.</p>
+<p>Read <a href="development.html">the 2026-10-05 source snapshot</a> and <a href="../learn/index.html?lang=en&amp;doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">the current roadmap</a> for implementation and acceptance limits.</p></div>
+</div></section>
+
 <section class="section compact-section"><div class="wrap">
 
 <div class="section-head">
-<div><p class="section-number">DEMO</p><h2 id="demo-title">Seven-step topology walkthrough</h2></div>
+<div><p class="section-number">DEMO</p><h2 id="demo-title">Seven-step Intel topology example</h2></div>
 </div>
 
 <div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
@@ -315,13 +323,13 @@
         <div class="hvm-flags" data-hvm-flags=""></div>
       </section>
       <section>
-        <h3>Capabilities that need this layer</h3>
+        <h3>Functions requiring separate admission</h3>
         <div class="hvm-caps" data-hvm-caps=""></div>
       </section>
     </div>
   </div>
 
-  <p class="hvm-foot">The walkthrough follows the HVM protocol and nested architecture documents in <code>KSwordDEV/KSword@main</code>. Readings come from the 2 vCPU nested Hyper-V target recorded there and are <b>not bare-metal conclusions</b>. This page performs no real virtualization operation.</p>
+  <p class="hvm-foot">Historical Intel/Hyper-V example; readings are saved results from the documented 2 vCPU target, <b>not AMD or general bare-metal conclusions</b>. Page review: 2026-10-05, source <code>db6f9fd9</code>. The current capability boundary is described above. This page performs no virtualization operation.</p>
 </div>
 
 </div></section>
@@ -354,13 +362,13 @@
 </div></section>
 
 <section class="section alt"><div class="wrap two-column">
-<h2>Three hard constraints that nesting imposes</h2>
+<h2>Three constraints in the saved Intel target</h2>
 <div class="document-narrow" style="width:100%">
 <p>Nesting is not &ldquo;the same as bare metal, only slower&rdquo;. The outer layer decides what the inner one can see, and all three of these were found by measurement on the target.</p>
 <div class="definition-list">
 <div>
 <p><strong>No Monitor Trap Flag</strong></p>
-<p>Nested Hyper-V does not advertise MTF to its guest. The default stealth-hook backend — write the leaf, restore it on a monitor trap — therefore cannot be installed at all, and only the <strong>EPTP switching backend</strong> works: it needs execute-only EPT leaves (<code>IA32_VMX_EPT_VPID_CAP</code> bit 0), and that bit is available on the same machine. That is the only reason that backend exists: <em>capability, not performance</em>.</p>
+<p>The saved target did not expose MTF to its guest. The default stealth-hook backend — write the leaf, restore it on a monitor trap — therefore cannot be installed at all, and only the <strong>EPTP switching backend</strong> works: it needs execute-only EPT leaves (<code>IA32_VMX_EPT_VPID_CAP</code> bit 0), and that bit is available on the same machine. That is the only reason that backend exists: <em>capability, not performance</em>.</p>
 </div>
 <div>
 <p><strong>Cross-core TLB invalidation has to be done by hand</strong></p>
@@ -425,7 +433,7 @@
     'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE', 'RESIDENT_STOPPING'
   ];
   var CAPS = [
-    'EPT ENFORCE persistent denial',
+    'EPT WATCH_ONCE first-touch evidence',
     'Split views: HOOK / CLOAK',
     'MSR / CR policy engines',
     'EPT execution domains · VMFUNC',

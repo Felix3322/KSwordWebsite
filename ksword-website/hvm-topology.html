@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword Nested HVM 拓扑变化演示：从开着 VBS 的物理机走不通，到嵌套靶机里 VMLAUNCH 之后 KSword 成为 L1、同一个 Windows 原地降为 L2，再到停止常驻后整层消失。" name="description"/>
+<meta content="KSword Intel/Hyper-V 七步拓扑示例，2026-10-05 以 db6f9fd9 核查；当前 EPT 策略与 AMD SVM/NPT 按能力和保存证据说明。" name="description"/>
 <title>Nested HVM 拓扑变化 — KSword</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/hvm-topology.html" hreflang="en" rel="alternate"/>
@@ -230,7 +230,7 @@
 <section class="page-hero compact"><div class="wrap">
 <p class="kicker">KERNEL VIRTUALIZATION / NESTED HVM</p>
 <h1>Nested HVM 拓扑变化</h1>
-<p class="lead">KSword HVM 不引导第二个 Windows。它对<strong>已经在跑的</strong>那个系统做一次后期接管：<code>VMLAUNCH</code> 之后，同一个执行上下文原地继续，只是从此运行在 VMX non-root，而 KSword 在 VMX root 处理它产生的每一次 VM exit。下面这台演示机逐步走完这个过程。</p>
+<p class="lead">七步演示说明已记录的 <strong>Intel/Hyper-V</strong> 场景：KSword 后期接管运行中的 Windows，原执行上下文在 <code>VMLAUNCH</code> 后继续于 VMX non-root。页面于 2026-10-05 按 <code>db6f9fd9</code> 核查；动画中的状态和读数为教学示例，不是当前机器实时探测，也不代表所有硬件。</p>
 <div class="actions">
 <a class="primary" href="https://github.com/KSwordDEV/KSword/blob/main/docs/next/%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md" rel="noreferrer" target="_blank">嵌套虚拟化架构文档 ↗</a>
 <a href="https://github.com/KSwordDEV/KSword/blob/main/docs/%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md" rel="noreferrer" target="_blank">虚拟化能力路线图 ↗</a>
@@ -238,10 +238,18 @@
 </div>
 </div></section>
 
+<section class="section alt" id="current-state"><div class="wrap two-column">
+<h2>当前能力与证据边界</h2>
+<div class="prose"><p>当前源码包含 Intel 常驻、MSR/CR 策略、EPT 双视图、首次访问监视、嵌套 VMX 与后代页/区域租约。生命周期、硬件、准备模式与逐 CPU 证据决定实际准入；支持、准备、武装和活动 CPU 分别报告。</p>
+<p><strong>EPT ENFORCE 当前返回 UNIMPLEMENTED。</strong> WATCH_ONCE 记录首次访问后放开对应页，不是持久拒绝或所有后续写入日志。演示中的能力标签表示仍需单独准入的功能。</p>
+<p>AMD SVM/NPT 与通用嵌套 SVM 已有实验实现。已保存短常驻和部分 8 核启停记录，但不证明完整内层 OS 并发；三重故障/宿主崩溃及待复测候选保留在 <a href="learn/index.html?doc=docs%2Fnext%2Fksword-amd-lab-status.md">AMD 状态</a>与链接证据中。此 Intel 动画不演示 AMD。</p>
+<p>当前实现与验收范围见 <a href="development.html">2026-10-05 开发快照</a>与<a href="learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">虚拟化路线图</a>。</p></div>
+</div></section>
+
 <section class="section compact-section"><div class="wrap">
 
 <div class="section-head">
-<div><p class="section-number">DEMO</p><h2 id="demo-title">七步拓扑演示</h2></div>
+<div><p class="section-number">DEMO</p><h2 id="demo-title">七步 Intel 拓扑示例</h2></div>
 </div>
 
 <div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
@@ -315,13 +323,13 @@
         <div class="hvm-flags" data-hvm-flags=""></div>
       </section>
       <section>
-        <h3>依赖这一层的能力</h3>
+        <h3>需单独准入的能力</h3>
         <div class="hvm-caps" data-hvm-caps=""></div>
       </section>
     </div>
   </div>
 
-  <p class="hvm-foot">演示按 <code>KSwordDEV/KSword@main</code> 的 HVM 协议与嵌套架构文档编排。读数取自文档记录的 2 vCPU 嵌套 Hyper-V 靶机实测，<b>不是裸机结论</b>；本页不执行任何真实虚拟化操作。</p>
+  <p class="hvm-foot">历史 Intel/Hyper-V 示例；读数来自已保存的 2 vCPU 靶机记录，<b>不能外推 AMD 或所有裸机</b>。页面核查：2026-10-05，源码 <code>db6f9fd9</code>；现行能力边界见上方说明。本页不执行真实虚拟化操作。</p>
 </div>
 
 </div></section>
@@ -354,13 +362,13 @@
 </div></section>
 
 <section class="section alt"><div class="wrap two-column">
-<h2>嵌套带来的三条硬约束</h2>
+<h2>记录中的 Intel 靶机的三条约束</h2>
 <div class="document-narrow" style="width:100%">
 <p>嵌套不是「和裸机一样，只是慢一点」。外层决定了内层能看见什么，下面三条都是在靶机上实测撞出来的。</p>
 <div class="definition-list">
 <div>
 <p><strong>没有 Monitor Trap Flag</strong></p>
-<p>嵌套 Hyper-V 不向来宾通告 MTF。默认那套「写叶 + monitor-trap 恢复」的隐蔽 Hook 后端因此根本装不上，只有 <strong>EPTP 切换后端</strong>能工作——它只要求 execute-only EPT 叶（<code>IA32_VMX_EPT_VPID_CAP</code> bit 0），而那一位在同一台机器上可用。这是选那套后端的唯一理由：<em>能力，不是性能</em>。</p>
+<p>这台记录中的嵌套 Hyper-V 靶机不向来宾通告 MTF。默认那套「写叶 + monitor-trap 恢复」的隐蔽 Hook 后端因此根本装不上，只有 <strong>EPTP 切换后端</strong>能工作——它只要求 execute-only EPT 叶（<code>IA32_VMX_EPT_VPID_CAP</code> bit 0），而那一位在同一台机器上可用。这是选那套后端的唯一理由：<em>能力，不是性能</em>。</p>
 </div>
 <div>
 <p><strong>跨核 TLB 失效要自己做</strong></p>
@@ -425,7 +433,7 @@
     'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE', 'RESIDENT_STOPPING'
   ];
   var CAPS = [
-    'EPT ENFORCE 持久拒绝',
+    'EPT WATCH_ONCE 首次访问证据',
     '分离视图 HOOK / CLOAK',
     'MSR / CR 策略引擎',
     'EPT 执行域 · VMFUNC',

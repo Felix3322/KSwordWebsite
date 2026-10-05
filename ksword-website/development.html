@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 2026-09-08 main 分支开发快照：常驻 VMM 与 R-1 层、EPT 分离视图与执行域、嵌套运行与跨核 TLB 失效修复、Light 调查工作台、内核诊断与验收状态。" name="description"/>
+<meta content="KSword 2026-10-05 源码快照 db6f9fd9：统一内存编辑、API/ETW/Syscall 监控、文件事务、回调、CE/x64dbg、Light 与 Intel/AMD 虚拟化实验及验收边界。" name="description"/>
 <title>main 分支开发快照 — KSword</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/development.html" hreflang="en" rel="alternate"/>
@@ -53,126 +53,33 @@
 </header>
 <main>
 <section class="page-hero compact"><div class="wrap">
-<p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT</p>
-<h1>主线最新开发变化</h1>
-<p class="lead">截至 2026-09-08，当前快照为 <code>KSwordDEV/KSword@e3d8106</code>。自上一次同步（<code>848b6bb</code>，2026-08-16）以来主线新增 <strong>297 个提交</strong>，绝大部分集中在硬件虚拟化。本页整理 main 的开发状态，不把未发布内容写成新的正式版本。</p>
-<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank">查看快照 HEAD</a><a href="hvm-topology.html">Nested HVM 拓扑演示</a><a href="learn/index.html">文档中心</a><a href="changelog.html">查看完整版本历史</a></div>
+<p class="kicker">MAIN BRANCH / DEVELOPMENT SNAPSHOT · 2026-10-05</p>
+<h1>主线开发快照</h1>
+<p class="lead">源码基线 <code>KSwordDEV/KSword@db6f9fd9</code> · 统一内存编辑、监控、文件事务、回调注销、调试器适配与 HVM 实验。</p>
+<div class="actions"><a class="primary" href="https://github.com/KSwordDEV/KSword/commit/db6f9fd96212aca8739cdd9e90ce3d3b0f39cd68" rel="noreferrer" target="_blank">查看源码快照</a><a href="hvm-topology.html">Intel 拓扑示例</a><a href="learn/index.html">文档中心</a><a href="changelog.html">发行历史</a></div>
 </div></section>
 <section class="section compact-section"><div class="wrap docs-layout">
-<aside aria-label="开发快照目录" class="side-index"><strong>本页目录</strong><a href="#scope">快照边界</a><a href="#hvm">常驻 VMM 与 R-1 层</a><a href="#hvm-nested">嵌套运行与实测读数</a><a href="#hvm-disposition">R-1 处置与内存通道</a><a href="#kernel">内核、驱动与诊断</a><a href="#light">Light 调查工作台</a><a href="#ui">界面与运行时</a><a href="#evidence">验收状态</a><a href="#operator">使用注意</a><a href="#commits">关键提交</a></aside>
+<aside aria-label="开发快照目录" class="side-index"><strong>本页目录</strong><a href="#scope">源码与发行边界</a><a href="#memory">统一内存编辑器与 Intel 汇编</a><a href="#monitor">API、ETW、Syscall 与回调监控</a><a href="#files">文件详情与 R0 删除</a><a href="#kernel">回调注销与内核知识中心</a><a href="#hvm">Intel EPT 与 AMD SVM/NPT</a><a href="#hvm-nested">嵌套实现与验收范围</a><a href="#hvm-disposition">R-1 内存与目标操作</a><a href="#debugger">CE / x64dbg 与剪贴板保护</a><a href="#light">Light 调查工作台</a><a href="#ui">搜索、窗口控制与兼容策略</a><a href="#evidence">沿证据阅读功能</a><a href="#operator">使用顺序</a><a href="#commits">源码与证据</a></aside>
 <div class="document-content operator-manual">
-
-<section id="scope"><p class="section-number">01 / SCOPE</p><h2>这是 main 开发快照，不是新的版本号</h2>
-<div class="status-table">
-<div><strong>快照 HEAD</strong><p><code>e3d8106e2bdb5bba2421627b52b9491c5c3fdebb</code></p></div>
-<div><strong>时间</strong><p>提交时间 2026-09-07 23:20（-04:00）。当前页面基于该提交及其祖先。</p></div>
-<div><strong>本轮提交</strong><p><code>848b6bb..e3d8106</code> 共 297 个提交，时间跨度 2026-08-16 至 2026-09-08。下文只整理能影响用户理解的功能和边界变化。</p></div>
-<div><strong>版本边界</strong><p>已发布的最新资产是 <code>5.1.4.3</code>（2026-08-28）与 <code>5.1.4.3Pre</code>（2026-08-27）；main 比 <code>5.1.4.3</code> 多 98 个提交，不能用单个 EXE 或 SYS 替换发行包。</p></div>
-</div>
-<div class="action-rule"><strong>需要稳定资产时使用 Releases。</strong><p>主程序、KswordARK.sys、共享 IOCTL、语言包、DynData profiles、Launcher 和插件必须来自同一构建链；混用文件会产生 Unsupported、协议不匹配或字段缺失。</p></div>
-</section>
-
-<section id="hvm"><p class="section-number">02 / VIRTUALIZATION</p><h2>常驻 VMM 活下来了，R-1 层的能力建立在它之上</h2>
-<p>这一轮之前，<code>RESIDENT_VMM</code> 能力位证明的只是「能正确进出 VMX non-root」：进入 non-root 后第一次 MSR 访问就会让 hypervisor 自我撤销。地基工作把它补齐了——MSR bitmap 落地（primary bit 28 + VMCS <code>0x2004</code>）、exit 引擎把可代执行的退出直接判为已处理、非私有 <code>VMCALL</code> 注入 <code>#UD</code>（此前任何用户态代码一条指令就能掀掉 hypervisor），再加上 <code>SOAK</code> 保持自检。</p>
-<div class="capability-grid">
-<div><strong>强制与策略</strong><ul>
-<li>EPT 规则新增 <code>ENFORCE</code> 持久拒绝：命中注入 <code>#PF</code> 并继续常驻，不再「命中即撤虚拟化」。</li>
-<li>MSR 策略引擎：按需在位图上开洞，支持记录后放行 / 拒绝 <code>#GP</code> / 伪造读值。</li>
-<li>CR/DR 策略：CR0、CR4 通过 guest/host 掩码钉住，MOV-CR 的四种 access type 全覆盖（含 <code>CLTS</code> 与 <code>LMSW</code>）。</li>
-<li>事件环接入 UI，可逐行读取退出证据。</li>
-</ul></div>
-<div><strong>隐藏与隔离</strong><ul>
-<li>EPT 分离视图：<code>HOOK</code>（执行走影子页、读取见原字节）与 <code>CLOAK</code>（执行照常、读写见影子）。</li>
-<li>EPTP 切换后端：缺 Monitor Trap Flag 的机器上唯一能用的后端。</li>
-<li>每处理器私有 EPT 层次（按需分叉），解除了视图与规则的单处理器限制。</li>
-<li>EPT 执行域与 VMFUNC；<code>#VE</code> 已实现但两道保险默认挡死实际投递。</li>
-</ul></div>
-</div>
-<p>AMD 上不再谎称「不支持的 CPU」：能力探测会如实报告 SVM、NPT、nRIP、decode assists、flush-by-ASID 与 <code>VM_CR.SVMDIS</code> 固件锁，并返回 <code>BACKEND_NOT_IMPLEMENTED</code>——硬件行，是软件还没做。SVM 后端本身刻意未写，因为在 Intel 机器上写两千行永远跑不起来的后端只会制造「看着完整、从没运行过」的代码。</p>
-<p><a href="learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">阅读虚拟化能力路线图 →</a></p>
-</section>
-
-<section id="hvm-nested"><p class="section-number">03 / NESTED</p><h2>可以作为 L1 在嵌套环境里运行，降级是显式的</h2>
-<p>原路线图假设「验证要在裸机上做」。实测推翻了它：开着内存完整性的开发机由 HVCI 拉起 Hyper-V，Hyper-V 对根分区隐藏 <code>CPUID.1:ECX[5]</code>，于是连 VT-x 都探测不到，<code>PREPARE</code> 阶段就失败。所以常驻启动改成显式 opt-in：检测到外层 hypervisor 而请求里没带 <code>ALLOW_NESTED</code> 时直接拒绝，成功时打上 <code>RESIDENT_NESTED</code> 并在界面标注「作为 L1 运行，性能与可用能力均降级」。</p>
-<div class="action-rule critical-rule"><strong>跨核 TLB 失效是本轮最重要的修复。</strong><p>转发给 L0 的 flush hypercall 只失效 L0 认为的那个 L1 VP，兄弟核上的陈旧翻译不会被清掉——这个缺陷只在「我们插在 Windows 和 Hyper-V 中间」时存在。用 <code>VirtualProtect</code> 返回语义做确定性判据量到违规率 <strong>97%</strong>，修复后三轮复测归零，同时取样量级从 1.8 亿回落到与基线同量级的 600–700 万。它还解释了此前三种没有归因的崩溃：<code>0x139 (0x1D)</code>、<code>0x0A</code> 与 <code>0x50</code>。</p></div>
-<p>修法是私有 VMX-root IDT + 广播 NMI，而私有 IDT 是发 NMI 的<strong>前提</strong>不是优化：第一次只加 NMI 广播就撞了 <code>0x80 NMI_HARDWARE_FAILURE</code>。这条修法依赖「未启用 VPID」，一旦为性能启用 VPID 会静默失效，因此两件事必须一起改。</p>
-<p><a href="hvm-topology.html">看 Nested HVM 拓扑变化演示 →</a>　<a href="learn/index.html?doc=docs%2Fnext%2F%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md">阅读嵌套虚拟化架构 →</a></p>
-</section>
-
-<section id="hvm-disposition"><p class="section-number">04 / R-1</p><h2>R-1 进程处置与内存通道</h2>
-<p>「用 R-1 结束进程」在 hypervisor 层没有直接对应物——它不认识进程，只看得见 CR3 与客户物理页。这条通路做的事是<strong>在目标地址空间里拒绝执行</strong>，两个操作的差别只在拒绝时给客户机注入什么。</p>
-<div class="status-table">
-<div><strong>冻结</strong><p>注入 <code>#PF(present)</code>。故障指令永不退休，进程状态一个字节没变，撤销后从原地继续。可逆是它与结束的本质区别，不是程度差别。</p></div>
-<div><strong>结束</strong><p>注入 <code>#UD</code>。用户态未处理异常，Windows 走自己的进程拆除路径——不调任何内核 API，进程是被客户机自己收掉的。</p></div>
-<div><strong>作用域</strong><p>靠 CR3-load exiting 选层次，不是逐页判 CR3。按地址空间选层次之后，非目标进程从不在受限层次下运行。</p></div>
-<div><strong>R-1 内存通道</strong><p>驱动预留一页私有窗口，运行时改写自己的页表项指向目标物理页。价值不在「能读内存」，而在不调用可能被 Hook 的内存管理器导出例程；窗口不可用时读退化为 <code>MmCopyMemory</code>、写直接不可用，响应里如实报告走了哪条路。</p></div>
-</div>
-<div class="action-rule critical-rule"><strong>这些不是安全边界。</strong><p>隐蔽 Hook、分离视图与 R-1 处置同源：失败即放行。目标若能让代码页换一个客户物理页，就不在被拒绝的那一页上了。这是 R0 之外的一条处置通路，不是用来对抗一个知道它存在的对手。</p></div>
-</section>
-
-<section id="kernel"><p class="section-number">05 / KERNEL</p><h2>内核、驱动与诊断</h2>
-<div class="capability-grid">
-<div><strong>新增或增强</strong><ul>
-<li>窗口层与 Z-order 诊断，接入窗口详情。</li>
-<li>内核 IoTimer 清单与控制。</li>
-<li>进程终止时按精确镜像文件删除。</li>
-<li>内核回调监控页与对应的 CLI 查询、启停命令。</li>
-<li>内核知识中心：12 类、71 个专题，含 R3/R0 现场证据查询与只读证据页路由。</li>
-</ul></div>
-<div><strong>修复与加固</strong><ul>
-<li>R0 抓包生命周期控制、网络协议校验的国际化覆盖。</li>
-<li>声音模块拒绝不可验证的进程身份。</li>
-<li>系统时间重置时保持计数器连续性。</li>
-<li>驱动功能矩阵 CI：新 IOCTL 必须有确定处置，崩溃即失败。</li>
-<li>HVM 算术单元测试 70 项接入 <code>source-integrity</code>。</li>
-</ul></div>
-</div>
-<p>这些页面仍然受 Driver Status、Capability、DynData 和目标身份门禁约束；按钮可见不代表对应 R0 能力已就绪。</p>
-</section>
-
-<section id="light"><p class="section-number">06 / LIGHT</p><h2>KswordARKLight 变成一套调查工作台</h2>
-<p>Light 这一轮从「若干只读页」重构为带工作区状态的调查流程：新增证据会话检查器、可版本化的窗口状态、有界的注册表搜索工作区、静态导航面板，以及内存的只读快照、暂存写入计划与受控的差量回写。窗口、启动项、服务、系统工具、句柄、驱动和 ETW 各页补齐了「跳到持有者进程详情」的路由，并把回调文件事件关联到实体。</p>
-<p>涉及写入、删除、恢复或放弃记录的动作继续使用显式确认、代次校验和结果回填；导出路径统一为可见结果的快照导出。</p>
-</section>
-
-<section id="ui"><p class="section-number">07 / UI &amp; RUNTIME</p><h2>界面与运行时</h2>
-<p>标题栏权限按钮排右侧新增 <strong>KVM 按钮</strong>，三态显示常驻状态并作为所有 R-1 能力的统一入口（左键切换常驻，右键菜单含保持自检、写权限门、内存操作与故障重置）；按钮名称可在设置中改叫 KVM / HVM / R-1，权限按钮也可逐级隐藏。</p>
-<p>其余：ADS 标签栏可横向滚动并修复被压成零宽的问题、详情报告改用统一结构化报告组件、进程页新增单核心 CPU 利用率归因与可展开图表、线程 CPU 亲和性设置、动态历史快照与表格快照比对、启动项多选，以及蓝屏诊断页面重构与「显式安装」改造。</p>
-</section>
-
-<section id="evidence"><p class="section-number">08 / EVIDENCE</p><h2>验收状态：哪些有证据，哪些没有</h2>
-<p>本轮在 2 vCPU 嵌套 Hyper-V 靶机上取得了第一批运行期读数：跨核 TLB 违规 97% → 0；CLOAK 方向的内核态读被 EPTP 切换透明重定向到影子页且常驻未掉；R-1 冻结让心跳停在 tick 15 并保持、解除后从 16 继续（不是从 0 重启）；R-1 结束后进程消失；常规 <code>SOAK</code> 30 秒仍 OK。</p>
-<div class="action-rule"><strong>仍然欠缺的部分不记 PASS。</strong><p>HOOK 方向（执行被重定向到影子）未实测；未对已知函数下 hook；用户态 <code>ReadProcessMemory</code> 路径未验证（用户态触发 fail-closed 会带 ring-3 的 RSP/RIP 在 ring 0 返回，实测蓝屏）；「关闭后逐位复原」未比对；裸机验收整体未做。上面的读数来自嵌套靶机，<strong>不能当作裸机结论</strong>。</p></div>
-<p>更早的下一阶段验收报告同样保持诚实计数：116 条里 2 条 PASS、114 条 NOT_RUN，六种目标环境一次都没跑过。<a href="learn/index.html?doc=docs%2Fnext%2F%E6%9C%80%E7%BB%88%E6%8A%A5%E5%91%8A.md">阅读验收最终报告 →</a></p>
-</section>
-
-<section id="operator"><p class="section-number">09 / OPERATOR NOTES</p><h2>在 main 上测试前的最低检查</h2>
-<ol class="numbered-procedure">
-<li><span>1</span><div><strong>整套构建必须来自同一提交。</strong><p>不要只替换 EXE、SYS、语言包、profiles 或插件。</p></div></li>
-<li><span>2</span><div><strong>先看 Driver Status、DynData 和 Capability。</strong><p>Unsupported 表示协议、驱动或能力不匹配，不等于页面没有数据。</p></div></li>
-<li><span>3</span><div><strong>常驻 HVM 只在授权且可回滚的环境启动。</strong><p>每次启动前保存工作。常驻期间 <code>sc stop</code> 会返回 <code>1052</code>——卸载守卫在拦，必须先停常驻。EPT 规则、分离视图和 R-1 处置也只能在常驻停着时安装。</p></div></li>
-<li><span>4</span><div><strong>高风险动作只在授权和可回滚环境测试。</strong><p>系统时间、磁盘写入、驱动卸载、内核修改、进程保护和删除动作都应准备快照或恢复路径。</p></div></li>
-<li><span>5</span><div><strong>保留修改前证据。</strong><p>导出目标身份、地址、来源模块、配置和时间戳；动作后刷新并保存新旧结果。</p></div></li>
-</ol>
-</section>
-
-<section id="commits"><p class="section-number">10 / COMMIT INDEX</p><h2>关键提交索引</h2>
-<div class="link-rows">
-<a href="https://github.com/KSwordDEV/KSword/commit/e3d8106e2bdb5bba2421627b52b9491c5c3fdebb" rel="noreferrer" target="_blank"><strong>e3d8106</strong><span>当前快照 HEAD：处置拒绝码拆分，补齐本轮验收与蓝屏取证记录</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/8660a560" rel="noreferrer" target="_blank"><strong>8660a56</strong><span>R-1 层的进程冻结与结束，按地址空间拒绝执行</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/66050557" rel="noreferrer" target="_blank"><strong>6605055</strong><span>补上转发 flush 丢掉的跨核失效，违规率 97% → 0</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/dad3a97e" rel="noreferrer" target="_blank"><strong>dad3a97</strong><span>常驻模式请求 NMI exiting 并接住 NMI</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/ad767a8e" rel="noreferrer" target="_blank"><strong>ad767a8</strong><span>EPTP 切换后端，分离视图在无 MTF 的嵌套环境下可用</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/7bb73ce1" rel="noreferrer" target="_blank"><strong>7bb73ce</strong><span>每处理器私有 EPT 层次</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/462032c1" rel="noreferrer" target="_blank"><strong>462032c</strong><span>EPT 分离视图：隐蔽 Hook 与内存隐藏</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/b1a55023" rel="noreferrer" target="_blank"><strong>b1a5502</strong><span>让常驻 VMM 活下来，并把 R-1 能力接到标题栏 KVM 按钮</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/239e4fcb" rel="noreferrer" target="_blank"><strong>239e4fc</strong><span>允许作为 L1 嵌套运行，并按 SDM 记下规范依据</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/c64e2e76" rel="noreferrer" target="_blank"><strong>c64e2e7</strong><span>AMD 上如实报告 SVM 能力，不再谎称「不支持的 CPU」</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/46c44326" rel="noreferrer" target="_blank"><strong>46c4432</strong><span>内核知识中心：完整 R0/R3 知识研究链</span></a>
-<a href="https://github.com/KSwordDEV/KSword/commit/d26639a3" rel="noreferrer" target="_blank"><strong>d26639a</strong><span>窗口层与 Z-order 诊断</span></a>
-</div>
-</section>
-
+<section id="scope"><p class="section-number">01 / SCOPE</p><h2>源码与发行边界</h2><p>官网核查日期为 2026-10-05，源码基线为 <code>KSwordDEV/KSword@db6f9fd96212aca8739cdd9e90ce3d3b0f39cd68</code>（提交日期 2026-10-03）。本页描述该快照中的实现与已保存证据，不把正在进行的工作区改动或开发功能写成正式发行。</p><div class="action-rule"><strong>源码功能与下载资产分别判断。</strong><p>发行记录见更新日志与 GitHub Releases；主程序、驱动、两个 API Agent、语言包、profiles 和插件应来自配套构建。能力位、按钮可见、编译通过、加载成功和具体场景验收有不同含义。</p></div></section>
+<section id="memory"><p class="section-number">02 / MEMORY</p><h2>统一内存编辑器与 Intel 汇编</h2><p>主程序的 R3/R0/R-1、DDMA、影子页、Hook 向导、内核反汇编与转储内存入口共用快照组件。Hex、文本、反汇编和对比使用同一份字节；橙色表示待提交修改，青色表示两次读取的变化，提供本地撤销/重做。</p><p>x86/x64 Intel 汇编支持多行、局部标签、实际地址分支与 RIP 相对寻址。数字默认十六进制，十进制用 <code>0d</code>；编译和预览仅暂存字节，所属页面显式应用，写前核对原字节、写后检查实际回读。它不实现 CE Auto Assembler 脚本。只读入口不会因可查看汇编而获得写权限。</p></section>
+<section id="monitor"><p class="section-number">03 / MONITORING</p><h2>API、ETW、Syscall 与回调监控</h2><p>API Monitor 已有独立 x86/x64 Agent、641 项共享 JSON 定义、主程序集中跨位数注入与子进程会话服务。API 覆盖页展示实际安装、等待、排除与失败；异步 I/O 区分提交、完成和取消。Raw 只记录入口，直接 syscall、任意 COM 和监控前调用不保证覆盖；TSV 只导出当前可见行，队列丢失单独计数。</p><p>ETW 按载荷关联进程与线程，保留原始事件头身份；数组、结构和 TraceLogging schema 按布局解析，未知或截断留证据缺口。Syscall 以原始 QPC、CPU 和 StackWalk 关联，兼容桩形态仅作为证据，不能由单个 syscall 字节或 RWX 判定恶意/工具版本。</p><p>内核回调监控使用独立 Control/Query/Read 与多消费者游标；暂停冻结 UI 提交，后台继续有界读取。它观察 Ksword 运行时回调事件，区别于列出系统注册回调和 AskUser 拦截规则。</p></section>
+<section id="files"><p class="section-number">04 / FILES</p><h2>文件详情与 R0 删除</h2><p>文件详情提供单文件/批量元数据暂存，底部“保存全部修改”统一复核文件身份、备份、写入与回读。基础时间/属性、ADS、EA、权限、重解析点、文件系统属性和 PE 资源各有边界；高风险修改强制备份。签名页突出 WinVerifyTrust 信任结果，字符串按条件扫描全文件，Hex 支持按偏移分页跳转。</p><p>R0 删除有分阶段回执。IRP 预设采用托管打开并向基础文件系统提交，普通/忽略共享/强制方式保留不同风险与确认；强制清空映像/缓存 section 成员不能保证活动映射一致性。关闭句柄后确认路径不存在才算完成，构建或模拟测试不能证明实机删除安全。</p></section>
+<section id="kernel"><p class="section-number">05 / KERNEL</p><h2>回调注销与内核知识中心</h2><p>V3 回调清单保留注册变体、来源、身份与可信状态。Object 使用真实 RegistrationHandle，Registry 使用 Cookie；EX 请求在驱动重新枚举核对，公开 API 调用后复核目标。新增配对注销类别保留 candidate，不宣称所有版本已验证；实验 unlink 菜单已移除，ETW/EMP 缺真实句柄的行仍不可移除。</p><p>Minifilter 子行的动作是“卸载所属过滤器”，包括全部回调和实例，过滤器可拒绝。知识中心提供 12 类 71 专题、现场证据与只读业务页路由；Available 表示链路闭环，不证明当前机器全部权限/偏移/字段可用。</p></section>
+<section id="hvm"><p class="section-number">06 / VIRTUALIZATION</p><h2>Intel EPT 与 AMD SVM/NPT</h2><p>当前代码包括 Intel 常驻、MSR bitmap、退出模拟、EPT 双视图/策略，以及 AMD SVM/NPT 实验后端。标题栏与 KVM Dock 共用准入，按硬件、逐 CPU 自检、电源代次、拓扑和卸载保护发布状态；未知外层与 Hyper-V/VBS 冲突不能靠开关绕过。</p><div class="action-rule"><strong>EPT ENFORCE 当前返回 UNIMPLEMENTED。</strong><p>不能将旧 #PF 拒绝路径宣传为已完成的持久强制。WATCH_ONCE 捕获首次访问现场后放开对应页，不是所有后续写入的日志。代码执行分离视图不是普通数据冻结或通用进程隔离。</p></div></section>
+<section id="hvm-nested"><p class="section-number">07 / NESTED</p><h2>嵌套实现与验收范围</h2><p>Intel 已有 vmcs12、退出反射、影子 EPT 及后代页/区域租约；支持、准备、全核 armed 和瞬时 L2 运行分别报告。AMD 已有通用 VMCB/NPT、事件协调与首故障记录，但保持实验 PARTIAL。</p><p>已保存 AMD 单核/8 核启停和 32 核短常驻证据。固定探针逐核串行往返不等于内层多核 OS 并发；完整 L2 启动已有三重故障/宿主崩溃记录与待复测候选，不能宣布完整 OS 兼容。七步拓扑演示保留的是历史 Intel/Hyper-V 示例，不覆盖 AMD 或所有外层配置。</p></section>
+<section id="hvm-disposition"><p class="section-number">08 / R-1</p><h2>R-1 内存与目标操作</h2><p>R-1 内存支持物理/虚拟读写、翻译与按 PID 定位。私有窗口不可用时读取可降级并明确报告，写不可用；快照绑定地址、CR3/PID、模式与代次。目标操作还需要正确目标身份、映射、策略与常驻状态。所有界面应检查具体回执，不能把请求成功当作目标已退出或字节已改变。</p></section>
+<section id="debugger"><p class="section-number">09 / DEBUGGERS</p><h2>CE / x64dbg 与剪贴板保护</h2><p>共享调试后端管理身份、内存、上下文、HVM 与自有资源；CE/Titan 使用真实 Windows 停止事件。执行断点可按能力走 EPT 或明确记录的 Shadow INT3 回退。隐蔽模式拒绝可见 DR/PAGE_GUARD 回退；CE 与 Titan 的数据断点范围分别维护。Shadow 代码写入要求私有/COW 页，不能等同数据 freeze。</p><p>剪贴板保护按位数选 Agent，与 API Monitor 共享 PID 租约，配置可热更新。仅收到 Hook 安装就绪才计入受保护进程；规则命中/注入成功不等于全局保护，跨用户、直接调用和受保护目标保留覆盖限制。</p></section>
+<section id="light"><p class="section-number">10 / LIGHT</p><h2>Light 调查工作台</h2><p>原生 Win32 x64 Light 保留二级页懒加载、实体路由、PID+创建时间与跨进程驱动租约。预先运行的驱动不由退出的 Light 误停；R3 浏览和证据在驱动不可用时继续工作。</p><p>命令框默认导航模块/实体，只有前导 <code>!</code> 执行 shell。成功导出进入证据会话，可做最近两次行级 diff、JSON/TSV 与用户目录脱敏。内存历史重放成功读取的本地快照，原生编辑器未包含 Qt 主程序的汇编功能。详细进程列区分未知、预热和真实 0；I/O 速率不等同物理磁盘吞吐。</p></section>
+<section id="ui"><p class="section-number">11 / UI &amp; COMPATIBILITY</p><h2>搜索、窗口控制与兼容策略</h2><p>全局 UI 搜索、快照差异和主题控件统一接入主工作台。窗口输入/DWM 排序在窗口和杂项两页均可直接操作；DWM 画面顺序与原生输入顺序分开。跨 UIAccess 的 Win32k 写事务仅适配精确 <code>win32kfull 10.0.26100.9022</code>，回执测试不代替真实点击验收。</p><p>驱动/Launcher 的 OS build 上限已取消，仍保留最低 build 16299 与逐功能能力/偏移/布局检查。解除启动上限不增加未知系统的已验证 profile，也不保证所有功能可用。</p></section>
+<section id="evidence"><p class="section-number">12 / EVIDENCE</p><h2>沿证据阅读功能</h2><p>实现/构建/签名/加载/GUI/硬件场景分别报告。API 真实自有进程与 offscreen 回归、调试器受控 VM、AMD 短时常驻和模拟注销各有不同范围；旧候选与新源码不能混用。未知、Partial、Truncated、丢事件、候选和 NOT_RUN 都保留在结论中。</p></section>
+<section id="operator"><p class="section-number">13 / OPERATOR NOTES</p><h2>使用顺序</h2><ol class="numbered-procedure"><li><span>1</span><div><strong>选择配套构建并先查看状态。</strong><p>记录系统、驱动、profile、目标身份与能力；Unsupported 和缺数据不能读成“没有异常”。</p></div></li><li><span>2</span><div><strong>先观察与导出，再做修改。</strong><p>内存/文件暂存不等于已写入；注销/删除/HVM 操作保留确认和恢复记录。</p></div></li><li><span>3</span><div><strong>检查实际结果与覆盖范围。</strong><p>核对回读、路径存在、后置枚举、完整 CPU 集合和丢失统计；失败或部分完成不报告整体成功。</p></div></li></ol></section>
+<section id="commits"><p class="section-number">14 / SOURCE &amp; EVIDENCE</p><h2>源码与证据入口</h2><div class="link-rows"><a href="https://github.com/KSwordDEV/KSword/commit/db6f9fd96212aca8739cdd9e90ce3d3b0f39cd68" rel="noreferrer" target="_blank"><strong>db6f9fd9</strong><span>本次核查的固定源码基线</span></a><a href="learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md"><strong>功能技术文档</strong><span>docs/功能技术文档.md</span></a>
+<a href="learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md"><strong>虚拟化路线图与验收门</strong><span>docs/虚拟化能力路线图.md</span></a>
+<a href="learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md"><strong>内存编辑器组件与边界</strong><span>docs/内存编辑器组件清单.md</span></a>
+<a href="learn/index.html?doc=docs%2Fksword-debugger-vm-validation.md"><strong>CE / x64dbg 验收记录</strong><span>docs/ksword-debugger-vm-validation.md</span></a>
+<a href="learn/index.html?doc=docs%2Fnext%2Fksword-amd-lab-status.md"><strong>AMD 实验状态与现场证据</strong><span>docs/next/ksword-amd-lab-status.md</span></a>
+<a href="learn/index.html?doc=docs%2F%E7%AA%97%E5%8F%A3%E8%BE%93%E5%85%A5%E6%8E%A7%E5%88%B6.md"><strong>窗口输入与恢复</strong><span>docs/窗口输入控制.md</span></a></div></section>
 </div></div></section>
 </main>
 <footer><div class="wrap footer-row"><span>KSWORD / MAIN SNAPSHOT</span><div class="footer-links"><a href="index.html">首页</a><a href="changelog.html">正式版本</a><a href="hvm-topology.html">HVM 拓扑</a>
