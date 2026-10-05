@@ -23,6 +23,9 @@
       enDesc: 'What KSword is, what to install, and where to start.',
       items: [
         { site: '../docs/index.html', zh: '安装与开始使用', en: 'Install and get started' },
+        { p: 'docs/README.md', zh: '文档总索引', en: 'Documentation index' },
+        { p: 'docs/使用与兼容性.md', zh: '使用与兼容性', en: 'Usage and compatibility' },
+        { p: 'docs/构建与发布.md', zh: '构建、发行与报告接入', en: 'Build, release and report intake' },
         { p: 'docs/readme_zh.md', zh: '项目说明（中文）', en: 'Project README (Chinese)' },
         { p: 'README.md', zh: '项目说明（English）', en: 'Project README (English)' },
         { p: 'docs/CLI使用文档.md', zh: 'KswordCLI 使用文档', en: 'KswordCLI reference' }
@@ -35,6 +38,11 @@
       enDesc: 'What each module does, how the UI is organised, and what the terms mean.',
       items: [
         { p: 'docs/功能技术文档.md', zh: '功能技术文档', en: 'Feature technical reference' },
+        { p: 'docs/内存编辑器组件清单.md', zh: '内存快照、汇编与编辑器', en: 'Memory snapshots, assembly and editors' },
+        { p: 'docs/PFN物理内存归因.md', zh: 'PFN 物理内存归因', en: 'PFN physical memory attribution' },
+        { p: 'docs/窗口输入控制.md', zh: '窗口与输入控制', en: 'Windows and input control' },
+        { p: 'docs/SOS救援桌面.md', zh: 'SOS 救援桌面', en: 'SOS rescue desktop' },
+        { p: 'docs/DWM窗口序列注入.md', zh: 'DWM 窗口排序', en: 'DWM window ordering' },
         { p: 'docs/Ksword_UI表格详情页面分类.md', zh: 'UI 表格与详情页分类', en: 'UI table and detail taxonomy' },
         { p: 'docs/内核知识中心.md', zh: '内核知识中心', en: 'Kernel knowledge center' },
         { p: 'docs/功能悬停提示词典.md', zh: '功能悬停提示词典', en: 'Hover tooltip dictionary' }
@@ -43,10 +51,13 @@
     {
       id: 'hvm',
       zh: '虚拟化 · HVM / R-1', en: 'Virtualization · HVM / R-1',
-      zhDesc: 'VMX 常驻层的架构、嵌套运行、EPT 能力与安全边界。主线当前投入最大的方向。',
-      enDesc: 'The resident VMX layer: architecture, nested operation, EPT capabilities, and boundaries.',
+      zhDesc: 'Intel VMX/EPT 与实验性 AMD SVM/NPT：实现、嵌套运行与验证边界。',
+      enDesc: 'Intel VMX/EPT and experimental AMD SVM/NPT: implementation, nesting and validation boundaries.',
       items: [
         { site: '../hvm-topology.html', zh: 'Nested HVM 拓扑变化演示', en: 'Nested HVM topology demo' },
+        { p: 'docs/next/amd-nested-svm-implementation.md', zh: 'AMD 嵌套 SVM（实验）', en: 'AMD nested SVM (experimental)' },
+        { p: 'docs/next/amd-nested-entry-progress.md', zh: 'AMD 入口与验收进展', en: 'AMD entry and validation progress' },
+        { p: 'tools/hvm_lab/README.md', zh: 'HVM 实验工具与证据', en: 'HVM lab tools and evidence' },
         { p: 'docs/next/嵌套虚拟化架构.md', zh: '嵌套虚拟化架构', en: 'Nested virtualization architecture' },
         { p: 'docs/虚拟化能力路线图.md', zh: '虚拟化能力路线图', en: 'Virtualization capability roadmap' },
         { p: 'docs/虚拟化规范要点.md', zh: '虚拟化规范要点（Intel SDM）', en: 'Specification notes (Intel SDM)' },
@@ -111,6 +122,8 @@
       zhDesc: '写插件、加语言包时必须遵守的接口与命名约定。',
       enDesc: 'Interfaces and naming rules for plugins and language packs.',
       items: [
+        { p: 'docs/文档与官网维护.md', zh: '文档与官网维护', en: 'Documentation and website maintenance' },
+        { p: 'CONTRIBUTING.md', zh: '贡献与模块边界', en: 'Contributing and module boundaries' },
         { p: 'docs/插件系统规范.md', zh: '插件系统规范', en: 'Plugin system specification' },
         { p: 'docs/多语言语言包规范.md', zh: '多语言语言包规范', en: 'Language pack specification' }
       ]
@@ -156,6 +169,61 @@
     }
   ];
 
+  GROUPS.splice(2, 0, {
+  "id": "monitoring",
+  "zh": "监控与调试器",
+  "en": "Monitoring and debuggers",
+  "zhDesc": "会话、覆盖、真实机制与适配器边界。",
+  "enDesc": "Sessions, coverage, actual mechanisms and adapter boundaries.",
+  "items": [
+    {
+      "p": "APIMonitor_x64/README.md",
+      "zh": "WinAPI x64 监控",
+      "en": "WinAPI x64 monitoring"
+    },
+    {
+      "p": "APIMonitor_x86/README.md",
+      "zh": "WinAPI x86 监控",
+      "en": "WinAPI x86 monitoring"
+    },
+    {
+      "p": "tools/syscall_monitor/README.md",
+      "zh": "Syscall 采集与工具",
+      "en": "Syscall capture and tools"
+    },
+    {
+      "p": "DebuggerBackend/README.md",
+      "zh": "公共调试后端与 Shadow 策略",
+      "en": "Shared debugger backend and Shadow policies"
+    },
+    {
+      "p": "CheatEnginePlugin/README.md",
+      "zh": "CE 后端适配器",
+      "en": "CE backend adapter"
+    },
+    {
+      "p": "TitanEnginePlugin/README.md",
+      "zh": "TitanEngine 适配器",
+      "en": "TitanEngine adapter"
+    },
+    {
+      "p": "X96dbgIntegration/README.md",
+      "zh": "x64dbg/x96dbg 集成",
+      "en": "x64dbg/x96dbg integration"
+    },
+    {
+      "p": "docs/ksword-x64dbg-backend.md",
+      "zh": "x64dbg 后端细节",
+      "en": "x64dbg backend details"
+    },
+    {
+      "p": "docs/ksword-debugger-vm-validation.md",
+      "zh": "调试器验证证据",
+      "en": "Debugger validation evidence"
+    }
+  ]
+});
+
   var STR = {
     zh: {
       docs: '文档', home: '首页', onThisPage: '本文内容', filter: '筛选文档标题…',
@@ -165,7 +233,7 @@
       failTitle: '读取失败',
       failBody: '无法从 raw.githubusercontent.com 读取该文件。可能是网络受限、文件已改名或分支已变动。',
       hubTitle: 'KSword 文档',
-      hubLead: '官网自有页面与主仓库 <code>docs/</code> 收在同一套目录里。markdown 直接读 <code>KSwordDEV/KSword@main</code>，因此这里看到的始终是主线当前版本，而不是某次快照。',
+      hubLead: '官网自有页面与主仓库 <code>docs/</code> 收在同一套目录里。目录核对日期 2026-10-05。Markdown 直接读取 <code>KSwordDEV/KSword@main</code>；历史实验、路线图和设计记录保留原日期，不能视为当前支持承诺。',
       hubCount: '篇',
       hubSite: '官网页面',
       site: '官网'
@@ -178,7 +246,7 @@
       failTitle: 'Could not load',
       failBody: 'Failed to read the file from raw.githubusercontent.com. The network may be restricted, or the file may have been renamed or moved.',
       hubTitle: 'KSword documentation',
-      hubLead: 'Site pages and the main repository <code>docs/</code> share one table of contents. Markdown is read straight from <code>KSwordDEV/KSword@main</code>, so this always reflects the current mainline — not a snapshot. Most source documents are written in Chinese.',
+      hubLead: 'Site pages and the main repository <code>docs/</code> share one table of contents. The index was verified on 2026-10-05. Markdown loads from <code>KSwordDEV/KSword@main</code>; historical experiments, roadmaps and designs retain their original dates and are not current support guarantees. Most source documents are in Chinese.',
       hubCount: 'articles',
       hubSite: 'site pages',
       site: 'Site'
@@ -442,6 +510,10 @@
   }
   function hubUrl(lang) { return lang === 'en' ? '?lang=en' : './'; }
 
+  function siteUrl(relative) {
+    return lang === 'en' ? relative.replace(/^\.\.\//, '../en/') : relative;
+  }
+
   /* ── 应用 ─────────────────────────────────────────── */
 
   var el = {
@@ -491,7 +563,7 @@
         var a = document.createElement('a');
         a.textContent = it[lang];
         if (it.site) {
-          a.href = it.site;
+          a.href = siteUrl(it.site);
           a.className = 'is-site';
         } else {
           a.href = docUrl(it.p, lang);
@@ -560,6 +632,7 @@
 
   function setChrome() {
     el.crumbHome.textContent = t('home');
+    el.crumbHome.href = siteUrl('../index.html');
     el.crumbDocs.textContent = t('docs');
     el.crumbDocs.href = hubUrl(lang);
     el.railTitle.textContent = t('onThisPage');
@@ -568,6 +641,19 @@
       b.setAttribute('aria-pressed', b.getAttribute('data-learn-lang') === lang ? 'true' : 'false');
     });
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+    var nav = document.querySelector('.site-header nav');
+    var labels = lang === 'en'
+      ? ['Home', 'Changelog', 'Development', 'HVM topology', 'Docs', '中文', 'GitHub ↗']
+      : ['首页', '更新日志', '开发快照', 'HVM 拓扑', '文档', 'English', 'GitHub ↗'];
+    var targets = [siteUrl('../index.html'), siteUrl('../changelog.html'),
+      siteUrl('../development.html'), siteUrl('../hvm-topology.html'), hubUrl(lang),
+      hubUrl(lang === 'en' ? 'zh' : 'en'), 'https://github.com/KSwordDEV/KSword'];
+    if (nav) Array.prototype.forEach.call(nav.querySelectorAll('a'), function (a, i) {
+      if (labels[i]) { a.textContent = labels[i]; a.href = targets[i]; }
+    });
+    var bar = document.querySelector('.learn-bar-title span');
+    if (bar) { bar.textContent = '/ ' + t('docs'); }
+    if (el.filter) { el.filter.setAttribute('aria-label', lang === 'en' ? 'Filter documents' : '筛选文档'); }
   }
 
   function buildRail(headings) {
@@ -748,7 +834,7 @@
         '<p class="learn-hub-desc">' + esc(g[lang === 'en' ? 'enDesc' : 'zhDesc']) + '</p><ul>';
       g.items.forEach(function (it) {
         if (it.site) {
-          html += '<li><a class="is-site" href="' + esc(it.site) + '">' + esc(it[lang]) +
+          html += '<li><a class="is-site" href="' + esc(siteUrl(it.site)) + '">' + esc(it[lang]) +
             '<em>' + t('site') + '</em></a></li>';
         } else {
           html += '<li><a data-hub-doc="' + esc(it.p) + '" href="' + esc(docUrl(it.p, lang)) + '">' +
