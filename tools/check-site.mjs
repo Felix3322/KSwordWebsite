@@ -84,6 +84,17 @@ if (source && snapshotSha) {
         for (const doc of paths) assert(committed.has(doc), 'Catalog document absent from reviewed commit: ' + doc);
     } catch (error) { errors.push('Cannot verify reviewed source tree: ' + error.message); }
 }
+// A stale cached script can overwrite an otherwise current static page.
+const assetVersion = reviewedOn?.replaceAll('-', '') + '-' + snapshotSha?.slice(0, 8);
+for (const file of htmlFiles) {
+    for (const match of read(file).matchAll(/\b(?:href|src)="([^"]+)"/g)) {
+        const resource = new URL(match[1], 'http://preview.local/');
+        if (['styles.css', 'script.js', 'learn.js'].some(asset => resource.pathname.endsWith('/' + asset))) {
+            assert(resource.searchParams.get('v') === assetVersion, 'Stale asset version in ' + path.relative(site, file) + ': ' + match[1]);
+        }
+    }
+}
+assert(read(path.join(site, 'en/script.js')).includes('../script.js?v=' + assetVersion), 'Stale English runtime adapter version');
 const guideIds = ['package', 'ce', 'memory', 'monitor', 'hvm', 'light', 'clipboard', 'compatibility', 'mcp', 'cli', 'reports-permissions', 'navigation', 'cks-research'];
 for (const lang of ['', 'en/']) {
     const guide = read(path.join(site, lang, 'docs/index.html'));
