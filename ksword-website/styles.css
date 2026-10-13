@@ -188,6 +188,7 @@ h2 { margin: 0; font-size: 28px; line-height: 1.15; }
 .requirements { margin-top: 0; font-weight: 700; }
 pre { overflow-x: auto; margin: 24px 0; padding: 20px; border: 1px solid #111; background: #f3f3f3; }
 code { font-family: Consolas, "SFMono-Regular", monospace; font-size: .92em; }
+p code { overflow-wrap: anywhere; }
 .note { border-left: 4px solid #111; padding-left: 16px; }
 .notice { background: #111; color: #fff; }
 .notice p { margin: 0; max-width: 800px; }

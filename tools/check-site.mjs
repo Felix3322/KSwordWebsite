@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -54,11 +55,40 @@ if (source) for (const doc of paths) assert(fs.existsSync(path.join(source, doc)
 for (const match of catalog.matchAll(/\bsite:\s*['"]([^'"]+\.html)['"]/g)) {
     assert(fs.existsSync(path.resolve(site, 'learn', match[1])), 'Missing catalog site page: ' + match[1]);
 }
-const guideIds = ['package', 'ce', 'memory', 'monitor', 'hvm', 'light', 'clipboard', 'compatibility'];
+// Keep static HTML and the runtime copy in sync: JS replaces homepage content.
+const sharedScript = read(path.join(site, 'script.js'));
+const copyMatch = sharedScript.match(/const copy = english \? (\{[\s\S]*?\}) : (\{[\s\S]*?\});/);
+assert(copyMatch, 'Missing bilingual homepage copy');
+const copies = copyMatch ? [JSON.parse(copyMatch[1]), JSON.parse(copyMatch[2])] : [];
+const reviewedOn = copies[0]?.latestHtml.match(/\d{4}-\d{2}-\d{2}/)?.[0];
+const snapshotSha = copies[0]?.latestHtml.match(/KSwordDEV\/KSword\/commit\/([a-f0-9]{40})/)?.[1];
+assert(reviewedOn && snapshotSha, 'Missing dated source baseline');
+assert(catalog.includes(reviewedOn), 'Stale document catalog review date');
+assert(sharedScript.includes('main / ' + snapshotSha?.slice(0, 8)), 'Stale timeline source baseline');
+const escapeHtml = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#x27;');
+for (const [index, lang] of ['en/', ''].entries()) {
+    const page = read(path.join(site, lang, 'index.html'));
+    const copy = copies[index];
+    if (!copy) continue;
+    assert(page.includes(copy.latestHtml), 'Homepage runtime/static update mismatch: ' + lang);
+    for (const [title, body] of copy.features) assert(page.includes('<h3>' + escapeHtml(title) + '</h3><p>' + escapeHtml(body) + '</p>'), 'Homepage runtime/static feature mismatch: ' + lang + title);
+    assert(page.includes(snapshotSha), 'Missing static patch fallback baseline: ' + lang);
+    assert(copy.latestHtml.includes(reviewedOn) && copy.latestHtml.includes(snapshotSha), 'Bilingual source baseline mismatch: ' + lang);
+    for (const file of ['development.html', 'changelog.html', 'docs/index.html']) {
+        assert(read(path.join(site, lang, file)).includes(reviewedOn), 'Stale verified date: ' + lang + file);
+    }
+}
+if (source && snapshotSha) {
+    try {
+        const committed = new Set(execFileSync('git', ['-c', 'core.quotepath=false', '-C', source, 'ls-tree', '-r', '--name-only', snapshotSha], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }).trim().split(/\r?\n/));
+        for (const doc of paths) assert(committed.has(doc), 'Catalog document absent from reviewed commit: ' + doc);
+    } catch (error) { errors.push('Cannot verify reviewed source tree: ' + error.message); }
+}
+const guideIds = ['package', 'ce', 'memory', 'monitor', 'hvm', 'light', 'clipboard', 'compatibility', 'mcp', 'cli', 'reports-permissions', 'navigation', 'cks-research'];
 for (const lang of ['', 'en/']) {
     const guide = read(path.join(site, lang, 'docs/index.html'));
     for (const id of guideIds) assert(guide.includes('id="' + id + '"'), `Missing ${lang || 'zh/'} guide section: ${id}`);
-    assert(guide.includes('2026-10-05'), 'Missing verified date: ' + lang);
+    assert(guide.includes(reviewedOn), 'Missing verified date: ' + lang);
 }
 assert(!catalog.includes('KSwordDEV/Website'), 'Stale website repository in catalog');
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1; }

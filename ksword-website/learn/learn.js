@@ -32,12 +32,57 @@
       ]
     },
     {
+      id: 'automation',
+      zh: 'MCP 自动化', en: 'MCP automation',
+      zhDesc: '真实 GUI 对象桥、CLI/IOCTL、安装权限与回执边界。',
+      enDesc: 'The real GUI object bridge, CLI/IOCTL tools, privileges and receipt boundaries.',
+      items: [
+        { p: 'tools/ksword_mcp/README.md', zh: 'MCP 工具与配置', en: 'MCP tools and configuration' },
+        { p: 'tools/ksword_mcp/INSTALL_FOR_AGENTS.md', zh: 'MCP 安装与分层验收', en: 'MCP installation and layered validation' },
+        { p: 'docs/MCP设置页-20261012.md', zh: 'MCP 设置与会话启停', en: 'MCP settings and session lifecycle' },
+        { p: 'docs/MCP-UAC与安装验收-20261012.md', zh: 'MCP UAC 与安装验收', en: 'MCP UAC and installation validation' },
+        { p: 'docs/MCP复选框字段修复-20261013.md', zh: 'MCP 布尔字段与勾选语义', en: 'MCP boolean fields and checkbox semantics' },
+        { p: 'docs/KSword-MCP接入可行性评估.md', zh: 'MCP 接入设计与边界', en: 'MCP integration design and boundaries' }
+      ]
+    },
+    {
+      id: 'cli',
+      zh: 'CLI 分域手册', en: 'CLI command families',
+      zhDesc: '原生帮助、R3 后端与结构化状态；写操作保留各命令确认与回读。',
+      enDesc: 'Native help, R3 backends and structured status; mutations retain command-specific confirmation and readback.',
+      items: [
+        { p: 'docs/cli/coverage.md', zh: 'R3 66 项覆盖清单', en: '66-item R3 coverage manifest' },
+        { p: 'docs/cli/process.md', zh: '进程、线程与令牌', en: 'Processes, threads and tokens' },
+        { p: 'docs/cli/file.md', zh: '文件与 PE 分析', en: 'Files and PE analysis' },
+        { p: 'docs/cli/registry.md', zh: '注册表浏览、搜索与修改', en: 'Registry browsing, search and changes' },
+        { p: 'docs/cli/service.md', zh: '服务查询与控制', en: 'Service queries and control' },
+        { p: 'docs/cli/startup.md', zh: '启动项查询与控制', en: 'Startup queries and control' },
+        { p: 'docs/cli/network.md', zh: '网络查询与控制', en: 'Network queries and control' },
+        { p: 'docs/cli/privilege.md', zh: '权限查询与作用域执行', en: 'Privileges and scoped execution' },
+        { p: 'docs/cli/driver.md', zh: '驱动 R3 枚举', en: 'R3 driver enumeration' },
+        { p: 'docs/cli/hardware.md', zh: '硬件与遥测', en: 'Hardware and telemetry' },
+        { p: 'docs/cli/window.md', zh: '窗口与剪贴板', en: 'Windows and clipboard' },
+        { p: 'docs/cli/monitor.md', zh: 'ETW 与事件日志', en: 'ETW and event logs' },
+        { p: 'docs/cli/system.md', zh: '系统工具与原始 IOCTL', en: 'System tools and raw IOCTLs' },
+        { p: 'docs/cli/kernel.md', zh: '内核对象与命名空间', en: 'Kernel objects and namespaces' },
+        { p: 'docs/cli/security.md', zh: 'CI、VBS 与安全证据', en: 'CI, VBS and security evidence' }
+      ]
+    },
+    {
       id: 'concepts',
       zh: '功能与概念', en: 'Features and concepts',
       zhDesc: '每个模块做什么、界面怎么组织、术语怎么理解。',
       enDesc: 'What each module does, how the UI is organised, and what the terms mean.',
       items: [
         { p: 'docs/功能技术文档.md', zh: '功能技术文档', en: 'Feature technical reference' },
+        { p: 'docs/Issue-216-内存区域Dump核对.md', zh: 'R3/R0 内存区域 Dump', en: 'R3/R0 memory-region dumps' },
+        { p: 'docs/Issue-223-复杂报告子页.md', zh: '复杂报告与规范文档', en: 'Complex reports and canonical documents' },
+        { p: 'docs/权限工作台.md', zh: '权限工作台（中文）', en: 'Permission workbench (Chinese)' },
+        { p: 'docs/PermissionWorkbench.md', zh: '权限工作台（English）', en: 'Permission workbench (English)' },
+        { p: 'docs/窗口控件检查.md', zh: '窗口控件检查', en: 'Window-control inspection' },
+        { p: 'docs/内核池分配分析.md', zh: '内核池分配分析', en: 'Kernel pool-allocation analysis' },
+        { p: 'docs/反编译后端.md', zh: '反编译后端', en: 'Decompilation backends' },
+        { p: 'docs/StorageController.md', zh: '存储控制器', en: 'Storage controllers' },
         { p: 'docs/内存编辑器组件清单.md', zh: '内存快照、汇编与编辑器', en: 'Memory snapshots, assembly and editors' },
         { p: 'docs/PFN物理内存归因.md', zh: 'PFN 物理内存归因', en: 'PFN physical memory attribution' },
         { p: 'docs/窗口输入控制.md', zh: '窗口与输入控制', en: 'Windows and input control' },
@@ -75,6 +120,8 @@
       enDesc: 'R0 protocol, dynamic offsets, memory forensics, and experimental backend constraints.',
       items: [
         { p: 'docs/driver_ioctl_audit.md', zh: '驱动 IOCTL 审计', en: 'Driver IOCTL audit' },
+        { p: 'docs/offset-profile-diagnosis-20261009.md', zh: '偏移 Profile 诊断与回执', en: 'Offset-profile diagnostics and receipts' },
+        { p: 'docs/PDB特征码回退增量适配.md', zh: 'PDB 与特征码回退边界', en: 'PDB and signature-fallback boundaries' },
         { p: 'docs/动态偏移功能接入步骤.md', zh: '动态偏移接入步骤', en: 'Dynamic offset integration steps' },
         { p: 'docs/系统内存审计.md', zh: '系统内存审计', en: 'System memory audit' },
         { p: 'docs/高级取证与实验后端设计.md', zh: '高级取证与实验后端设计', en: 'Advanced forensics backend design' },
@@ -117,6 +164,22 @@
       ]
     },
     {
+      id: 'ui',
+      zh: '共享 UI 与工作台设计', en: 'Shared UI and workspace design',
+      zhDesc: '共享框架、主线实现记录与验证边界；设计文档保留原状态。',
+      enDesc: 'Shared frameworks, main-branch records and validation boundaries; designs retain their stated status.',
+      items: [
+        { p: 'docs/默认标准主题-20261012.md', zh: '应用级标准控件主题', en: 'Application-wide standard widget theme' },
+        { p: 'docs/参数表单框架接入.md', zh: '参数工作区接入', en: 'Parameter workspace integration' },
+        { p: 'docs/设置与二级工具页面布局-20261010.md', zh: '设置与二级工具布局', en: 'Settings and secondary-tool layouts' },
+        { p: 'docs/详情共享框架接入-20261011.md', zh: '共享详情框架', en: 'Shared detail framework' },
+        { p: 'docs/UI结果Tab连体布局-20261012.md', zh: '结果 Tab 与工具区衔接', en: 'Joined result tabs and tool areas' },
+        { p: 'docs/统一组件验收记录.md', zh: '统一组件验收记录', en: 'Shared-component validation record' },
+        { p: 'docs/共享UI组件重构验收记录.md', zh: '共享 UI 重构验收', en: 'Shared UI refactor validation' },
+        { p: 'docs/内存工作台重写设计.md', zh: '内存工作台重写设计', en: 'Memory-workbench rewrite design' }
+      ]
+    },
+    {
       id: 'extend',
       zh: '扩展开发', en: 'Extending KSword',
       zhDesc: '写插件、加语言包时必须遵守的接口与命名约定。',
@@ -146,6 +209,17 @@
       ]
     },
     {
+      id: 'cks',
+      zh: 'CKS 管理与研究', en: 'CKS management and research',
+      zhDesc: '管理步骤与免重置研究分开；启动前登记和修复安装候选仍未验证。',
+      enDesc: 'Management and reset-free research stay separate; pre-boot enrollment and repair-install candidates remain unverified.',
+      items: [
+        { p: 'docs/CKS管理.md', zh: 'CKS 管理', en: 'CKS management' },
+        { p: 'docs/CKS新版免重置启用研究.md', zh: 'CKS 新版免重置研究（未验证）', en: 'Reset-free CKS research (unverified)' },
+        { p: 'docs/CKS本机登记链深入研究.md', zh: 'CKS 本机登记链与候选边界', en: 'Local CKS enrollment chain and candidate limits' }
+      ]
+    },
+    {
       id: 'security',
       zh: '安全研究', en: 'Security research',
       zhDesc: '具体样本与攻击链的分析记录及对应检测判据。',
@@ -169,7 +243,7 @@
     }
   ];
 
-  GROUPS.splice(2, 0, {
+  GROUPS.splice(4, 0, {
   "id": "monitoring",
   "zh": "监控与调试器",
   "en": "Monitoring and debuggers",
@@ -233,7 +307,7 @@
       failTitle: '读取失败',
       failBody: '无法从 raw.githubusercontent.com 读取该文件。可能是网络受限、文件已改名或分支已变动。',
       hubTitle: 'KSword 文档',
-      hubLead: '官网自有页面与主仓库 <code>docs/</code> 收在同一套目录里。目录核对日期 2026-10-05。Markdown 直接读取 <code>KSwordDEV/KSword@main</code>；历史实验、路线图和设计记录保留原日期，不能视为当前支持承诺。',
+      hubLead: '官网自有页面与主仓库 <code>docs/</code> 收在同一套目录里。目录核对日期 2026-10-13，基线 main a996d38d。Markdown 直接读取 <code>KSwordDEV/KSword@main</code>；主线文档不代表旧发布包已包含相应功能；历史实验、路线图和设计记录保留原日期与验证状态，不能视为当前支持承诺。',
       hubCount: '篇',
       hubSite: '官网页面',
       site: '官网'
@@ -246,7 +320,7 @@
       failTitle: 'Could not load',
       failBody: 'Failed to read the file from raw.githubusercontent.com. The network may be restricted, or the file may have been renamed or moved.',
       hubTitle: 'KSword documentation',
-      hubLead: 'Site pages and the main repository <code>docs/</code> share one table of contents. The index was verified on 2026-10-05. Markdown loads from <code>KSwordDEV/KSword@main</code>; historical experiments, roadmaps and designs retain their original dates and are not current support guarantees. Most source documents are in Chinese.',
+      hubLead: 'Site pages and the main repository <code>docs/</code> share one table of contents. The index was verified on 2026-10-13 against main a996d38d. Markdown loads from <code>KSwordDEV/KSword@main</code>; main-branch documentation does not establish availability in older packages. Historical experiments, roadmaps and designs retain their original dates and validation status and are not current support guarantees. Most source documents are in Chinese.',
       hubCount: 'articles',
       hubSite: 'site pages',
       site: 'Site'

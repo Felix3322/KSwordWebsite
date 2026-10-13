@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 是 Windows x64 ARK、内核分析与系统取证工具集，提供内存汇编、多后端访问、API 与回调监控、调试器插件和 Light 证据工作台。" name="description"/>
+<meta content="KSword 是 Windows x64 ARK、内核分析与系统取证工具集，提供内存工作台、R3/R0 区域导出、MCP 与 CLI 自动化、结构化报告和 Light 证据工作台。" name="description"/>
 <title>KSword — Windows ARK 与内核分析工具集</title>
 <link href="styles.css" rel="stylesheet"/>
 <link href="en/index.html" hreflang="en" rel="alternate"/>
@@ -58,19 +58,19 @@
 <p class="section-number">MAIN / LIVE PATCHES</p>
 <h2 id="git-timeline-title">实时 Patch</h2>
 <ol class="git-commit-list" data-git-timeline-list="">
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/e3be5c5708829b6ff09471319a8ee6dcdf3ac20c" rel="noreferrer" target="_blank"><code>e3be5c5</code><span>进程历史记录次数限制+UacDesk退出机制重修</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/3e84608455514f0ab38bea72207626f81d2a4e4c" rel="noreferrer" target="_blank"><code>3e84608</code><span>Merge origin/main with FileDock updates and SOS rescue desktop</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/9764758056a56d55640e36d30b4fb69f00bc453a" rel="noreferrer" target="_blank"><code>9764758</code><span>零碎的更改</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/8d2fd074f94c345d9623ae2b7d60ae41f4458bb3" rel="noreferrer" target="_blank"><code>8d2fd07</code><span>fix(filedock): preserve viewport across directory refresh</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/7d3cd01a7266f1520beef5e3eb47369d1c570a4c" rel="noreferrer" target="_blank"><code>7d3cd01</code><span>fix(filedock): defer Shell icons and MIME probing during directory load</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/31ade54bf1f53c307aa99418d2d97ecfac9804c0" rel="noreferrer" target="_blank"><code>31ade54</code><span>feat(filedock): refine context menu and add run-as identities</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a4747f619299f201ff30fa88d9c0e0d51786f719" rel="noreferrer" target="_blank"><code>a4747f6</code><span>feat(rescue): launch elevated KSword on an isolated desktop</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/db6f9fd96212aca8739cdd9e90ce3d3b0f39cd68" rel="noreferrer" target="_blank"><code>db6f9fd</code><span>记录内存改动推送与临时产物审查结论</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/862e4e58572042697601269caf40f78dd791e055" rel="noreferrer" target="_blank"><code>862e4e5</code><span>fix(file): keep large FileDock listings responsive</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/6d5f60c78f664ff42191c6107381b250b68b389d" rel="noreferrer" target="_blank"><code>6d5f60c</code><span>Merge remote-tracking branch &#x27;origin/main&#x27;</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a142dffff204600f63f7dc51334cb807ba28a6c3" rel="noreferrer" target="_blank"><code>a142dff</code><span>fix(file): use managed opens for IRP delete presets</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/20f21ee08ae8dad79fe434c630f9a1bbfddfdafe" rel="noreferrer" target="_blank"><code>20f21ee</code><span>chore(welcome): update prerelease version and donor information</span></a></li>
-<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/9961263ad60c62ec3043729ecfce710905f423d3" rel="noreferrer" target="_blank"><code>9961263</code><span>fix(file): remove safety policy prerequisites for file deletion</span></a></li></ol>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a996d38d91c85a9d99744454880a58b7b223f7f7" rel="noreferrer" target="_blank"><code>a996d38</code><span>fix(ui): structure complex process reports with inline field details</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/0f882ef7b29f9bf69c40db6705777208acf80873" rel="noreferrer" target="_blank"><code>0f882ef</code><span>chore(mcp): prepare 0.1.1 trusted publisher release</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/12a69822ebceba2cf3b10ff766b61f67b9bb0ed3" rel="noreferrer" target="_blank"><code>12a6982</code><span>chore(memory): sign issue #216 completion record</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/844b893e9670a282f3c3d9e5479acae21a61b3c8" rel="noreferrer" target="_blank"><code>844b893</code><span>fix(ui): restore PEB workspace and stable detail projection identities</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/a722116df30cf7f837a6f7ef7efcc109a370d004" rel="noreferrer" target="_blank"><code>a722116</code><span>fix(mcp): collect fixture garbage before the handle baseline</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/4f970d056b611ed140b4bb8a0d48a4b8af3ec940" rel="noreferrer" target="_blank"><code>4f970d0</code><span>fix(mcp): release fixture references before checking native handles</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/814039bf14a976d48166abde61bdd72924055bc8" rel="noreferrer" target="_blank"><code>814039b</code><span>feat(mcp): add CLI and IOCTL tools with npm and Python packages</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/67bec7f9f1ca84e07e116087f2513052e5268c59" rel="noreferrer" target="_blank"><code>67bec7f</code><span>feat(cli): add confirmed raw KSword driver IOCTL command</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/da9a5efc2da1fd2c23731202d1a62168b171af8c" rel="noreferrer" target="_blank"><code>da9a5ef</code><span>fix(ci): exclude symbol bundles from manual release templates</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/521c127d0689c86c5fef653e40b1a307473a6d9a" rel="noreferrer" target="_blank"><code>521c127</code><span>fix(ci): handle Unicode JSON paths and link split startup test sources</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/c2c591adc8dc83390ad788b821c727472b94d350" rel="noreferrer" target="_blank"><code>c2c591a</code><span>Merge remote-tracking branch &#x27;origin/main&#x27;</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/da3b191aacdc381fc9375cafb378348a3dca5cbf" rel="noreferrer" target="_blank"><code>da3b191</code><span>feat(memory): add R3 and R0 region dump export</span></a></li>
+<li data-git-fallback=""><a href="https://github.com/KSwordDEV/KSword/commit/f00f7ced0ca8c9823719a629558fe92ff7a027ff" rel="noreferrer" target="_blank"><code>f00f7ce</code><span>Add AI agent installation instructions for KSwordMCP</span></a></li></ol>
 <p class="git-timeline-status" data-git-timeline-status="">正在读取 main…</p><a class="git-history-link" href="https://github.com/KSwordDEV/KSword/commits/main/" rel="noreferrer" target="_blank">全部提交记录 ↗</a>
 </div>
 </aside><div class="home-content" data-home-content="">
@@ -82,7 +82,8 @@
 <h1>Windows ARK、内核调试与系统取证工具集</h1>
 <p class="lead">KSword 将用户态与内核态信息集中在同一套工作流中，用于进程、内存、网络、文件、驱动、内核对象和系统安全审计。</p>
 <div class="actions">
-<a class="primary" href="https://github.com/KSwordDEV/KSword/releases/latest" rel="noreferrer" target="_blank">下载最新版本</a>
+<a class="primary" href="https://github.com/KSwordDEV/KSword/releases/tag/mcp-preview-20261012" rel="noreferrer" target="_blank">下载 MCP 预发行版</a>
+<a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">全部发行与 CI 构建</a>
 <a href="learn/index.html">开始使用</a>
 <a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">查看源代码</a>
 </div>
@@ -91,8 +92,7 @@
 </section>
 <section class="section alt">
 <div class="wrap two-column">
-<h2>最新更新</h2>
-<div class="prose"><p><strong><a href="https://github.com/KSwordDEV/KSword/commit/e3be5c5708829b6ff09471319a8ee6dcdf3ac20c" rel="noreferrer" target="_blank">main / e3be5c57</a> 开发快照</strong>（内容核对：2026-10-05）。本次另补 SOS 救援桌面、文件右键身份启动和进程历史保留控制。本次同步统一内存编辑器与汇编、多后端访问、x86/x64 API Agent、回调监控与注销、调试器插件、AMD 实验路径和 Light 证据工作台。Launcher 与驱动已取消 OS build 上限，驱动仍要求 build 16299 或更高，具体功能继续按能力与精确 profile 校验。</p><p>主线能力与已发布安装包按各自版本区分。<a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">正式版与预发行下载 →</a>　<a href="development.html">开发快照与验收边界 →</a>　<a href="hvm-topology.html">Nested HVM 拓扑 →</a>　<a href="changelog.html">发行更新日志 →</a></p></div>
+<h2>最新更新</h2><div class="prose"><p><strong><a href="https://github.com/KSwordDEV/KSword/commit/a996d38d91c85a9d99744454880a58b7b223f7f7" rel="noreferrer" target="_blank">main / a996d38d</a> 开发快照</strong>（内容核对：2026-10-13）。近期新增 MCP GUI 与 CLI/IOCTL 工具、R3/R0 内存区域 dump 导出、复杂进程报告与恢复的 PEB 工作区，并完善注册表与权限工作流、共享 UI 组件和 Taskbar 页面导航。CKS 管理附带研究页，免重置登记仍未验证。</p><p><a href="https://github.com/KSwordDEV/KSword/releases/tag/mcp-preview-20261012" rel="noreferrer" target="_blank">10 月 12 日 MCP/UAC 预发行版</a>已提供 7z/ZIP 整包和独立符号附件；之后的主线改动按各自版本区分。<a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">全部发行与 CI 构建 →</a>　<a href="development.html">开发快照与验收边界 →</a>　<a href="changelog.html">发行更新日志 →</a>　<a href="https://github.com/KSwordDEV/MCP" rel="noreferrer" target="_blank">MCP 安装 →</a></p></div>
 </div>
 </section>
 <section aria-labelledby="screenshots-title" class="screenshot-section">
@@ -124,17 +124,20 @@
 <div class="wrap two-column">
 <h2>核心功能</h2>
 <div class="rows">
+<article><h3>MCP 与 CLI 自动化</h3><p>通过本地 stdio sidecar 与 Qt 对象桥接入 AI 客户端，发现页面、读取快照并操作原生控件。设置提供会话启停、配置预览、操作日志和安装提示词；CLI 发现/help 与需要确认的 CLI/IOCTL 调用补充 GUI，原始请求的输入与输出各限 1 MiB。默认启动策略为 fail，自动启动及 UAC 按明确策略选择；动作派发后仍需回读业务状态。</p></article>
 <article><h3>硬件虚拟化与 R-1 层</h3><p>Intel VT-x/EPT 常驻、嵌套 VMX 分派与 shadow EPT 合成、分离视图、EPTP 切换 Hook、执行域及 R-1 内存/进程控制已经接入。AMD SVM/VMCB/NPT 与嵌套 SVM 使用独立实验路径；完整内层系统启动与广泛性能验收仍未完成。准入检查全 CPU 自检、外层环境与生命周期状态。</p></article>
-<article><h3>内存快照、汇编与多后端</h3><p>Hex、反汇编、文本与字节差异共用快照，支持 x86/x64 Intel 汇编、补丁预览、本地撤销/重做和显式写回。按能力选择 R3、标准 R0、私有页表窗口或 DDMA；写前比对、实际回读及目标/会话绑定保留。DDMA 需要显式暂存扇区，受硬件和驱动栈限制。</p></article>
-<article><h3>进程、对象与注入痕迹</h3><p>对照 R3/R0 进程、线程、CID 和句柄视图，按 PID 与创建时间绑定实例。线程栈、模块、令牌、保护字段及注入痕迹检查区分异常证据、未解释差异与采集缺口；视图差异本身不等于恶意隐藏。 齿轮按钮打开进程列表设置；活动历史默认保留最近 50 次，可选全量留存或不记录。</p></article>
+<article><h3>内存快照、汇编与多后端</h3><p>Hex、反汇编、文本与字节差异共用快照，支持 x86/x64 Intel 汇编、补丁预览、本地撤销/重做和显式写回。按能力选择 R3、标准 R0、私有页表窗口或 DDMA；写前比对、实际回读及目标/会话绑定保留。DDMA 需要显式暂存扇区，受硬件和驱动栈限制。 R3/R0 内存区域菜单新增原始 dump 导出、进度与取消；部分读取或短响应明确失败，失败/取消不残留半成品，内核后端仍依赖对应驱动能力。</p></article>
+<article><h3>进程、对象与注入痕迹</h3><p>对照 R3/R0 进程、线程、CID 和句柄视图，按 PID 与创建时间绑定实例。线程栈、模块、令牌、保护字段及注入痕迹检查区分异常证据、未解释差异与采集缺口；视图差异本身不等于恶意隐藏。 齿轮按钮打开进程列表设置；活动历史默认保留最近 50 次，可选全量留存或不记录。 证据详情分为概览、字段监视与已登记报告；分区卡片、偏移/类型行内详情、搜索和完整复制/导出共用规范文档。PEB 工作区保留专业编辑器布局。</p></article>
 <article><h3>驱动、内核与动态能力</h3><p>驱动/设备栈、SSDT/Hook、回调枚举与监控、验证身份后的注销、IDT、PDB/DynData、IOCTL 与反汇编整合到内核工作流。71 篇双语内核知识连接现场证据。OS build 上限已取消，逐功能能力与精确 profile 校验继续生效。</p></article>
 <article><h3>API、Syscall 与剪贴板监控</h3><p>ETW、Syscall、WMI 和 WinAPI 监控保留会话与覆盖状态；x86/x64 Agent 按目标位数自动选择。剪贴板进程/全局规则分别允许、记录或阻止读取、写入与枚举，实际保护状态依据 Hook 就绪确认。</p></article>
 <article><h3>调试器与插件</h3><p>插件市场、可执行/UI 插件，以及可选的独立 64 位 Cheat Engine 与 x64dbg 共享 KSword 后端。控制与日志留在 KSword Tab，调试器保留自己的窗口；原生、R0、HVM、隐藏执行断点和可选 Shadow 执行页写入按能力与策略选择，回退原因明确记录。</p></article>
 <article><h3>文件、磁盘与原始存储</h3><p>双面板管理器、文件元数据编辑、流式哈希与签名证据、按需 Hex/字符串搜索、PE/ELF/Mach-O 扫描。整合 R0 目录与删除模式、NTFS 恢复、Minifilter/FileObject/Section 证据和原始文件系统取证，原始磁盘写入需解锁。 单选 .exe 的右键菜单按令牌可用性提供 System、TrustedInstaller、管理员或普通用户身份启动。</p></article>
-<article><h3>网络与安全审计</h3><p>抓包与过滤、连接管理、按进程限速、请求构造、HTTPS/WFP/NIDS 及 R0 网络栈清单。配合启动项、DLL/IFEO 检查、AppLocker、WDAC、Defender/ASR、VBS/HVCI 与驱动信任证据开展调查。</p></article>
+<article><h3>注册表与权限工作台</h3><p>注册表支持类型编辑、文档工作台与核验后的修改事务；权限工作台集中账号/用户组、LSA 分配、令牌比较、访问诊断、登录会话和身份启动。权限快照可对照，CLI 与 Light 复用共享 R3 后端，各版本继续保留自己的能力范围。</p></article>
+<article><h3>网络与安全审计</h3><p>抓包与过滤、连接管理、按进程限速、请求构造、HTTPS/WFP/NIDS 及 R0 网络栈清单。配合启动项、DLL/IFEO 检查、AppLocker、WDAC、Defender/ASR、VBS/HVCI 与驱动信任证据开展调查。 注册表浏览、有界搜索、修改事务与共享 R3 CLI/Light 后端补充对象权限审阅；CKS 管理分别呈现当前状态、登记工作流与研究候选，保留版本和验证边界。</p></article>
+<article><h3>窗口检查与端口诊断</h3><p>窗口详情提供独立 Win32/UIA 控件树与可视选区覆盖；原生输入顺序和 DWM 画面顺序分别控制。网络端口诊断识别占用来源，按核验后的对象身份解除占用，并显示采集与操作限制。</p></article>
 <article><h3>Light 调查工作台</h3><p>原生 Win32 版本提供二级页懒加载、实体导航、进程详细列、证据快照与行级差异、JSON/TSV 导出和可选用户路径脱敏。跨进程驱动租约区分自身启动与预先运行的驱动，功能缺失时保留可用的 R3 浏览与导出。</p></article>
 <article><h3>崩溃转储与 BugCheck 证据</h3><p>分析转储上下文、符号、捕获内存、triage 与 BlackBox 证据；蓝屏诊断结合预生成画面和崩溃前进程/模块缓存。可选 Shield 通过公共回调提供有界缓冲，不宣称防止所有蓝屏或从任意内核错误恢复。</p></article>
-<article><h3>工作区与界面</h3><p>17 个主 Dock 与 3 个辅助面板，独立 KVM 工作区、全局页面搜索与定位、深浅主题和窗口通知。设置使用独立对话框，文件扫描属于文件工作流；实际能力与操作结果通过页面状态、日志和证据展示。</p></article>
+<article><h3>工作区与界面</h3><p>17 个主 Dock 与 3 个辅助面板，独立 KVM 工作区、全局页面搜索与定位、深浅主题和窗口通知。设置使用独立对话框，文件扫描属于文件工作流；实际能力与操作结果通过页面状态、日志和证据展示。 共享参数/详情布局、任务进度和文本编辑器保留采集数据并区分空态/错误。Taskbar 读取实际页面目录，支持搜索、逐层直达和可调总览模糊。</p></article>
 <article><h3>SOS 救援桌面</h3><p>Taskbar 运行时，用真实键盘输入 S O S Enter，在原桌面批准 UAC 后，于限制访问的私有 Win32 桌面启动新的管理员 KSword。顶部返回按钮或 Ctrl+Alt+Shift+F10 可返回；原窗口和未保存会话留在原桌面，不会迁移。这与 Windows 的 UAC 安全桌面不同。</p></article>
 </div>
 </div>
@@ -148,6 +151,7 @@
 <div><strong>KswordARKLight</strong><p>证据工作台、快速调查与极简部署</p><span>Native Win32</span></div>
 <div><strong>KswordARKDriver</strong><p>统一 R0 审计与 HVM 协议</p><span>WDK / IOCTL</span></div>
 <div><strong>Launcher</strong><p>兼容性检查与入口选择</p><span>Native Win32</span></div>
+<div><strong>KSword MCP</strong><p>AI 客户端接入、原生 GUI 发现与确认式 CLI 工具</p><span>Python / stdio</span></div>
 <div><strong>KswordCLI</strong><p>自动化、验证与故障排查</p><span>Command line</span></div>
 <div><strong>API / Clipboard Agents</strong><p>按目标架构采集 API 与剪贴板事件</p><span>x86 / x64 DLL</span></div>
 <div><strong>Debugger plugins</strong><p>可选 CE / x64dbg 共享后端与独立窗口</p><span>64-bit plugins</span></div>

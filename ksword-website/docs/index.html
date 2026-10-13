@@ -57,7 +57,7 @@
 <div class="wrap">
 <p class="kicker">OPERATOR DOCUMENTATION</p>
 <h1>软件使用文档</h1>
-<p class="lead">按 2026-10-05 当前源码核对：启动与能力、内存编辑、监控、调试后端、Light 及实验边界。</p>
+<p class="lead">按 2026-10-13 主线 a996d38d 核对：MCP、CLI、内存区域 Dump、复杂报告、权限工作台与实验边界。实际发行包以下载说明及配套版本为准。</p>
 </div>
 </section>
 <div class="doc-tabs-shell">
@@ -88,7 +88,7 @@
 <a href="#raw-write">注册表、启动项与磁盘写入</a>
 <a href="#shutdown">退出与恢复顺序</a>
 <a href="#diagnostics">按症状排查</a>
-<a href="#monitor">ETW、Syscall 与 WinAPI 会话</a><a href="#hvm">Intel 与实验性 AMD 虚拟化</a><a href="#light">Light 工作台与证据</a><a href="#clipboard">剪贴板保护会话</a><a href="#compatibility">Windows 与精确偏移支持</a></aside>
+<a href="#monitor">ETW、Syscall 与 WinAPI 会话</a><a href="#hvm">Intel 与实验性 AMD 虚拟化</a><a href="#light">Light 工作台与证据</a><a href="#clipboard">剪贴板保护会话</a><a href="#compatibility">Windows 与精确偏移支持</a><a href="#mcp">MCP 设置与 GUI 连接</a><a href="#cli">CLI 与原始 IOCTL</a><a href="#reports-permissions">复杂报告与权限工作台</a><a href="#navigation">Taskbar 页面总览</a><a href="#cks-research">CKS 免重置研究</a></aside>
 <div class="document-content operator-manual">
 <section id="choose-mode">
 <p class="section-number">01</p>
@@ -102,7 +102,7 @@
 <p>实际标准是客户端能打开 <code>\\.\KswordARKLog</code>，目标 IOCTL 被当前驱动支持，并且该功能所需的 DynData/Capability 已就绪。</p>
 </div>
 </section>
-<section id="package"><p class="section-number">02</p><h2>启动、版本与完整发行包</h2><p>内容按 <strong>2026-10-05</strong> 源码核对；实际包以构建日期和配套版本为准。完整解压 <code>Release/</code>，保留 Qt/ADS DLL、插件、<code>platforms/</code>、<code>profiles/</code>、<code>languages/</code> 与许可证，然后运行 <code>Launcher.exe</code>。</p><p>完整 Qt 版用于全工作流，Light 是原生 Win32 工作台，CLI 适合脚本和有界查询。Launcher 可显式选择目标：</p><pre><code>Launcher.exe --launcher-main
+<section id="package"><p class="section-number">02</p><h2>启动、版本与完整发行包</h2><p>内容按 <strong>2026-10-13 · main a996d38d</strong> 源码核对；新增主线功能不代表旧发布包已包含。下载前查看发行说明，MCP、CLI 与调试器适配器按各自清单核对。完整解压 <code>Release/</code>，保留 Qt/ADS DLL、插件、<code>platforms/</code>、<code>profiles/</code>、<code>languages/</code> 与许可证，然后运行 <code>Launcher.exe</code>。</p><p>完整 Qt 版用于全工作流，Light 是原生 Win32 工作台，CLI 适合脚本和有界查询。Launcher 可显式选择目标：</p><pre><code>Launcher.exe --launcher-main
 Launcher.exe --launcher-light
 Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，不启动主程序，也不生成采集包。需要 R0 或受保护模块采集时按提示提升权限。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
 <section id="driver">
@@ -153,7 +153,8 @@ Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，
 </ul>
 <p class="source-path">依据：进程 identity、应用聚合批量动作、R0 visibility 记录。</p>
 </section>
-<section id="memory"><p class="section-number">07</p><h2>读取快照、暂存编辑与实际回读</h2><p>Hex、反汇编、文本和对比视图使用同一份读取快照。修改、汇编、撤销/重做只改变本地缓存；必须通过所属页面显式应用，成功以实际回读为准。</p><ol><li>核对目标身份、R3/R0/R-1/DDMA 后端、地址、CR3 与 x86/x64 位数，再读取。</li><li>选择修改范围，预览旧/新机器码，覆盖完整可解码旧指令。支持常用 Intel 指令和局部标签，不支持 CE alloc/registersymbol 等脚本。</li><li>写前复核原字节和会话，检查每个授权差异块的回读。冲突、partial 或未知回读不得当作整体成功。</li></ol><p>普通进程查看器 DDMA 保持只读。独立 DDMA 入口涉及显式暂存磁盘/LBA、调试器状态、透传和扇区恢复；虚拟机模拟 DMA 不证明绕过宿主翻译。</p><p><a href="../learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md">完整文档与限制 →</a></p></section>
+<section id="memory"><p class="section-number">07</p><h2>读取快照、暂存编辑与实际回读</h2><p>Hex、反汇编、文本和对比视图使用同一份读取快照。修改、汇编、撤销/重做只改变本地缓存；必须通过所属页面显式应用，成功以实际回读为准。</p><ol><li>核对目标身份、R3/R0/R-1/DDMA 后端、地址、CR3 与 x86/x64 位数，再读取。</li><li>选择修改范围，预览旧/新机器码，覆盖完整可解码旧指令。支持常用 Intel 指令和局部标签，不支持 CE alloc/registersymbol 等脚本。</li><li>写前复核原字节和会话，检查每个授权差异块的回读。冲突、partial 或未知回读不得当作整体成功。</li></ol><p>普通进程查看器 DDMA 保持只读。独立 DDMA 入口涉及显式暂存磁盘/LBA、调试器状态、透传和扇区恢复；虚拟机模拟 DMA 不证明绕过宿主翻译。</p><p><a href="../learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md">完整文档与限制 →</a></p><h3>只导出一个内存区域</h3><p>进程详情 → 内存 → 内存区域，或主导航 → 内存 → 内存区域，右键选择“R3导出此区域Dump…”或“R0导出此区域Dump…”。动作固定所选后端，不自动回退；输出是与区域长度一致的原始 <code>.bin</code> 字节，不是整进程 <code>.kmdump</code> 或 Windows minidump。</p><p>每块读取复核进程身份和区域元数据；短读、partial、补零或长度不一致会失败。读取阶段可取消，原子保存不会发布半个目标文件；进入最终提交后不能撤回。运行中进程的分块读取不保证所有字节来自同一时刻。</p><p>已提交记录包含真实 GUI 的受控 R3 导出；R0 固定通道经源码与回归核对，记录中未加载驱动实读。<a href="../learn/index.html?doc=docs%2FIssue-216-%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9FDump%E6%A0%B8%E5%AF%B9.md">入口、保存语义与验证 →</a></p>
+</section>
 <section id="file">
 <p class="section-number">08</p>
 <h2>文件 Unlocker 不是“自动关闭所有占用”</h2>
@@ -232,6 +233,7 @@ Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，
 <li>服务停止成功不代表其驱动对象、设备或过滤器已安全清理。</li>
 <li>磁盘写入后的撤销依赖你保存的原始字节，不依赖 UI 历史记录。</li>
 </ul>
+<h3>注册表工作台先暂存，再应用</h3><p>当前主线把多值编辑组织成文档与变更计划：按注册表类型编辑并保留原始字节，先预览差异，再核对源值、应用并回读。暂存或计划显示完成不代表系统已改变；源值冲突和回读失败保留为真实错误。修改前仍需导出原键。</p><p><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">注册表功能与边界 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fregistry.md">注册表 CLI 命令 →</a></p>
 </section>
 <section id="shutdown">
 <p class="section-number">13</p>
@@ -272,6 +274,45 @@ Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，
 <section id="light"><p class="section-number">17</p><h2>Light 工作台与证据</h2><p>Light 保持原生 Win32、无 Qt 依赖，提供按需二级页、进程遥测、跨模块实体跳转与证据会话。功能覆盖不承诺与完整版本完全相同。</p><ul><li>命令框默认解释 pid/tid/hwnd/file/reg/net 等导航；前导 <code>!</code> 显式进入命令执行。</li><li>证据会话记录成功导出，支持快照、最近两次行级差异、JSON/TSV 与用户路径脱敏。</li><li>跨进程驱动租约保留预先运行的驱动；只有自行启动且最后租约退出时才请求停止。</li><li>unknown/partial 与真实零值分别保留。</li></ul><p>由 Launcher 选择 Light；实体身份核对与能力状态仍适用。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
 <section id="clipboard"><p class="section-number">18</p><h2>剪贴板保护会话</h2><p>杂项 → 剪贴板保护使用 Agent Hook 与规则热更新。驱动策略表只保存策略，不会单独阻断所有剪贴板访问。</p><ul><li>启动后核对目标位数、注入与 Hook 就绪。</li><li>会话停止、目标退出和规则修订可能改变覆盖范围。</li><li>同目标 Agent 会话互斥，必须保留覆盖/丢事件状态。</li></ul><p>按实际会话覆盖解释阻断与放行结果。</p><p><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">完整文档与限制 →</a></p></section>
 <section id="compatibility"><p class="section-number">19</p><h2>Windows 与精确偏移支持</h2><p>当前 Qt 路径最低 build 17763，R0 启动协议最低 build 16299；两者是不同组件的门槛。产品定位 Windows 10/11 x64。</p><p>2026-10-03 已停用 Launcher 与驱动的 OS build 上限拦截；新系统仍依赖精确 PE/RSDS/PDB profile 及逐功能能力、布局与地址校验。</p><p>collection-only 表示可采集身份，不代表已有完整偏移支持。报告接入先只读校验 valid=true，再进入正式矩阵。</p><p><a href="../learn/index.html?doc=docs%2F%E6%9E%84%E5%BB%BA%E4%B8%8E%E5%8F%91%E5%B8%83.md">完整文档与限制 →</a></p></section>
+<section id="mcp">
+<p class="section-number">20</p><h2>MCP 设置与 GUI 连接</h2>
+<p>当前主线通过外部 stdio sidecar 与同机命名管道连接真实 Qt GUI，提供页面发现、控件树、表格切片、文本读取和原生控件动作；特殊控件按已登记的只读适配器开放。</p>
+<ol class="procedure"><li>确认下载的主程序构建支持 MCP，安装配套 sidecar 与 Python 依赖；旧发布包可能早于该功能。</li><li>在“设置 → MCP”启用本次服务。自动启动默认关闭，路径与启动偏好通过“应用/取消”保存；本次启停立即生效，两者分开。</li><li>客户端配置使用真实 Python、sidecar 与主程序完整路径。<code>--ksword-exe</code> 默认 <code>--startup-policy fail</code>；只有明确选择 auto 才在调用时启动。固定 PID 模式需指定实际 PID。</li><li>先读取 hello、pages 和 snapshot，再操作当前对象。按最新表格 revision 选行；销毁或重新创建的控件需重新获取对象 ID。</li></ol>
+<div class="action-rule"><strong>已注册、工具已发现、GUI 已连接与业务成功分别核对。</strong><p><code>accepted</code> / <code>dispatched</code> 只描述控件调用。后台任务、确认弹窗与结果仍须从原页面回读；动作、字段修改和选行要求明确确认，保留原业务确认流程。</p></div>
+<ul><li>普通复选框用布尔 true/false 指定状态；toggle 反转当前值。同值设置不反向切换，表格单元格勾选需要相应模型能力。</li><li>连接校验用户、会话及完整性级别；UAC 启动例外仅绑定本次客户端真实 PID 与创建时间。没有 TCP 服务，不自动重启已有实例或重试业务请求。</li><li>设置操作日志保留最近 1000 条内存记录，记录方法和回执，不记录参数或读取结果；退出程序后不保留。</li></ul>
+<p>MCP 的 CLI/IOCTL 工具可独立于 GUI 配置运行，按下一节单独核对权限与结果。</p>
+<p><a href="../learn/index.html?doc=tools%2Fksword_mcp%2FREADME.md">MCP 工具与配置 →</a> · <a href="../learn/index.html?doc=tools%2Fksword_mcp%2FINSTALL_FOR_AGENTS.md">安装与分层验收 →</a></p>
+</section>
+<section id="cli">
+<p class="section-number">21</p><h2>CLI 与原始 IOCTL</h2>
+<p>CLI 已接入 Light R3 的 66 项迁移清单，包含进程、文件、注册表、服务、网络、监控、对象命名空间和安全证据。R3 查询是否需要管理员由具体命令决定；R0 命令通常需要已加载的配套驱动。</p>
+<pre><code>KswordCLI.exe help
+KswordCLI.exe help process
+KswordCLI.exe help system ioctl call</code></pre>
+<p><code>--json</code> 保留 backend、success/partial/unsupported/failed、data 与 diagnostics。保留实际退出码，不能把空结果或 partial 当作完整成功；纯 R3 命令默认 R3，不自动切换到 R0。</p>
+<p><code>system ioctl decode</code> 只解析编码，不发送请求。<code>system ioctl call</code> 经既有 ArkDriverClient 向固定 KSword 控制设备发送一次有界请求，全部要求 <code>--confirm</code>，输入与输出各上限 1 MiB。编码和缓冲区 ABI 来自配套 <code>shared/driver/</code>；传输成功不能替代响应中的业务状态。不会自动装驱动、提权或重发。</p>
+<p>MCP 先用 <code>ksword_cli_status</code> 核对路径，再用 <code>ksword_cli_help</code> 读取原生帮助。任意命令和原始 IOCTL 都要求 <code>confirmed=true</code>，原生命令所需的 <code>--confirm</code> 仍需提供。超时可能留下未知业务结果，先回读状态再决定下一步。</p>
+<p><a href="../learn/index.html?doc=docs%2FCLI%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md">CLI 总手册 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fcoverage.md">R3 覆盖清单 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fsystem.md">IOCTL 语法与限制 →</a></p>
+</section>
+<section id="reports-permissions">
+<p class="section-number">22</p><h2>复杂报告与权限工作台</h2>
+<p>进程详情 → Process Detail Evidence → 结构报告保留分区、类型和字段层级。搜索包含折叠后代及完整原始值；分区复制、复制全部和导出基于同一规范文档，不按当前折叠或筛选截断。生产者未载入或已截断的目录项仍保持原限制。</p>
+<p>权限工作台包括账号、组成员、直接 LSA 权利分配、令牌对比、访问诊断、登录会话、身份启动和手动快照。操作前确认 SID、进程创建时间与实际令牌，修改后核对回读。</p>
+<ul><li>直接 LSA 分配不等于当前进程的有效令牌；策略修改不会立即重写已有令牌。</li><li>AccessCheck 是指定令牌、描述符与掩码的诊断证据，不保证真实文件、注册表或服务操作一定成功。</li><li>不可读、缺失与相等分别处理；手动快照不是所有对象在同一时刻的原子系统快照。</li></ul>
+<p><a href="../learn/index.html?doc=docs%2FIssue-223-%E5%A4%8D%E6%9D%82%E6%8A%A5%E5%91%8A%E5%AD%90%E9%A1%B5.md">报告行为与验收 →</a> · <a href="../learn/index.html?doc=docs%2F%E6%9D%83%E9%99%90%E5%B7%A5%E4%BD%9C%E5%8F%B0.md">权限工作台 →</a></p>
+</section>
+<section id="navigation">
+<p class="section-number">23</p><h2>Taskbar 页面总览</h2>
+<p>主窗口标题栏支持页面路径与控件搜索。独立 Taskbar 右侧网格按钮打开页面总览：一级 Dock 分列，二三级页缩进，可搜索名称与完整路径；Enter 跳首项，Esc 收起。</p>
+<p>总览读取主程序真实页面目录，按外到内恢复 Tab 路径，并复核可见与可用状态。过期目录先刷新；RGB 只作辅助强调，模糊不可用时退回可读的透明布局。Taskbar 的 SOS 键盘入口与页面导航是各自独立的功能。</p>
+<p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">页面搜索、启动与 SOS →</a></p>
+</section>
+<section id="cks-research">
+<p class="section-number">24</p><h2>CKS 免重置研究</h2>
+<p>CKS 的第三个子页“免重置研究”区分两条候选：启动前重新建立登记，以及可能触及登记的保留应用修复安装。它们都未验证成功，不是受支持的免重置启用流程。</p>
+<p>既有关闭登记、启动许可、PK/KEK 信任与基础策略签名分别影响准入。Licensed=1、策略已部署或普通刷新成功不能证明 CKS 已生效；判断需要实际 CKS 状态、目标驱动加载、CI 事件及重启/更新后的持续性证据。</p>
+<p><a href="../learn/index.html?doc=docs%2FCKS%E7%AE%A1%E7%90%86.md">CKS 管理 →</a> · <a href="../learn/index.html?doc=docs%2FCKS%E6%96%B0%E7%89%88%E5%85%8D%E9%87%8D%E7%BD%AE%E5%90%AF%E7%94%A8%E7%A0%94%E7%A9%B6.md">免重置启用研究 →</a> · <a href="../learn/index.html?doc=docs%2FCKS%E6%9C%AC%E6%9C%BA%E7%99%BB%E8%AE%B0%E9%93%BE%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6.md">登记链证据与边界 →</a></p>
+</section>
 </div>
 </div>
 </section>
