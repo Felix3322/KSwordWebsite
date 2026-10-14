@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="按工作内容了解 KSword 的主要工具。"/><title>功能介绍 — KSword</title><link rel="icon" href="assets/ksword.ico"/><link rel="stylesheet" href="styles.css?v=20261014-technical"/></head><body>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="HVM / DMA 交叉比对、内核回调、内存编辑、EPT 调试，以及 Light、CLI 和 MCP。"/><title>功能介绍 — KSword</title><link rel="icon" href="assets/ksword.ico"/><link rel="stylesheet" href="styles.css?v=20261014-technical"/></head><body>
 <header class="site-header"><div class="wrap header-row">
 <a class="wordmark" href="index.html"><img src="assets/ksword.ico" width="25" height="25" alt=""/>KSword <span>5.1</span></a>
 <nav aria-label="主导航"><a href="index.html">首页</a><a href="changelog.html">更新日志</a><a href="development.html" aria-current="page">功能介绍</a><a href="hvm-topology.html">HVM 拓扑</a><a href="learn/index.html">文档</a><a href="en/development.html">English</a><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub</a></nav>
 <form class="header-search" action="learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="搜索文档" placeholder="搜索文档…"/></form>
 </div></header>
 <main>
-<section class="page-hero"><div class="wrap"><h1>功能介绍</h1><p class="lead">按工作内容了解 KSword 的主要工具。</p></div></section>
+<section class="page-hero"><div class="wrap"><h1>功能介绍</h1></div></section>
 <section class="section compact-section"><div class="wrap docs-layout">
-<aside class="side-index" aria-label="目录"><a href="#scope">版本与下载</a><a href="#mcp">MCP 与命令行</a><a href="#reports">进程详情与权限</a><a href="#registry-permissions">注册表工作台</a><a href="#cks">CKS 管理</a><a href="#memory">内存查看、编辑与导出</a><a href="#monitor">API、ETW 与 Syscall</a><a href="#files">文件、磁盘与占用</a><a href="#kernel">驱动、回调与内核对象</a><a href="#hvm">Intel 与 AMD 虚拟化</a><a href="#hvm-nested">嵌套虚拟化</a><a href="#hvm-disposition">R-1 内存工具</a><a href="#debugger">调试器与剪贴板保护</a><a href="#light">Light 轻量工作台</a><a href="#ui">窗口、网络与页面导航</a><a href="#evidence">快照与导出</a><a href="#operator">从查询开始</a><a href="#commits">项目资源</a></aside>
+<aside class="side-index" aria-label="目录"><a href="#scope">版本与下载</a><a href="#mcp">CLI / MCP</a><a href="#reports">进程 Cross-View 与结构详情</a><a href="#registry-permissions">注册表编辑</a><a href="#cks">CKS 管理</a><a href="#memory">HVM / DMA Cross-View 与内存编辑</a><a href="#monitor">API、ETW 与 Syscall 跟踪</a><a href="#files">文件占用与磁盘分析</a><a href="#kernel">内核回调、Hook 与对象</a><a href="#hvm">EPT、影子页与 R-1</a><a href="#hvm-nested">嵌套虚拟化</a><a href="#hvm-disposition">R-1 内存工具</a><a href="#debugger">CE / x64dbg 与剪贴板保护</a><a href="#light">Light 轻量版</a><a href="#ui">窗口、网络与页面搜索</a><a href="#evidence">快照比较与导出</a><a href="#commits">项目资源</a></aside>
 <div class="document-content">
-<section id="scope"><h2>版本与下载</h2><p>下载页面提供完整安装包、预发行版和 CI 构建。使用 Launcher 选择完整版或 Light，具体功能以所安装版本为准。</p><div class="actions"><a href="https://github.com/KSwordDEV/KSword/releases" target="_blank" rel="noreferrer">下载</a><a href="learn/index.html">文档</a><a href="https://github.com/KSwordDEV/MCP" target="_blank" rel="noreferrer">MCP</a></div></section>
-<section id="mcp"><h2>MCP 与命令行</h2><p>在“设置 → MCP”启停服务、复制客户端配置并查看操作日志。MCP 支持页面导航、控件读取与操作，也可调用 KswordCLI；执行修改命令时需要确认。安装说明见独立 MCP 项目。</p></section>
-<section id="reports"><h2>进程详情与权限</h2><p>查看线程、模块、句柄、令牌与 PEB。结构化报告提供分组浏览、搜索、字段详情和完整导出；权限工作台集中账号、组成员、LSA 分配、令牌比较与访问诊断。</p></section>
-<section id="registry-permissions"><h2>注册表工作台</h2><p>按标签页浏览注册表，编辑键值或打开注册表文档。修改前查看计划和差异，应用后读取结果；常用查询也可通过 CLI 与 Light 完成。</p></section>
-<section id="cks"><h2>CKS 管理</h2><p>杂项中的 CKS 页面提供状态查询、官方登记流程和 SSDE 实验流程。免重置页面整理研究资料，目前没有经过验证的免重置启用方案。</p></section>
-<section id="memory"><h2>内存查看、编辑与导出</h2><p>Hex、反汇编、文本和差异视图共用快照。支持 x86/x64 汇编、暂存编辑、撤销/重做和写回；区域列表可导出 R3/R0 内存 dump。读取与写入后端按当前机器的可用能力选择。</p></section>
-<section id="monitor"><h2>API、ETW 与 Syscall</h2><p>按目标位数加载 API Agent，查看调用参数、返回值和调用栈。ETW、Syscall、WMI 与回调监控提供会话管理、过滤和导出。</p></section>
-<section id="files"><h2>文件、磁盘与占用</h2><p>双面板文件管理器集成属性编辑、哈希、签名、字符串搜索和 Hex 浏览。占用查询按句柄或映射定位相关进程；另有 R0 文件工具、原始磁盘与文件系统分析。</p></section>
-<section id="kernel"><h2>驱动、回调与内核对象</h2><p>浏览驱动、设备栈、回调、SSDT、IDT 与内核对象。PDB/DynData 提供版本相关解析，内核知识中心连接专题说明和对应工具页。</p></section>
-<section id="hvm"><h2>Intel 与 AMD 虚拟化</h2><p>Intel VT-x / EPT 提供常驻监控与 R-1 工具。AMD SVM / NPT 和嵌套 SVM 为实验功能；启动前查看页面中的硬件检测和当前可用状态。</p></section>
-<section id="hvm-nested"><h2>嵌套虚拟化</h2><p>拓扑演示展示 Intel 嵌套场景中主机、虚拟机和 KSword 的位置变化。实际配置、支持进度和测试记录可在虚拟化文档中查看。</p></section>
-<section id="hvm-disposition"><h2>R-1 内存工具</h2><p>提供物理/虚拟内存读取、地址翻译和目标进程定位；需要已启动的虚拟化后端。写入和目标操作按页面显示的能力启用。</p></section>
-<section id="debugger"><h2>调试器与剪贴板保护</h2><p>Cheat Engine 与 x64dbg 使用独立窗口，可连接 KSword 后端。剪贴板保护按进程或全局规则记录、允许或阻止访问，状态显示当前 Agent 的连接情况。</p></section>
-<section id="light"><h2>Light 轻量工作台</h2><p>原生 Win32 界面提供进程查询、详情导航、快照比较和 JSON/TSV 导出。适合快速调查与便携使用，界面和插件范围与完整版不同。</p></section>
-<section id="ui"><h2>窗口、网络与页面导航</h2><p>检查 Win32/UIA 控件、管理窗口和输入顺序，或使用连接、端口与抓包工具。标题栏搜索可定位页面；Taskbar 总览支持按名称和路径搜索并直接跳转。</p></section>
-<section id="evidence"><h2>快照与导出</h2><p>表格支持筛选、复制、导出和快照比较。报告搜索与复制使用完整文档，内存编辑器保存自己的读取快照，便于保留操作前后的数据。</p></section>
-<section id="operator"><h2>从查询开始</h2><p>先选择对象，再打开对应详情。常用动作位于表格上方或右键菜单，耗时任务可在任务中心查看进度。涉及删除、写入或驱动修改时，先保存需要的数据。</p></section>
-<section id="commits"><h2>项目资源</h2><p>使用文档、安装说明和发行包可以从下面的入口找到。</p><div class="actions"><a href="https://github.com/KSwordDEV/KSword/releases" target="_blank" rel="noreferrer">下载</a><a href="learn/index.html">文档</a><a href="https://github.com/KSwordDEV/MCP" target="_blank" rel="noreferrer">MCP</a></div></section>
+<section id="scope"><h2>版本与下载</h2><p>完整版用 Qt6，界面和功能最完整。Light 用原生 Win32，绕过 Qt6 的兼容范围，启动更快。CLI 用于脚本和批量操作，MCP 让 AI 客户端直接接入主程序或 CLI。</p><div class="actions"><a href="https://github.com/KSwordDEV/KSword/releases" target="_blank" rel="noreferrer">下载</a><a href="learn/index.html">文档</a><a href="https://github.com/KSwordDEV/MCP" target="_blank" rel="noreferrer">MCP</a></div></section>
+<section id="mcp"><h2>CLI / MCP</h2><p>AI 客户端可以读取表格和控件、切换页面、执行操作，也能调用 KswordCLI。批量查询和导出可以写成脚本。“设置 → MCP”里可以启停服务、复制客户端配置和查看日志。修改类命令会要求确认。</p></section>
+<section id="reports"><h2>进程 Cross-View 与结构详情</h2><p>交叉核对进程链表、CID 和线程来源，找只在某个来源出现的对象、孤儿线程和异常入口。详情里可以查模块、句柄、令牌、PEB，以及 PDB 中的字段偏移、类型和位域。权限页还能比较令牌、组成员和 LSA 权限。</p></section>
+<section id="registry-permissions"><h2>注册表编辑</h2><p>可以同时开多个注册表标签，编辑键值、打开注册表文档。修改前先看差异，应用后读回结果；CLI 和 Light 也能做常用查询。</p></section>
+<section id="cks"><h2>CKS 管理</h2><p>查看 CKS 状态，按官方流程登记，或使用 SSDE 实验流程。“免重置研究”里放的是研究记录，目前还没有验证成功的免重置启用方案。</p></section>
+<section id="memory"><h2>HVM / DMA Cross-View 与内存编辑</h2><p>同一段内存可以走 R3、R0、HVM 私有页表和 DDMA，逐页、多轮比较读取结果。HVM 不走常规内存管理函数，用来排查读取 Hook；DDMA 通过磁盘控制器读取物理页，用来排查 EPT/SLAT 重定向。DDMA 需要先配置通道和暂存扇区。内存编辑支持 Hex、x86/x64 反汇编与汇编、暂存修改、撤销和差异比较，区域列表还能导出 R3/R0 dump。</p></section>
+<section id="monitor"><h2>API、ETW 与 Syscall 跟踪</h2><p>API Monitor 按目标进程的位数加载 Agent，记录参数、返回值和调用栈。ETW、Syscall、WMI 和内核回调都有对应的监控页，可以按目标和事件筛选，再导出记录。</p></section>
+<section id="files"><h2>文件占用与磁盘分析</h2><p>占用查询会区分句柄和映射，帮你找到占用文件的进程。文件页支持属性、哈希、签名、字符串和 Hex 检查；更底层的操作有 R0 文件工具、原始磁盘和文件系统分析。</p></section>
+<section id="kernel"><h2>内核回调、Hook 与对象</h2><p>查看驱动、设备栈、SSDT、IDT 和内核对象，定位回调和函数指针属于哪个模块。回调清单覆盖进程、线程、镜像、注册表、Ob、Minifilter 等类型。PDB/DynData 用来解析不同系统版本的结构和偏移，内核知识页可以直接跳到对应工具。</p></section>
+<section id="hvm"><h2>EPT、影子页与 R-1</h2><p>Intel VT-x / EPT 支持原始视图与执行视图、影子页、Hook 和执行断点。可以直接用 R-1 内存工具，也可以接 CE / x64dbg。AMD SVM / NPT 和嵌套 SVM 还在实验阶段，能否启动以硬件检测结果为准。</p></section>
+<section id="hvm-nested"><h2>嵌套虚拟化</h2><p>拓扑演示可以看到 Intel 嵌套虚拟化中主机、虚拟机和 KSword 分别在哪一层。具体支持哪些组合、怎么配置、哪些已经测过，见虚拟化文档。</p></section>
+<section id="hvm-disposition"><h2>R-1 内存工具</h2><p>虚拟化启动后，可以读取物理或虚拟内存、翻译地址、定位目标进程。页面会列出当前后端支持的读取、写入和目标操作。</p></section>
+<section id="debugger"><h2>CE / x64dbg 与剪贴板保护</h2><p>CE 和 x64dbg 保留自己的界面，通过插件接入 KSword 的 R0/R-1 内存和调试后端，支持 EPT/Shadow 执行断点。剪贴板保护可以按进程或全局规则记录、放行或阻止访问。</p></section>
+<section id="light"><h2>Light 轻量版</h2><p>原生 Win32 界面，不依赖 Qt6，启动快，也绕过了 Qt6 的系统兼容范围。能查进程详情，在进程、文件、网络、句柄和窗口之间跳转，比对快照，导出 JSON/TSV。需要最完整的界面和插件功能时用完整版。</p></section>
+<section id="ui"><h2>窗口、网络与页面搜索</h2><p>窗口检查可以看 Win32 和 UIA 两棵控件树；网络页可以查连接、找端口占用和抓包。页面太多时，直接用标题栏搜索，或在 Taskbar 总览里按名称、路径跳转。</p></section>
+<section id="evidence"><h2>快照比较与导出</h2><p>表格可以保存快照，对照前后哪些行、哪些字段变了。报告里的搜索、复制和导出包含完整数据；内存编辑器也能保留读取快照，对比字节变化。</p></section>
+
+<section id="commits"><h2>项目资源</h2><div class="actions"><a href="https://github.com/KSwordDEV/KSword/releases" target="_blank" rel="noreferrer">下载</a><a href="learn/index.html">文档</a><a href="https://github.com/KSwordDEV/MCP" target="_blank" rel="noreferrer">MCP</a></div></section>
 </div></div></section>
 </main>
 <footer><div class="wrap footer-row"><span>KSword · Windows x64</span><div class="footer-links"><a href="docs/contact.html">联系</a><a href="docs/credits.html">鸣谢</a><a href="docs/license.html">许可证</a><a href="https://github.com/KSwordDEV/KSword" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer">wangwei-cm</a><a href="https://github.com/Felix3322" target="_blank" rel="noreferrer">OB_BUFF</a></div></div></footer>
