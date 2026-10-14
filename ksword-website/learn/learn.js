@@ -38,20 +38,20 @@
       enDesc: 'The real GUI object bridge, CLI/IOCTL tools, privileges and receipt boundaries.',
       items: [
         { p: 'tools/ksword_mcp/README.md', zh: 'MCP 工具与配置', en: 'MCP tools and configuration' },
-        { p: 'tools/ksword_mcp/INSTALL_FOR_AGENTS.md', zh: 'MCP 安装与分层验收', en: 'MCP installation and layered validation' },
+        { p: 'tools/ksword_mcp/INSTALL_FOR_AGENTS.md', zh: 'MCP 安装指南', en: 'MCP installation guide' },
         { p: 'docs/MCP设置页-20261012.md', zh: 'MCP 设置与会话启停', en: 'MCP settings and session lifecycle' },
-        { p: 'docs/MCP-UAC与安装验收-20261012.md', zh: 'MCP UAC 与安装验收', en: 'MCP UAC and installation validation' },
+        { p: 'docs/MCP-UAC与安装验收-20261012.md', zh: 'MCP 与管理员启动', en: 'MCP and administrator startup' },
         { p: 'docs/MCP复选框字段修复-20261013.md', zh: 'MCP 布尔字段与勾选语义', en: 'MCP boolean fields and checkbox semantics' },
-        { p: 'docs/KSword-MCP接入可行性评估.md', zh: 'MCP 接入设计与边界', en: 'MCP integration design and boundaries' }
+        { p: 'docs/KSword-MCP接入可行性评估.md', zh: 'MCP 接入设计', en: 'MCP integration design' }
       ]
     },
     {
       id: 'cli',
-      zh: 'CLI 分域手册', en: 'CLI command families',
+      zh: 'CLI 命令参考', en: 'CLI command families',
       zhDesc: '原生帮助、R3 后端与结构化状态；写操作保留各命令确认与回读。',
       enDesc: 'Native help, R3 backends and structured status; mutations retain command-specific confirmation and readback.',
       items: [
-        { p: 'docs/cli/coverage.md', zh: 'R3 66 项覆盖清单', en: '66-item R3 coverage manifest' },
+        { p: 'docs/cli/coverage.md', zh: 'CLI 功能清单', en: 'CLI feature list' },
         { p: 'docs/cli/process.md', zh: '进程、线程与令牌', en: 'Processes, threads and tokens' },
         { p: 'docs/cli/file.md', zh: '文件与 PE 分析', en: 'Files and PE analysis' },
         { p: 'docs/cli/registry.md', zh: '注册表浏览、搜索与修改', en: 'Registry browsing, search and changes' },
@@ -76,7 +76,7 @@
       items: [
         { p: 'docs/功能技术文档.md', zh: '功能技术文档', en: 'Feature technical reference' },
         { p: 'docs/Issue-216-内存区域Dump核对.md', zh: 'R3/R0 内存区域 Dump', en: 'R3/R0 memory-region dumps' },
-        { p: 'docs/Issue-223-复杂报告子页.md', zh: '复杂报告与规范文档', en: 'Complex reports and canonical documents' },
+        { p: 'docs/Issue-223-复杂报告子页.md', zh: '结构化报告', en: 'Structured reports' },
         { p: 'docs/权限工作台.md', zh: '权限工作台（中文）', en: 'Permission workbench (Chinese)' },
         { p: 'docs/PermissionWorkbench.md', zh: '权限工作台（English）', en: 'Permission workbench (English)' },
         { p: 'docs/窗口控件检查.md', zh: '窗口控件检查', en: 'Window-control inspection' },
@@ -102,7 +102,7 @@
         { site: '../hvm-topology.html', zh: 'Nested HVM 拓扑变化演示', en: 'Nested HVM topology demo' },
         { p: 'docs/next/amd-nested-svm-implementation.md', zh: 'AMD 嵌套 SVM（实验）', en: 'AMD nested SVM (experimental)' },
         { p: 'docs/next/amd-nested-entry-progress.md', zh: 'AMD 入口与验收进展', en: 'AMD entry and validation progress' },
-        { p: 'tools/hvm_lab/README.md', zh: 'HVM 实验工具与证据', en: 'HVM lab tools and evidence' },
+        { p: 'tools/hvm_lab/README.md', zh: 'HVM 实验工具', en: 'HVM lab tools' },
         { p: 'docs/next/嵌套虚拟化架构.md', zh: '嵌套虚拟化架构', en: 'Nested virtualization architecture' },
         { p: 'docs/虚拟化能力路线图.md', zh: '虚拟化能力路线图', en: 'Virtualization capability roadmap' },
         { p: 'docs/虚拟化规范要点.md', zh: '虚拟化规范要点（Intel SDM）', en: 'Specification notes (Intel SDM)' },
@@ -235,7 +235,7 @@
       enDesc: 'Releases, licence, credits, and contact.',
       items: [
         { site: '../changelog.html', zh: '更新日志', en: 'Release history' },
-        { site: '../development.html', zh: 'main 开发快照', en: 'Main development snapshot' },
+        { site: '../development.html', zh: '功能介绍', en: 'Features' },
         { site: '../docs/license.html', zh: '许可证说明', en: 'Licence overview' },
         { site: '../docs/credits.html', zh: '第三方与致谢', en: 'Third-party credits' },
         { site: '../docs/contact.html', zh: '联系方式', en: 'Contact' }
@@ -292,8 +292,8 @@
     },
     {
       "p": "docs/ksword-debugger-vm-validation.md",
-      "zh": "调试器验证证据",
-      "en": "Debugger validation evidence"
+      "zh": "调试器测试记录",
+      "en": "Debugger test records"
     }
   ]
 });
@@ -301,26 +301,26 @@
   var STR = {
     zh: {
       docs: '文档', home: '首页', onThisPage: '本文内容', filter: '筛选文档标题…',
-      loading: '正在读取 main 分支…', source: '源文件', edit: '在 GitHub 上查看 ↗',
+      loading: '正在加载…', source: '源文件', edit: '在 GitHub 上查看 ↗',
       updated: '最近更新', prev: '上一篇', next: '下一篇', noMatch: '没有匹配的文档。',
       noHeadings: '本文没有二级标题。',
       failTitle: '读取失败',
       failBody: '无法从 raw.githubusercontent.com 读取该文件。可能是网络受限、文件已改名或分支已变动。',
       hubTitle: 'KSword 文档',
-      hubLead: '官网自有页面与主仓库 <code>docs/</code> 收在同一套目录里。目录核对日期 2026-10-13，基线 main a996d38d。Markdown 直接读取 <code>KSwordDEV/KSword@main</code>；主线文档不代表旧发布包已包含相应功能；历史实验、路线图和设计记录保留原日期与验证状态，不能视为当前支持承诺。',
+      hubLead: '从安装和常用工具开始，也可以在左侧搜索完整文档。',
       hubCount: '篇',
       hubSite: '官网页面',
       site: '官网'
     },
     en: {
       docs: 'Docs', home: 'Home', onThisPage: 'In this article', filter: 'Filter by title…',
-      loading: 'Loading from main…', source: 'Source', edit: 'View on GitHub ↗',
+      loading: 'Loading…', source: 'Source', edit: 'View on GitHub ↗',
       updated: 'Last updated', prev: 'Previous', next: 'Next', noMatch: 'No matching document.',
       noHeadings: 'This article has no level-2 headings.',
       failTitle: 'Could not load',
       failBody: 'Failed to read the file from raw.githubusercontent.com. The network may be restricted, or the file may have been renamed or moved.',
       hubTitle: 'KSword documentation',
-      hubLead: 'Site pages and the main repository <code>docs/</code> share one table of contents. The index was verified on 2026-10-13 against main a996d38d. Markdown loads from <code>KSwordDEV/KSword@main</code>; main-branch documentation does not establish availability in older packages. Historical experiments, roadmaps and designs retain their original dates and validation status and are not current support guarantees. Most source documents are in Chinese.',
+      hubLead: 'Start with installation and everyday tools, or search the full documentation on the left.',
       hubCount: 'articles',
       hubSite: 'site pages',
       site: 'Site'
@@ -717,14 +717,23 @@
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
     var nav = document.querySelector('.site-header nav');
     var labels = lang === 'en'
-      ? ['Home', 'Changelog', 'Development', 'HVM topology', 'Docs', '中文', 'GitHub ↗']
-      : ['首页', '更新日志', '开发快照', 'HVM 拓扑', '文档', 'English', 'GitHub ↗'];
+      ? ['Home', 'Changelog', 'Features', 'HVM topology', 'Docs', '中文', 'GitHub ↗']
+      : ['首页', '更新日志', '功能介绍', 'HVM 拓扑', '文档', 'English', 'GitHub ↗'];
     var targets = [siteUrl('../index.html'), siteUrl('../changelog.html'),
       siteUrl('../development.html'), siteUrl('../hvm-topology.html'), hubUrl(lang),
       hubUrl(lang === 'en' ? 'zh' : 'en'), 'https://github.com/KSwordDEV/KSword'];
     if (nav) Array.prototype.forEach.call(nav.querySelectorAll('a'), function (a, i) {
       if (labels[i]) { a.textContent = labels[i]; a.href = targets[i]; }
     });
+    var searchForm = document.querySelector('.header-search');
+    if (searchForm) {
+      var searchInput = searchForm.querySelector('[name="q"]');
+      searchInput.placeholder = lang === 'en' ? 'Search docs…' : '搜索文档…';
+      searchInput.setAttribute('aria-label', lang === 'en' ? 'Search documentation' : '搜索文档');
+      var languageInput = searchForm.querySelector('[name="lang"]');
+      if (!languageInput) { languageInput = document.createElement('input'); languageInput.type = 'hidden'; languageInput.name = 'lang'; searchForm.appendChild(languageInput); }
+      languageInput.value = lang;
+    }
     var bar = document.querySelector('.learn-bar-title span');
     if (bar) { bar.textContent = '/ ' + t('docs'); }
     if (el.filter) { el.filter.setAttribute('aria-label', lang === 'en' ? 'Filter documents' : '筛选文档'); }
@@ -897,7 +906,7 @@
     markActive();
 
     var html = '<p class="learn-hub-lead">' + t('hubLead') + '</p><div class="learn-hub">';
-    GROUPS.forEach(function (g) {
+    GROUPS.filter(function (g) { return ['start', 'automation', 'cli', 'concepts', 'monitoring', 'hvm'].indexOf(g.id) >= 0; }).forEach(function (g) {
       var docCount = g.items.filter(function (x) { return x.p; }).length;
       var siteCount = g.items.length - docCount;
       var badge = [];
@@ -905,8 +914,8 @@
       if (siteCount) { badge.push(siteCount + ' ' + t('hubSite')); }
 
       html += '<section class="learn-hub-card"><h2>' + esc(g[lang]) + '</h2>' +
-        '<p class="learn-hub-desc">' + esc(g[lang === 'en' ? 'enDesc' : 'zhDesc']) + '</p><ul>';
-      g.items.forEach(function (it) {
+        '<ul>';
+      g.items.slice(0, 5).forEach(function (it) {
         if (it.site) {
           html += '<li><a class="is-site" href="' + esc(siteUrl(it.site)) + '">' + esc(it[lang]) +
             '<em>' + t('site') + '</em></a></li>';
@@ -1008,6 +1017,8 @@
     if (path) { navigate(path, (window.location.hash || '').slice(1), true); } else { showHub(true); }
   });
 
+  var searchQuery = new URLSearchParams(window.location.search).get('q') || '';
+  if (el.filter) el.filter.value = searchQuery;
   var initial = readQuery();
   setChrome();
   buildToc();

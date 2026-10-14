@@ -55,29 +55,11 @@ if (source) for (const doc of paths) assert(fs.existsSync(path.join(source, doc)
 for (const match of catalog.matchAll(/\bsite:\s*['"]([^'"]+\.html)['"]/g)) {
     assert(fs.existsSync(path.resolve(site, 'learn', match[1])), 'Missing catalog site page: ' + match[1]);
 }
-// Keep static HTML and the runtime copy in sync: JS replaces homepage content.
-const sharedScript = read(path.join(site, 'script.js'));
-const copyMatch = sharedScript.match(/const copy = english \? (\{[\s\S]*?\}) : (\{[\s\S]*?\});/);
-assert(copyMatch, 'Missing bilingual homepage copy');
-const copies = copyMatch ? [JSON.parse(copyMatch[1]), JSON.parse(copyMatch[2])] : [];
-const reviewedOn = copies[0]?.latestHtml.match(/\d{4}-\d{2}-\d{2}/)?.[0];
-const snapshotSha = copies[0]?.latestHtml.match(/KSwordDEV\/KSword\/commit\/([a-f0-9]{40})/)?.[1];
-assert(reviewedOn && snapshotSha, 'Missing dated source baseline');
-assert(catalog.includes(reviewedOn), 'Stale document catalog review date');
-assert(sharedScript.includes('main / ' + snapshotSha?.slice(0, 8)), 'Stale timeline source baseline');
-const escapeHtml = value => value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#x27;');
-for (const [index, lang] of ['en/', ''].entries()) {
-    const page = read(path.join(site, lang, 'index.html'));
-    const copy = copies[index];
-    if (!copy) continue;
-    assert(page.includes(copy.latestHtml), 'Homepage runtime/static update mismatch: ' + lang);
-    for (const [title, body] of copy.features) assert(page.includes('<h3>' + escapeHtml(title) + '</h3><p>' + escapeHtml(body) + '</p>'), 'Homepage runtime/static feature mismatch: ' + lang + title);
-    assert(page.includes(snapshotSha), 'Missing static patch fallback baseline: ' + lang);
-    assert(copy.latestHtml.includes(reviewedOn) && copy.latestHtml.includes(snapshotSha), 'Bilingual source baseline mismatch: ' + lang);
-    for (const file of ['development.html', 'changelog.html', 'docs/index.html']) {
-        assert(read(path.join(site, lang, file)).includes(reviewedOn), 'Stale verified date: ' + lang + file);
-    }
-}
+// Maintenance metadata stays outside the product copy.
+const snapshot = JSON.parse(read(path.join(site, 'site-info.json')));
+const reviewedOn = snapshot.contentDate;
+const snapshotSha = snapshot.sourceRevision;
+assert(/^\d{4}-\d{2}-\d{2}$/.test(reviewedOn) && /^[a-f0-9]{40}$/.test(snapshotSha), 'Invalid source metadata');
 if (source && snapshotSha) {
     try {
         const committed = new Set(execFileSync('git', ['-c', 'core.quotepath=false', '-C', source, 'ls-tree', '-r', '--name-only', snapshotSha], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }).trim().split(/\r?\n/));
@@ -85,11 +67,11 @@ if (source && snapshotSha) {
     } catch (error) { errors.push('Cannot verify reviewed source tree: ' + error.message); }
 }
 // A stale cached script can overwrite an otherwise current static page.
-const assetVersion = reviewedOn?.replaceAll('-', '') + '-' + snapshotSha?.slice(0, 8);
+const assetVersion = snapshot.assetVersion;
 for (const file of htmlFiles) {
     for (const match of read(file).matchAll(/\b(?:href|src)="([^"]+)"/g)) {
         const resource = new URL(match[1], 'http://preview.local/');
-        if (['styles.css', 'script.js', 'learn.js'].some(asset => resource.pathname.endsWith('/' + asset))) {
+        if (['styles.css', 'script.js', 'learn.js', 'learn.css', 'hvm.css'].some(asset => resource.pathname.endsWith('/' + asset))) {
             assert(resource.searchParams.get('v') === assetVersion, 'Stale asset version in ' + path.relative(site, file) + ': ' + match[1]);
         }
     }
@@ -99,7 +81,7 @@ const guideIds = ['package', 'ce', 'memory', 'monitor', 'hvm', 'light', 'clipboa
 for (const lang of ['', 'en/']) {
     const guide = read(path.join(site, lang, 'docs/index.html'));
     for (const id of guideIds) assert(guide.includes('id="' + id + '"'), `Missing ${lang || 'zh/'} guide section: ${id}`);
-    assert(guide.includes(reviewedOn), 'Missing verified date: ' + lang);
+
 }
 assert(!catalog.includes('KSwordDEV/Website'), 'Stale website repository in catalog');
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1; }

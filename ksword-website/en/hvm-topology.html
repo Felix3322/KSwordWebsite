@@ -3,256 +3,21 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword Intel/Hyper-V seven-step topology example, reviewed 2026-10-05 against e3be5c57. Current EPT policies and AMD SVM/NPT remain scoped by capability and saved evidence." name="description"/>
+<meta content="An interactive view of the host, guest and KSword through seven stages." name="description"/>
 <title>Nested HVM topology — KSword</title>
-<link href="../styles.css?v=20261013-a996d38d" rel="stylesheet"/>
+<link href="../styles.css?v=20261013-ui2" rel="stylesheet"/>
 <link href="../hvm-topology.html" hreflang="zh-CN" rel="alternate"/>
-<style>
-/* ── 演示台 ───────────────────────────────────────────── */
-.hvm-demo { border: 1px solid #111; background: #111; color: #e9e9e9; }
-
-.hvm-demo-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px; flex-wrap: wrap;
-  padding: 14px 18px; border-bottom: 1px solid #3a3a3a;
-}
-.hvm-step-label { display: grid; gap: 3px; min-width: 0; }
-.hvm-step-label .idx {
-  font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #9a9a9a;
-  font-family: Consolas, "SFMono-Regular", monospace;
-}
-.hvm-step-label strong { font-size: 18px; line-height: 1.25; }
-
-.hvm-controls { display: flex; align-items: center; gap: 0; border: 1px solid #6a6a6a; flex: 0 0 auto; }
-.hvm-controls button {
-  height: 40px; min-width: 46px; padding: 0 14px;
-  border: 0; background: #111; color: #e9e9e9; cursor: pointer;
-  font-variant-numeric: tabular-nums;
-}
-.hvm-controls button + button { border-left: 1px solid #6a6a6a; }
-.hvm-controls button:hover:not(:disabled),
-.hvm-controls button:focus-visible { background: #e9e9e9; color: #111; }
-.hvm-controls button:disabled { color: #5c5c5c; cursor: default; }
-.hvm-controls .hvm-count { min-width: 74px; text-align: center; font-family: Consolas, monospace; }
-
-/* ── 步骤刻度 ─────────────────────────────────────────── */
-.hvm-track { display: flex; border-bottom: 1px solid #3a3a3a; }
-.hvm-track button {
-  flex: 1 1 0; min-width: 0;
-  display: grid; gap: 4px; justify-items: start;
-  padding: 9px 10px 10px;
-  border: 0; border-right: 1px solid #3a3a3a; border-top: 3px solid #3a3a3a;
-  background: #111; color: #9a9a9a; cursor: pointer; text-align: left;
-}
-.hvm-track button:last-child { border-right: 0; }
-.hvm-track button b { font-family: Consolas, monospace; font-size: 11px; font-weight: 700; }
-.hvm-track button span {
-  font-size: 12px; line-height: 1.3;
-  overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-}
-.hvm-track button:hover, .hvm-track button:focus-visible { color: #e9e9e9; border-top-color: #9a9a9a; }
-.hvm-track button[aria-current="true"] { color: #fff; border-top-color: #e8b04b; background: #1b1b1b; }
-
-/* ── 拓扑树 ───────────────────────────────────────────── */
-.hvm-body { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); }
-.hvm-tree-pane { padding: 26px 18px 30px; border-right: 1px solid #3a3a3a; min-width: 0; }
-.hvm-tree { display: grid; }
-
-.hvm-node {
-  --depth: 0;
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px;
-  margin-left: calc(var(--depth) * 26px);
-  padding: 10px 12px;
-  border: 1px solid #4a4a4a; background: #171717;
-  overflow: hidden;
-  transition: margin-left .5s ease, max-height .45s ease, opacity .3s ease,
-              padding .45s ease, border-color .3s ease, background-color .3s ease;
-  max-height: 90px;
-}
-.hvm-node + .hvm-node { margin-top: -1px; }
-.hvm-node[data-hidden="true"] {
-  max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
-  border-top-width: 0; border-bottom-width: 0; pointer-events: none;
-}
-.hvm-node-main { min-width: 0; display: grid; gap: 3px; }
-.hvm-node-main strong { font-size: 15px; line-height: 1.25; }
-.hvm-node-main span { font-size: 12px; color: #9a9a9a; line-height: 1.35; }
-.hvm-node-mode {
-  flex: 0 0 auto; font-family: Consolas, monospace; font-size: 11px;
-  padding: 3px 8px; border: 1px solid #4a4a4a; color: #9a9a9a; white-space: nowrap;
-}
-
-.hvm-node[data-tone="hw"]     { border-color: #6a6a6a; }
-.hvm-node[data-tone="l0"]     { border-color: #8a8a8a; background: #1c1c1c; }
-.hvm-node[data-tone="guest"]  { border-color: #5aa9e6; }
-.hvm-node[data-tone="guest"] .hvm-node-mode { border-color: #5aa9e6; color: #8ec7f0; }
-.hvm-node[data-tone="ksword"] { border-color: #e8b04b; background: #1f1a10; }
-.hvm-node[data-tone="ksword"] .hvm-node-mode { border-color: #e8b04b; color: #e8b04b; }
-.hvm-node[data-tone="ksword"] strong { color: #e8b04b; }
-.hvm-node[data-tone="blocked"] { border-color: #e05c5c; background: #1f1212; }
-.hvm-node[data-tone="blocked"] strong { color: #e88; }
-.hvm-node[data-tone="blocked"] .hvm-node-mode { border-color: #e05c5c; color: #e88; }
-
-.hvm-node[data-flash="true"] { animation: hvm-flash 1.1s ease-out 1; }
-@keyframes hvm-flash {
-  0%   { background: #e8b04b; border-color: #e8b04b; }
-  100% { background: #1f1a10; border-color: #e8b04b; }
-}
-
-.hvm-callout {
-  margin-top: 22px; padding: 13px 15px;
-  border: 1px solid #4a4a4a; border-left: 4px solid #e8b04b;
-  background: #171717; font-size: 14px; line-height: 1.55;
-}
-.hvm-callout[data-kind="blocked"] { border-left-color: #e05c5c; }
-.hvm-callout[data-kind="plain"]   { border-left-color: #6a6a6a; }
-.hvm-callout b { color: #fff; }
-
-/* ── 右侧仪表 ─────────────────────────────────────────── */
-.hvm-meta { display: grid; align-content: start; min-width: 0; }
-.hvm-meta section { padding: 16px 18px; border-bottom: 1px solid #3a3a3a; }
-.hvm-meta section:last-child { border-bottom: 0; }
-.hvm-meta h3 {
-  margin: 0 0 11px; font-size: 11px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase; color: #9a9a9a;
-}
-
-.hvm-gauges { display: grid; gap: 0; border-top: 1px solid #3a3a3a; }
-.hvm-gauges > div {
-  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-  padding: 8px 0; border-bottom: 1px solid #2b2b2b;
-}
-.hvm-gauges dt, .hvm-gauges dd { margin: 0; }
-.hvm-gauges dt { font-size: 12px; color: #9a9a9a; }
-.hvm-gauges dd { font-family: Consolas, monospace; font-size: 13px; color: #e9e9e9; white-space: nowrap; }
-.hvm-gauges dd[data-live="on"] { color: #7fd39b; }
-.hvm-gauges dd[data-live="off"] { color: #6a6a6a; }
-
-.hvm-flags { display: flex; flex-wrap: wrap; gap: 5px; }
-.hvm-flags span {
-  font-family: Consolas, monospace; font-size: 11px; line-height: 1.5;
-  padding: 3px 7px; border: 1px solid #3a3a3a; color: #5c5c5c;
-  transition: color .3s ease, border-color .3s ease, background-color .3s ease;
-}
-.hvm-flags span[data-on="true"] { color: #111; background: #e9e9e9; border-color: #e9e9e9; }
-.hvm-flags span[data-on="true"][data-accent="warn"] { background: #e8b04b; border-color: #e8b04b; }
-
-.hvm-caps { display: grid; gap: 5px; }
-.hvm-caps span {
-  display: flex; align-items: baseline; gap: 8px;
-  font-size: 12px; padding: 5px 8px; border: 1px solid #3a3a3a; color: #5c5c5c;
-  transition: color .3s ease, border-color .3s ease;
-}
-.hvm-caps span::before { content: "○"; font-family: Consolas, monospace; }
-.hvm-caps span[data-on="true"] { color: #e8b04b; border-color: #e8b04b; }
-.hvm-caps span[data-on="true"]::before { content: "●"; }
-
-.hvm-foot {
-  padding: 11px 18px; border-top: 1px solid #3a3a3a;
-  font-size: 12px; color: #9a9a9a; line-height: 1.5;
-}
-.hvm-foot code { color: #c9c9c9; }
-
-@media (max-width: 900px) {
-  .hvm-body { grid-template-columns: minmax(0, 1fr); }
-  .hvm-tree-pane { border-right: 0; border-bottom: 1px solid #3a3a3a; }
-  .hvm-track button span { display: none; }
-  .hvm-track button { justify-items: center; padding: 10px 4px; }
-  .hvm-node { margin-left: calc(var(--depth) * 14px); }
-}
-
-/* ── 页面内的数据表 ───────────────────────────────────── */
-.compare-table { border-top: 1px solid #111; margin: 20px 0 0; }
-.compare-table > div {
-  display: grid; grid-template-columns: minmax(150px, .8fr) 1.1fr 1.1fr; gap: 26px;
-  padding: 14px 0; border-bottom: 1px solid #999;
-}
-.compare-table p { margin: 0; }
-.compare-table .compare-head { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.reading-table { border-top: 1px solid #111; margin: 20px 0 0; }
-.reading-table > div {
-  display: grid; grid-template-columns: minmax(140px, .7fr) repeat(3, 1fr); gap: 22px;
-  padding: 13px 0; border-bottom: 1px solid #999;
-  font-variant-numeric: tabular-nums;
-}
-.reading-table p { margin: 0; }
-.reading-table .reading-head { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-@media (max-width: 760px) {
-  .compare-table > div, .reading-table > div { grid-template-columns: minmax(0, 1fr); gap: 6px; }
-}
-</style>
-</head>
+<link href="../hvm.css?v=20261013-ui2" rel="stylesheet"/>
+<link rel="icon" href="../assets/ksword.ico"/></head>
 <body>
-<header class="site-header">
-<div class="wrap header-row">
-<a aria-label="Back to homepage" class="wordmark" href="index.html">KSWORD <span>/ 5.1</span></a>
-<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
-</div>
-<div class="creator-info">
-<strong>wangwei-cm</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
-</div>
-</div>
-</article>
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
-</div>
-<div class="creator-info">
-<strong>OB_BUFF</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
-</div>
-</div>
-</article>
-</div>
-<nav aria-label="Main navigation">
-<a href="index.html">Home</a>
-<a href="changelog.html">Changelog</a>
-<a href="development.html">Development</a>
-<a aria-current="page" href="hvm-topology.html">HVM topology</a>
-<a href="../learn/index.html?lang=en">Documentation</a>
-<a href="../hvm-topology.html" hreflang="zh-CN">中文</a>
-<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
-</nav>
-</div>
-</header>
+<header class="site-header"><div class="wrap header-row">
+<a class="wordmark" href="../en/index.html"><img src="../assets/ksword.ico" width="25" height="25" alt=""/>KSword <span>5.1</span></a>
+<nav aria-label="Main navigation"><a href="../en/index.html">Home</a><a href="../en/changelog.html">Changelog</a><a href="../en/development.html">Features</a><a href="../en/hvm-topology.html" aria-current="page">HVM topology</a><a href="../learn/index.html?lang=en">Docs</a><a href="../hvm-topology.html">中文</a><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub</a></nav>
+<form class="header-search" action="../learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="Search documentation" placeholder="Search docs…"/><input type="hidden" name="lang" value="en"/></form>
+</div></header>
 <main>
-
-<section class="page-hero compact"><div class="wrap">
-<p class="kicker">KERNEL VIRTUALIZATION / NESTED HVM</p>
-<h1>Nested HVM topology</h1>
-<p class="lead">The seven-step demo illustrates a saved <strong>Intel/Hyper-V</strong> scenario: KSword takes over the running Windows context, which continues in VMX non-root after <code>VMLAUNCH</code>. Content reviewed on 2026-10-05 against <code>e3be5c57</code>. The animation is a teaching example; its states and readings are not a live probe or a universal hardware guarantee.</p>
-<div class="actions">
-<a class="primary" href="https://github.com/KSwordDEV/KSword/blob/main/docs/next/%E5%B5%8C%E5%A5%97%E8%99%9A%E6%8B%9F%E5%8C%96%E6%9E%B6%E6%9E%84.md" rel="noreferrer" target="_blank">Nested architecture doc ↗</a>
-<a href="https://github.com/KSwordDEV/KSword/blob/main/docs/%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md" rel="noreferrer" target="_blank">Capability roadmap ↗</a>
-<a href="development.html">Development snapshot</a>
-</div>
-</div></section>
-
-<section class="section alt" id="current-state"><div class="wrap two-column">
-<h2>Current capability and evidence boundary</h2>
-<div class="prose"><p>Current source includes Intel residency, MSR/CR policies, EPT split views, first-touch monitoring, nested VMX and descendant page/region leases. Lifecycle, hardware, prepared mode and per-CPU evidence decide what can run. Support, preparation, arming and active CPUs are separate states.</p>
-<p><strong>EPT ENFORCE returns UNIMPLEMENTED.</strong> WATCH_ONCE records the first access and opens the page afterwards; it is not durable denial or a complete stream of later writes. The displayed capability chips describe functions that need separate admission.</p>
-<p>AMD SVM/NPT and general nested SVM now have an experimental implementation. Saved short-residency and selected 8-core cycle tests do not prove full concurrent L2 OS operation. Triple-fault/host-crash records and candidates awaiting retest remain in the <a href="../learn/index.html?lang=en&amp;doc=docs%2Fnext%2Fksword-amd-lab-status.md">AMD status</a> and linked evidence. This Intel animation does not demonstrate AMD.</p>
-<p>Read <a href="development.html">the current development snapshot</a> and <a href="../learn/index.html?lang=en&amp;doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">the current roadmap</a> for implementation and acceptance limits.</p></div>
-</div></section>
-
-<section class="section compact-section"><div class="wrap">
-
-<div class="section-head">
-<div><p class="section-number">DEMO</p><h2 id="demo-title">Seven-step Intel topology example</h2></div>
-</div>
-
-<div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
+<section class="page-hero"><div class="wrap"><h1>Nested HVM topology</h1><p class="lead">An interactive view of the host, guest and KSword through seven stages.</p></div></section>
+<section class="section compact-section"><div class="wrap"><h2 id="demo-title">Topology demo</h2><div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
   <div class="hvm-demo-head">
     <div class="hvm-step-label">
       <span class="idx" data-hvm-index="">STEP 01 / 07</span>
@@ -305,12 +70,14 @@
     </div>
 
     <div class="hvm-meta">
-      <section>
-        <h3>What happens in this step</h3>
+
+<section>
+        <h3>Step details</h3>
         <p data-hvm-detail="" style="margin:0;font-size:14px;line-height:1.6;"></p>
       </section>
-      <section>
-        <h3>Authoritative signals</h3>
+
+<section>
+        <h3>Status</h3>
         <dl class="hvm-gauges">
           <div><dt>CR4.VMXE (bit 13)</dt><dd data-gauge="vmxe">0</dd></div>
           <div><dt>residentProcessorCount</dt><dd data-gauge="rpc">0</dd></div>
@@ -318,109 +85,29 @@
           <div><dt>sc stop</dt><dd data-gauge="unload">allowed</dd></div>
         </dl>
       </section>
-      <section>
+
+<section>
         <h3>KSWORD_ARK_HVM_STATE_*</h3>
         <div class="hvm-flags" data-hvm-flags=""></div>
       </section>
-      <section>
+
+<section>
         <h3>Functions requiring separate admission</h3>
         <div class="hvm-caps" data-hvm-caps=""></div>
       </section>
     </div>
   </div>
 
-  <p class="hvm-foot">Historical Intel/Hyper-V example; readings are saved results from the documented 2 vCPU target, <b>not AMD or general bare-metal conclusions</b>. Page review: 2026-10-05, source <code>e3be5c57</code>. The current capability boundary is described above. This page performs no virtualization operation.</p>
-</div>
-
+  <p class="hvm-foot">The diagram and readings are illustrative. AMD SVM/NPT support is experimental.</p>
+</div></div></section>
+<section class="section"><div class="wrap feature-grid">
+<article class="feature-card"><h3>Host</h3><p>The outer system provides hardware and virtualization resources.</p></article>
+<article class="feature-card"><h3>Guest</h3><p>Windows continues running in its existing context as the topology changes.</p></article>
+<article class="feature-card"><h3>KSword</h3><p>The resident layer handles VM exits and provides EPT and R-1 tools.</p></article>
 </div></section>
-
-<section class="section alt"><div class="wrap two-column">
-<h2>It does not boot a second Windows</h2>
-<div class="prose">
-<p>This is the part most often read backwards. After <code>VMLAUNCH</code> there is no reboot, no second kernel, and nothing visible on the desktop — the original Windows execution context keeps running <strong>in place</strong>, simply in VMX non-root from that point on. In the demo, the &ldquo;Windows&rdquo; row is the same node throughout; step 5 only inserts a layer above it.</p>
-<p>Because it is invisible, it is also easy to misjudge as &ldquo;it didn't work&rdquo;. So the criterion cannot be what you see: <code>RESIDENT_ACTIVE</code> is a state bit, not a heartbeat. The authoritative signal is <code>residentProcessorCount &gt; 0</code>, and the harder one is <code>CR4.VMXE</code> — if that bit is 0 in a crash dump, this layer was not running when the machine died.</p>
-</div>
-</div></section>
-
-<section class="section"><div class="wrap two-column">
-<h2>One-shot guest vs resident</h2>
-<div class="document-narrow" style="width:100%">
-<p>There are two ways into VMX in the driver, and the difference is one of kind, not degree.</p>
-<div class="compare-table">
-<div class="compare-head"><p>Dimension</p><p>One-shot guest</p><p>Resident</p></div>
-<div><p><strong>What runs in non-root</strong></p><p>A small test payload the driver builds itself</p><p><strong>The Windows that is running right now</strong></p></div>
-<div><p><strong>Duration</strong></p><p>A few instructions, then VMXOFF</p><p>Continuous, until explicitly stopped</p></div>
-<div><p><strong>What can be observed</strong></p><p>Only that test payload</p><p>Every VM exit on the machine</p></div>
-<div><p><strong>Purpose</strong></p><p>Prove VMX can be entered and left</p><p>Actual monitoring and interception</p></div>
-</div>
-<div class="action-rule critical-rule" style="margin-top:26px">
-<strong>This layer exists only while residency is running.</strong>
-<p>After residency stops, the CPU returns to a VMX-off state and EPT is no longer honoured by hardware. Every EPT-based capability — stealth hooks, split views, execution domains, R-1 process disposition — <strong>stops at the same moment</strong>. It is not a downgrade; the layer is gone.</p>
-</div>
-<p>That also explains two counter-intuitive behaviours. EPT rules, split views, and R-1 dispositions <strong>can only be installed while residency is stopped</strong>, because the exit path reads those tables without holding a lock; so &ldquo;install a disposition&rdquo; in the UI is really <code>stop → install → restart</code>. And <code>sc stop</code> returns <code>1052</code> during residency because the unload guard is holding it: the image is being executed in VMX root, and unloading it would kill the machine.</p>
-</div>
-</div></section>
-
-<section class="section alt"><div class="wrap two-column">
-<h2>Three constraints in the saved Intel target</h2>
-<div class="document-narrow" style="width:100%">
-<p>Nesting is not &ldquo;the same as bare metal, only slower&rdquo;. The outer layer decides what the inner one can see, and all three of these were found by measurement on the target.</p>
-<div class="definition-list">
-<div>
-<p><strong>No Monitor Trap Flag</strong></p>
-<p>The saved target did not expose MTF to its guest. The default stealth-hook backend — write the leaf, restore it on a monitor trap — therefore cannot be installed at all, and only the <strong>EPTP switching backend</strong> works: it needs execute-only EPT leaves (<code>IA32_VMX_EPT_VPID_CAP</code> bit 0), and that bit is available on the same machine. That is the only reason that backend exists: <em>capability, not performance</em>.</p>
-</div>
-<div>
-<p><strong>Cross-core TLB invalidation has to be done by hand</strong></p>
-<p>A flush hypercall forwarded to L0 only makes L0 invalidate the L1 VP it knows about — and that VP is currently running our L2, so stale translations on sibling cores are never cleared. The defect exists <strong>only because we sit between Windows and Hyper-V</strong>. The fix is a private VMX-root IDT plus a broadcast NMI, and the private IDT is a <em>precondition</em> for sending the NMI rather than an optimization: a first attempt with broadcast alone hit <code>0x80 NMI_HARDWARE_FAILURE</code>.</p>
-</div>
-<div>
-<p><strong>Nesting must be opted into explicitly</strong></p>
-<p>If an outer hypervisor is detected and the request does not carry <code>ALLOW_NESTED</code>, the driver refuses to start residency rather than silently degrading — nobody can judge what a silently degraded build is actually protecting. On success it sets <code>RESIDENT_NESTED</code>, and the UI states plainly that it is running as L1 with degraded performance and capabilities.</p>
-</div>
-</div>
-</div>
-</div></section>
-
-<section class="section"><div class="wrap two-column">
-<h2>Cross-core invalidation: flip the switch, the effect follows</h2>
-<div class="document-narrow" style="width:100%">
-<p>The criterion is deterministic rather than a &ldquo;ran a long time without crashing&rdquo; statistical experiment: the return of <code>VirtualProtect</code> means &ldquo;every processor has seen the new protection&rdquo;. The main thread turns a page into <code>PAGE_NOACCESS</code> and waits for that return; afterwards a thread pinned to a different processor reads the page. A <strong>successful</strong> read means it used a mapping that should already have been invalidated.</p>
-<div class="reading-table">
-<div class="reading-head"><p>Run</p><p>Resident cores</p><p>Samples in window</p><p>Violations</p></div>
-<div><p>Baseline</p><p>0</p><p>10,429,398</p><p><strong>0</strong></p></div>
-<div><p>Resident (before fix)</p><p>2</p><p>180,208,570</p><p><strong>174,787,358 (97%)</strong></p></div>
-<div><p>Baseline</p><p>0</p><p>10,644,062</p><p><strong>0</strong></p></div>
-<div><p>Resident (after fix) ×3</p><p>2</p><p>6,434,264 / 6,952,434 / 6,782,150</p><p><strong>0 / 0 / 0</strong></p></div>
-</div>
-<p class="source-path">Besides the violation count reaching zero, the sample volume falls from 180 million back to 6–7 million — the same order as the baseline — because reads only get that slow when they actually fault. &ldquo;Violations = 0&rdquo; alone could just mean a broken probe; <strong>the magnitude matching too</strong> is what shows the page tables are really being walked. The same defect accounts for three previously unattributed crashes: <code>0x139 (0x1D)</code>, <code>0x0A</code>, and <code>0x50</code>.</p>
-<div class="action-rule" style="margin-top:26px">
-<strong>The fix depends on VPID being disabled.</strong>
-<p>With VPID off, VM entry invalidates linear mappings associated with VPID 0000H, which is what makes the broadcast NMI cure the problem. Enable VPID for performance and that entry flushes nothing, so the fix <strong>fails silently</strong> — and it fails back into exactly the 97% above, with no error anywhere. The two changes have to be made together.</p>
-</div>
-</div>
-</div></section>
-
-<section class="section alt"><div class="wrap two-column">
-<h2>Why a VBS-enabled physical machine is a dead end</h2>
-<div class="prose">
-<p>This is not a policy question but a hard fact. Enabling memory integrity or Credential Guard brings up Hyper-V; Hyper-V owns VMX root and <strong>hides <code>CPUID.1:ECX[5]</code> from the root partition</strong>. So even &ldquo;this machine has VT-x&rdquo; cannot be detected, and <code>PREPARE</code> fails before reaching any <code>HYPERVISOR_PRESENT</code> check at all.</p>
-<p>The crux is that <strong>the root partition cannot get nested VMX</strong>. Hyper-V does support exposing virtualization extensions to a guest (<code>Set-VMProcessor -ExposeVirtualizationExtensions</code>), but that is for its <em>guest partitions</em>; the root partition is not among them — and the KswordARK driver runs in the root partition.</p>
-<p>That leaves two options, both requiring a reboot and both the user's own decision: turn off memory integrity and set <code>bcdedit /set hypervisorlaunchtype off</code> to run locally, at the cost of HVCI and Credential Guard; or keep VBS and run inside a child partition with <code>ExposeVirtualizationExtensions</code> enabled. The product stays fail-closed and reports the reason honestly: <code>NestedNotAllowed</code> and <code>HypervisorConflict</code> are separate states, because the user can resolve the first one themselves.</p>
-<p><strong>What it does not do</strong>: try to preempt VMX root when VBS is detected, or guess whether VMX really exists behind the CPUID mask. Both would gamble the user's machine on an assumption we cannot verify.</p>
-</div>
-</div></section>
-
-<section class="notice"><div class="wrap two-column">
-<h2>Boundaries</h2>
-<div>
-<p>Resident HVM is an experimental backend intended only for authorized lab and diagnostic environments. Save your work before starting it: faults in VMCS, EPT, firmware, Hyper-V/VBS, nested virtualization, or the processor implementation can destabilize or bugcheck the system and may require a restart.</p>
-<p style="margin-top:14px">Stealth hooks, split views, and R-1 process disposition are <strong>not security boundaries</strong>: they fail open, and a target that can move its code page to a different guest physical page is no longer on the page being refused. This is a disposition path outside R0, not a defence against an adversary who knows it exists. The readings above come from a nested target, and several bare-metal acceptance items in the roadmap remain undone.</p>
-</div>
-</div></section>
-
+<section class="section"><div class="wrap"><div class="actions"><a href="../learn/index.html?lang=en&amp;doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">Virtualization documentation</a><a href="development.html#hvm">HVM features</a></div></div></section>
 </main>
-<footer><div class="wrap footer-row"><span>KSWORD / NESTED HVM</span><div class="footer-links"><a href="index.html">Home</a><a href="development.html">Development</a><a href="../learn/index.html?lang=en">Documentation</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+<footer><div class="wrap footer-row"><span>KSword · Windows x64</span><div class="footer-links"><a href="../en/docs/contact.html">Contact</a><a href="../en/docs/credits.html">Credits</a><a href="../en/docs/license.html">License</a><a href="https://github.com/KSwordDEV/KSword" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer">wangwei-cm</a><a href="https://github.com/Felix3322" target="_blank" rel="noreferrer">OB_BUFF</a></div></div></footer>
 
 <script>
 (function () {
@@ -445,70 +132,70 @@
     {
       tag: 'VBS',
       short: 'Physical machine with VBS',
-      title: 'Precondition: a physical machine with VBS on',
+      title: 'VBS host',
       nodes: { cpu: 0, l0: 1, root: 2, rootdrv: 3 },
       l0sub: 'Physical-layer hypervisor; owns VMX root and hides CPUID.1:ECX[5] from the root partition',
       calloutKind: 'blocked',
-      callout: '<b>This path is a dead end.</b> HVCI brings up Hyper-V, Hyper-V hides the VMX bit, and so even &ldquo;this machine has VT-x&rdquo; cannot be detected &mdash; <code>PREPARE</code> fails during capability probing, never reaching the <code>HYPERVISOR_PRESENT</code> check. The root partition cannot obtain nested VMX either.',
-      detail: 'The conclusion is &ldquo;there is no coexistence&rdquo;, not &ldquo;not done yet&rdquo;. Either turn off memory integrity and hypervisorlaunchtype, or move to a child partition with nesting enabled.',
+      callout: 'In this example, Hyper-V owns the virtualization resources and the root partition cannot prepare KSword VMX.',
+      detail: 'This example cannot start KSword VMX. A compatible nested guest can be used instead.',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
     {
       tag: 'TARGET',
       short: 'Nested target ready',
-      title: 'Target: a child partition with nesting enabled',
+      title: 'Nested guest',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       l0sub: 'The physical-layer hypervisor; owns VMX root exclusively',
       guestTitle: 'Guest Windows',
       guestSub: 'The only Windows on the target, running directly on the child partition',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
-      callout: 'The host can keep VBS/HVCI enabled &mdash; those protections belong to the <b>outer</b> Hyper-V environment. But the <b>target guest itself</b> cannot run its own Hyper-V/VBS, which is why <code>bcdedit /set hypervisorlaunchtype off</code> is a requirement on the target, not an option.',
-      detail: 'Capability probing reads: VMX ✓, HYPERVISOR_PRESENT ✓, NESTED_VMX_EXPOSED ✓. No VMX resources have been allocated yet.',
+      callout: 'Expose nested virtualization to the target guest. VBS may remain enabled on the outer host; the guest must meet its own startup requirements.',
+      detail: 'Check VMX, the outer hypervisor and exposed nesting extensions.',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
     {
       tag: 'PREPARE',
       short: 'Allocate VMX resources and EPT',
-      title: 'PREPARE: resources allocated, nothing virtualized yet',
+      title: 'Prepare resources',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
       guestSub: 'Running normally, entirely unaware of what is happening underneath',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
-      callout: 'Per-CPU VMXON / VMCS regions, an MTRR-aware identity EPT map (2 MiB leaves plus a 4 KiB split ledger), the MSR bitmap, and the <b>private VMX-root IDT</b> are all allocated here. Everything stays at PASSIVE_LEVEL because it has to page.',
-      detail: 'The private IDT is a full copy of the running table with only the vector 2 offset changed; selector, IST index, and type-DPL-P are all preserved. If allocation fails it is not installed, VMX root keeps using the guest table, and no NMI is sent afterwards.',
+      callout: 'Allocate per-CPU VMXON, VMCS, EPT and exit-handling resources. Windows keeps its current execution context.',
+      detail: 'Prepare per-CPU resources and EPT mappings.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
     {
       tag: 'SELFTEST',
       short: 'VMXON / VMXOFF per core',
-      title: 'SELF_TEST: proving it can get in and back out',
+      title: 'Per-CPU self-test',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
       guestSub: 'Running normally; the self-test window is only a few instructions wide',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
-      callout: 'A brief VMXON / VMXOFF on every logical processor: the current processor is pinned, IRQL is raised to DISPATCH_LEVEL, and VMX and CR4 are cleaned up before the original IRQL and thread affinity are restored.',
-      detail: 'Neither preparation nor a passing self-test means a VM is running. The prepared count, the self-test-passed count, and the active CPU count must match exactly, and EPT must not be EPT_TRUNCATED, or the residency gate refuses.',
+      callout: 'Run a short VMXON / VMXOFF cycle on each logical processor to check entry, exit and cleanup.',
+      detail: 'Residency can start once all CPUs pass the self-test and EPT is complete.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
     {
       tag: 'VMLAUNCH',
       short: 'The topology changes here',
-      title: 'START_RESIDENT: VMLAUNCH, and the topology changes',
+      title: 'Start residency',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
       flash: 'ksword',
-      guestTitle: 'The same Windows (L2)',
-      guestSub: 'No reboot, no second kernel — the execution context continues in place, now in VMX non-root',
+      guestTitle: 'Windows (L2)',
+      guestSub: 'The existing context runs in VMX non-root',
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
-      callout: 'After an all-core rendezvous each core executes one <code>VMLAUNCH</code>. <b>&ldquo;Windows&rdquo; is still the same node</b>; a layer was simply inserted above it. KSword enters VMX root as L1 and handles every VM exit coming from L2 from now on.',
-      detail: 'The request must carry ALLOW_NESTED explicitly, or an outer hypervisor causes an outright refusal instead of a silent downgrade. On success RESIDENT_NESTED is set and the UI states that it is running as L1 with degraded performance and capabilities.',
+      callout: 'Each processor executes VMLAUNCH. KSword enters VMX root while the existing Windows context continues beneath it.',
+      detail: 'In nested mode, KSword runs as L1 and Windows runs as L2.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       gauges: { vmxe: '1', rpc: '2', exits: '0', unload: 'sc stop → 1052' }
@@ -516,15 +203,15 @@
     {
       tag: 'RESIDENT',
       short: 'Capabilities come online',
-      title: 'Resident: every capability that needs this layer comes online',
+      title: 'Resident operation',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
       kswordSub: 'VMX root · EPT rules, split views, policy engines, and R-1 disposition are all delivered by this layer',
-      guestTitle: 'The same Windows (L2)',
+      guestTitle: 'Windows (L2)',
       guestSub: 'Nothing happens on the desktop — which is exactly why it is easy to misjudge as ineffective',
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
-      callout: 'On the nested target, 30 seconds measured <b>34,000–68,000 exits</b>, the largest class being HLT. The outer layer already does VMCS shadowing, so VMREAD is not expensive — roughly <b>0.149%</b> of one exit. Turning on CR3 tracing makes every address-space switch an exit, and Windows switches thousands of times per second, so the machine slows noticeably; it is opt-in.',
-      detail: 'These capabilities must be installed while residency is stopped: the exit path reads those tables without holding a lock, while installation has to page and modify page tables every processor walks. So &ldquo;install a disposition&rdquo; in the UI is really stop → install → restart.',
+      callout: 'EPT, exit handling and R-1 tools run during residency. Enable optional tracing such as CR3 tracking only when needed.',
+      detail: 'Stop residency before changing EPT rules, then start it again.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE'],
       caps: [0, 1, 2, 3, 4, 5],
@@ -533,14 +220,14 @@
     {
       tag: 'STOP',
       short: 'The layer is gone',
-      title: 'STOP_RESIDENT: the layer is no longer there',
+      title: 'Stop residency',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
       guestSub: 'Running directly on the child partition again; again no reboot, again nothing visible',
       guestMode: 'ring 0 / 3',
       calloutKind: 'blocked',
-      callout: 'After an all-core VMXOFF the CPU returns to a VMX-off state and EPT is no longer honoured by hardware. <b>Every EPT-based capability stops at the same moment — not a downgrade; the layer is gone.</b>',
-      detail: 'The unload guard is released only now, and sc stop works again. An incomplete stop must keep the host stack, the unload lock, and ROLLBACK_REQUIRED. Sleep and resume invalidate the per-CPU self-test and VMXON evidence taken before sleep, requiring a fresh self-test before restarting.',
+      callout: 'Each processor executes VMXOFF to end residency. EPT-dependent functions stop at the same time.',
+      detail: 'The driver can unload after all CPUs exit. Repeat the self-test after sleep or resume.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: 'cleared', unload: 'allowed' }
     }

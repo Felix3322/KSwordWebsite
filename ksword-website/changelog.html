@@ -4,62 +4,35 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 发行历史与 2026-10-13 源码快照 a996d38d；区分发行资产、开发功能与验收范围。" name="description"/>
-<title>完整更新日志 — KSword</title>
-<link href="styles.css?v=20261013-a996d38d" rel="stylesheet"/>
+<meta content="查看版本变化和下载记录，预发行与 CI 构建在下载页标注。" name="description"/>
+<title>更新日志 — KSword</title>
+<link href="styles.css?v=20261013-ui2" rel="stylesheet"/>
 <link href="en/changelog.html" hreflang="en" rel="alternate"/>
-</head>
+<link rel="icon" href="assets/ksword.ico"/></head>
 <body>
-<header class="site-header">
-<div class="wrap header-row">
-<a aria-label="返回首页" class="wordmark" href="index.html">KSWORD <span>/ 5.1</span></a>
-<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
-</div>
-<div class="creator-info">
-<strong>wangwei-cm</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
-</div>
-</div>
-</article>
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
-</div>
-<div class="creator-info">
-<strong>OB_BUFF</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
-</div>
-</div>
-</article>
-</div>
-<nav aria-label="主导航">
-<a href="index.html">首页</a>
-<a aria-current="page" href="changelog.html">更新日志</a>
-<a href="development.html">开发快照</a>
-<a href="hvm-topology.html">HVM 拓扑</a>
-<a href="learn/index.html">文档</a>
-<a href="en/changelog.html" hreflang="en">English</a>
-<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
-</nav>
-</div>
-</header>
-<main><section class="page-hero compact"><div class="wrap"><p class="kicker">RELEASE HISTORY</p><h1>完整更新日志</h1><p class="lead">发行历史与 2026-10-13 源码同步说明。本轮开发基线为 <code>a996d38d</code>，不为开发功能新增发行版本号。下方历史条目描述各自 tag；当前下载资产和滚动 CI 构建请查看 <a href="https://github.com/KSwordDEV/KSword/releases" rel="noreferrer" target="_blank">GitHub Releases</a>，源码能力见<a href="development.html">开发快照</a>。</p></div></section><section class="section compact-section"><div class="wrap docs-layout"><aside aria-label="版本索引" class="side-index"><strong>版本</strong><a href="#source-snapshot">2026-10-13 源码同步</a><a href="#release-ci-a722116d">2026-10-13 CI / a722116d</a><a href="#release-mcp-20261012">2026-10-12 MCP / UAC</a><a href="#source-snapshot-20261005">2026-10-05 源码同步</a><a href="#release-14cf41b">5.1.4.3</a><a href="#release-8860b64">5.1.4.3Pre</a><a href="#release-160944d">5.1.3.0-1</a><a href="#release-9b2b0e6">5.1.3.0-2</a><a href="#release-f477355">5.1.3.0</a><a href="#release-f40fca0">5.1.4.0</a><a href="#release-8f12a6c">5.1.5.0-pre</a><a href="#release-6631344">5.1.4.1-Alpha</a><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside><div class="release-history">
-<article class="release-entry" id="source-snapshot"><header class="release-entry-head"><div><p class="section-number">2026-10-13 / SOURCE REVIEW</p><h2>源码同步 · a996d38d</h2></div><strong class="release-badge">开发快照</strong></header><ul class="update-list"><li>MCP GUI 对象桥、会话设置、操作日志、明确的启动/UAC 策略，以及 CLI/IOCTL 工具。</li><li>R3/R0 内存区域 dump 导出；复杂进程报告、字段行内详情及恢复的 PEB 工作区。</li><li>注册表与对象权限工作流、CLI/Light 共享 R3 后端，以及 Taskbar 页面搜索与逐层导航。</li><li>共享参数/详情布局、任务进度与文本外壳；完整规范文档继续用于复制和导出。</li><li>CKS 管理与免重置研究页。免重置登记及 AMD 广泛嵌套系统验收仍未验证。</li></ul><div class="release-note"><p>本节只描述源码基线；10 月 12 日整包之后的主线变化不会倒算进旧包，驱动/硬件验收单独判断。</p></div><div class="release-links"><a href="development.html">功能与验收边界</a><a href="https://github.com/KSwordDEV/KSword/compare/e3be5c57...a996d38d91c85a9d99744454880a58b7b223f7f7" rel="noreferrer" target="_blank">Diff ↗</a></div></article>
-<article class="release-entry" id="release-ci-a722116d"><header class="release-entry-head"><div><p class="section-number">2026-10-13 / CI</p><h2>CI · a722116d</h2></div><strong class="release-badge">PRERELEASE</strong></header><p>自动生成的未签名预发行版，提供完整聚合 7z、Setup ZIP 和分模块产物。已核对包基线为 a722116d，之后的复杂报告 UI 改动不属于该包；各模块来源见 CI_ARTIFACT_PROVENANCE.md。</p><div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/ci-build-a722116d-38438847419-1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/actions/runs/38438847419" rel="noreferrer" target="_blank">CI ↗</a></div></article>
-<article class="release-entry" id="release-mcp-20261012"><header class="release-entry-head"><div><p class="section-number">2026-10-12 / MCP &amp; UAC</p><h2>MCP / UAC 安装引导预发行版</h2></div><strong class="release-badge">PRERELEASE</strong></header><p>7z/ZIP 整包包含本地 MCP sidecar、会话设置、配置预览、操作日志与安装引导。明确选择 auto 启动后可由 Windows UAC 请求授权，授权属于发起它的 sidecar 进程；符号为独立附件。</p><div class="release-note"><p>主程序基线 dcb2381b；驱动/PDB 基线 39cbd1a1。驱动未签名，主程序使用系统不信任的本地测试证书。已记录只读 GUI 连通验证，业务操作和硬件验收范围独立；之后的 CLI/IOCTL 工具与 10 月 13 日报告改动不属于该包。</p></div><div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/mcp-preview-20261012" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/MCP/blob/main/INSTALL_FOR_AGENTS.md" rel="noreferrer" target="_blank">安装指南 ↗</a></div></article>
+<header class="site-header"><div class="wrap header-row">
+<a class="wordmark" href="index.html"><img src="assets/ksword.ico" width="25" height="25" alt=""/>KSword <span>5.1</span></a>
+<nav aria-label="主导航"><a href="index.html">首页</a><a href="changelog.html" aria-current="page">更新日志</a><a href="development.html">功能介绍</a><a href="hvm-topology.html">HVM 拓扑</a><a href="learn/index.html">文档</a><a href="en/changelog.html">English</a><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub</a></nav>
+<form class="header-search" action="learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="搜索文档" placeholder="搜索文档…"/></form>
+</div></header>
+<main>
+<section class="page-hero compact"><div class="wrap"><p class="kicker">RELEASE HISTORY</p><h1>更新日志</h1><p class="lead">查看版本变化和下载记录，预发行与 CI 构建在下载页标注。</p></div></section>
+<section class="section compact-section"><div class="wrap docs-layout">
+<aside aria-label="版本索引" class="side-index"><strong>版本</strong><a href="#source-snapshot">2026-10-13 功能更新</a><a href="#release-ci-a722116d">2026-10-13 CI / a722116d</a><a href="#release-mcp-20261012">2026-10-12 MCP / UAC</a><a href="#source-snapshot-20261005">2026-10-05 功能更新</a><a href="#release-14cf41b">5.1.4.3</a><a href="#release-8860b64">5.1.4.3Pre</a><a href="#release-160944d">5.1.3.0-1</a><a href="#release-9b2b0e6">5.1.3.0-2</a><a href="#release-f477355">5.1.3.0</a><a href="#release-f40fca0">5.1.4.0</a><a href="#release-8f12a6c">5.1.5.0-pre</a><a href="#release-6631344">5.1.4.1-Alpha</a><a href="#release-15b2842">5.1.2.4</a><a href="#release-214f3fe">5.1.2.3</a><a href="#release-1744e8f">5.1.2.2</a><a href="#release-e8f9b8b">5.1.2.1</a><a href="#release-955981b">5.1.1.1</a><a href="#release-dede6a1">α260427</a><a href="#release-1749d00">5.1.0.4 Alpha</a><a href="#release-074f2cb">5.0.9.14</a><a href="#release-fcd0eb3">5.0.0.0 Alpha.0.1</a></aside>
+<div class="release-history">
+<article class="release-entry" id="source-snapshot">
+<header class="release-entry-head"><div><p class="section-number">2026-10-13 / UPDATE</p><h2>近期功能</h2></div><strong class="release-badge">开发版</strong></header>
+<ul class="update-list"><li>MCP GUI 对象桥、会话设置、操作日志、明确的启动/UAC 策略，以及 CLI/IOCTL 工具。</li><li>R3/R0 内存区域 dump 导出；复杂进程报告、字段行内详情及恢复的 PEB 工作区。</li><li>注册表与对象权限工作流、CLI/Light 共享 R3 后端，以及 Taskbar 页面搜索与逐层导航。</li><li>共享参数/详情布局、任务进度与文本外壳；完整规范文档继续用于复制和导出。</li><li>CKS 管理与免重置研究页。免重置登记与 AMD 嵌套支持仍在研究中。</li></ul><div class="release-links"><a href="development.html">功能介绍</a><a href="https://github.com/KSwordDEV/KSword/compare/e3be5c57...a996d38d91c85a9d99744454880a58b7b223f7f7" rel="noreferrer" target="_blank">Diff ↗</a></div></article>
+<article class="release-entry" id="release-ci-a722116d">
+<header class="release-entry-head"><div><p class="section-number">2026-10-13 / CI</p><h2>CI · a722116d</h2></div><strong class="release-badge">PRERELEASE</strong></header>
+<p>自动生成的未签名预发行版，提供完整聚合 7z、Setup ZIP 和分模块产物。包内附各模块版本与来源信息。</p><div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/ci-build-a722116d-38438847419-1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/actions/runs/38438847419" rel="noreferrer" target="_blank">CI ↗</a></div></article>
+<article class="release-entry" id="release-mcp-20261012">
+<header class="release-entry-head"><div><p class="section-number">2026-10-12 / MCP &amp; UAC</p><h2>MCP / UAC 安装引导预发行版</h2></div><strong class="release-badge">PRERELEASE</strong></header>
+<p>7z/ZIP 整包包含本地 MCP sidecar、会话设置、配置预览、操作日志与安装引导。明确选择 auto 启动后可由 Windows UAC 请求授权，授权属于发起它的 sidecar 进程；符号为独立附件。</p><div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/mcp-preview-20261012" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/MCP/blob/main/INSTALL_FOR_AGENTS.md" rel="noreferrer" target="_blank">安装指南 ↗</a></div></article>
 
 <article class="release-entry" id="source-snapshot-20261005">
-<header class="release-entry-head"><div><p class="section-number">2026-10-05 / SOURCE REVIEW</p><h2>源码同步 · e3be5c57</h2></div><strong class="release-badge">开发快照</strong></header>
-<div class="release-note"><strong>源码快照，不是新增发行</strong><p>基于 2026-10-04 的源码提交核查。下方 tag 说明保留历史范围；选择构建时须配套主程序、驱动、两个 API Agent、profiles 和插件。</p></div>
+<header class="release-entry-head"><div><p class="section-number">2026-10-05 / UPDATE</p><h2>近期功能</h2></div><strong class="release-badge">开发版</strong></header>
+
 <ul class="update-list">
 <li>统一快照内存查看、x86/x64 Intel 汇编暂存、撤销/重做、差异与实际回读。</li>
 <li>641 项 API 定义、独立 x86/x64 Agent、主程序跨位数注入、覆盖快照与异步 I/O；ETW 身份/布局与 Syscall 证据改进。</li>
@@ -67,72 +40,73 @@
 <li>按行身份的 EX 回调注销、配对公开 API、Minifilter 所属过滤器卸载、回调事件监控与 71 专题知识中心。</li>
 <li>CE/Titan 共享调试后端、按策略的 EPT/Shadow 执行路径、剪贴板会话与 Light 实体/证据流程。</li>
 <li>Intel 嵌套/页租约实现与 AMD SVM/NPT 实验；ENFORCE 仍为 UNIMPLEMENTED，AMD 完整 L2 OS 验收未完成。</li>
-<li>取消 OS build 上限，保留最低版本及逐功能校验；源码准入不代表所有新系统已验证。</li>
+<li>取消 OS build 上限，保留最低版本及逐功能校验；具体支持取决于系统配置。</li>
 </ul>
-<div class="release-links"><a href="development.html">功能与证据边界</a><a href="https://github.com/KSwordDEV/KSword/commit/e3be5c5708829b6ff09471319a8ee6dcdf3ac20c" rel="noreferrer" target="_blank">源码快照 ↗</a></div>
+<div class="release-links"><a href="development.html">功能介绍</a><a href="https://github.com/KSwordDEV/KSword/commit/e3be5c5708829b6ff09471319a8ee6dcdf3ac20c" rel="noreferrer" target="_blank">源码快照 ↗</a></div>
 </article>
 <article class="release-entry" id="release-14cf41b">
 <header class="release-entry-head"><div><p class="section-number">2026-08-28</p><h2>KswordARK 5.1.4.3</h2></div><strong class="release-badge">5.1.4.3</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.4.3Pre</strong></div><div><span>当前 tag</span><strong>5.1.4.3</strong></div><div><span>Patch</span><code>14cf41b</code></div><div><span>提交数量</span><strong>63</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>简化 UI 布局。</li><li>修复窗口边框裁剪问题与部分表格的透明样式。</li><li>修复日志窗口刷新时的选中状态。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>发布说明原文只有「简化UI布局」一条；上面另外两条来自 <code>5.1.4.3Pre..5.1.4.3</code> 的提交范围。该 Release 在 GitHub 上被标记为预发行，而 <code>5.1.4.3Pre</code> 反而没有标记，因此「最新正式版」的判断请以实际需要的资产为准。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>简化 UI 布局。</li><li>修复窗口边框裁剪问题与部分表格的透明样式。</li><li>修复日志窗口刷新时的选中状态。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.3" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.4.3Pre...5.1.4.3" rel="noreferrer" target="_blank">完整 diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-8860b64">
 <header class="release-entry-head"><div><p class="section-number">2026-08-27</p><h2>KswordARK 5.1.4.3Pre</h2></div><strong class="release-badge">5.1.4.3Pre</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.4.1-Alpha</strong></div><div><span>当前 tag</span><strong>5.1.4.3Pre</strong></div><div><span>Patch</span><code>8860b64</code></div><div><span>提交数量</span><strong>188</strong></div></div>
-<h3>实际变更</h3><ul class="update-list">
+
+<h3>更新内容</h3><ul class="update-list">
 <li>新增「内核知识」中心：覆盖 12 类、71 个 Windows 内核专题，提供中英文内容、全文检索、官方文档参考、R3/R0 现场证据查询，以及跳转至对应只读证据页的路由。</li>
 <li>新增内核回调监控页，支持进程、线程、镜像、注册表、对象、文件等回调事件的实时采集、过滤、暂停与丢失统计；KswordCLI 同步新增查询与启停命令。</li>
-<li>HVM 页面扩展为受生命周期保护的 Intel VT-x/EPT 常驻监控模式，加入电源状态、处理器拓扑、卸载互锁及 VMX 状态保护；该 tag 的 HVM 实现会在 AMD、已有 Hypervisor 或保护条件不满足时拒绝启动；后续源码变化见本页开发快照。</li>
+<li>HVM 页面扩展为受生命周期保护的 Intel VT-x/EPT 常驻监控模式，加入电源状态、处理器拓扑、卸载互锁及 VMX 状态保护；该 tag 的 HVM 实现会在 AMD、已有 Hypervisor 或保护条件不满足时拒绝启动；后续源码变化见本页开发版。</li>
 <li>进程页新增单核心 CPU 利用率归因与可展开图表、线程 CPU 亲和性设置、动态历史快照与表格快照比对；启动项表格支持多选。</li>
 <li>KswordARKLight 重整工作区结构（性能与总线归入硬件页、网络与窗口归入对应主功能页），补齐进程视图字段与详情能力，进程列表改为差量刷新并移除刷新遮罩，修复退出时的驱动卸载流程。</li>
 <li>重构蓝屏诊断页面与布局，强化 Stop Code、关键进程、候选模块与可操作证据；改为显式「本次安装」或可配置自动安装，默认不在普通驱动加载时扫描 BGP 私有路径或注册诊断回调。</li>
 <li>详情/报告页改用统一结构化报告组件；标题栏全局搜索改为范围标签式筛选；修复组合框弹层重入崩溃与高频刷新场景的稳定性问题。</li>
 <li>修复 SYSTEM/提权重启与单实例保护的接管冲突；启动项枚举改为增量发布；移除标准发行链路中的实验性存储控制器驱动与相关界面。</li>
 </ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是 HVM 常驻模式第一次进入发行资产。常驻属于实验性后端，仅适用于已获授权的实验与诊断环境；启动前请保存工作。此后 main 上的虚拟化工作请参考<a href="development.html">开发快照</a>与 <a href="hvm-topology.html">Nested HVM 拓扑演示</a>。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.3Pre" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.4.1-Alpha...5.1.4.3Pre" rel="noreferrer" target="_blank">完整 diff ↗</a></div>
-</article><article class="release-entry" id="release-160944d">
+</article>
+<article class="release-entry" id="release-160944d">
 <header class="release-entry-head"><div><p class="section-number">2026-07-22</p><h2>KswordARK 评估版本 5.1.3.0-1 Alpha</h2></div><strong class="release-badge">5.1.3.0-1</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.2.4</strong></div><div><span>当前 tag</span><strong>5.1.3.0-1</strong></div><div><span>Patch</span><code>160944d</code></div><div><span>提交数量</span><strong>43</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>全面优化界面视觉与布局，默认启用文字和界面抗锯齿，主程序默认取消置顶。</li><li>重大优化进程页面卡顿，并覆盖硬盘采样、网络抓包、连接管理、多线程下载、进程追踪、WinAPI、直接内核调用和内存二次扫描等刷新路径。</li><li>修复并优化 R0 注册表相关功能，完善驱动结束线程能力，并优化 Light 版结束进程能力。</li><li>调整 QADS 触发流程，优化测试模式设置、计划任务启动项删除和文件接管所有权操作。</li><li>优化 Release 体积并更新项目说明文档。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是 5.1.3.0 系列的首个公开评估版本；后续 -2 与正式版继续在同一主线补充底层枚举、进程动作和性能改进。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>全面优化界面视觉与布局，默认启用文字和界面抗锯齿，主程序默认取消置顶。</li><li>重大优化进程页面卡顿，并覆盖硬盘采样、网络抓包、连接管理、多线程下载、进程追踪、WinAPI、直接内核调用和内存二次扫描等刷新路径。</li><li>修复并优化 R0 注册表相关功能，完善驱动结束线程能力，并优化 Light 版结束进程能力。</li><li>调整 QADS 触发流程，优化测试模式设置、计划任务启动项删除和文件接管所有权操作。</li><li>优化 Release 体积并更新项目说明文档。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0-1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.2.4...5.1.3.0-1" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-9b2b0e6">
 <header class="release-entry-head"><div><p class="section-number">2026-07-24</p><h2>KswordARK 评估版本 5.1.3.0-2 Beta</h2></div><strong class="release-badge">5.1.3.0-2</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0-1</strong></div><div><span>当前 tag</span><strong>5.1.3.0-2</strong></div><div><span>Patch</span><code>9b2b0e6</code></div><div><span>提交数量</span><strong>77</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>右键菜单支持结束进程树。</li><li>新增 IPC 枚举、IDT/GDT 枚举、GUI 句柄、窗口定时器和 DPC 相关能力。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 原文以新增功能清单为主；比较链接保留了这一 Beta 与前一 Alpha 的真实 tag 关系。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>右键菜单支持结束进程树。</li><li>新增 IPC 枚举、IDT/GDT 枚举、GUI 句柄、窗口定时器和 DPC 相关能力。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0-2" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0-1...5.1.3.0-2" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-f477355">
 <header class="release-entry-head"><div><p class="section-number">2026-07-25</p><h2>KswordARK 5.1.3.0 正式版</h2></div><strong class="release-badge">5.1.3.0</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0-2</strong></div><div><span>当前 tag</span><strong>5.1.3.0</strong></div><div><span>Patch</span><code>f477355</code></div><div><span>提交数量</span><strong>13</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>增强并重新布局进程详细信息，加入进程历史性能与 CPU 亲和性设置。</li><li>简化 ETW 筛选器，强化 ETW 监控采集 UI，面向高吞吐数据保持响应。</li><li>为所有表格增加历史比对和导出能力。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 原文为简短更新摘要；此处保留其明确列出的功能，不把后续 main 提交倒灌进正式版。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>增强并重新布局进程详细信息，加入进程历史性能与 CPU 亲和性设置。</li><li>简化 ETW 筛选器，强化 ETW 监控采集 UI，面向高吞吐数据保持响应。</li><li>为所有表格增加历史比对和导出能力。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.3.0" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0-2...5.1.3.0" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-f40fca0">
 <header class="release-entry-head"><div><p class="section-number">2026-07-29</p><h2>KswordARK 5.1.4.0 正式版</h2></div><strong class="release-badge">5.1.4.0</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.3.0</strong></div><div><span>当前 tag</span><strong>5.1.4.0</strong></div><div><span>Patch</span><code>f40fca0</code></div><div><span>提交数量</span><strong>41</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>新增 Cheat Engine 可执行插件，提供主题化启动、KSword 内存访问桥接、市场安装进度和更新提示。</li><li>增强 HTTPS 分析：展示关联进程、请求/响应事件、内容类型、TLS/ALPN、耗时及上下行流量，并支持筛选、统计、清空和 CSV 导出；停止后可恢复系统代理。</li><li>进程亲和性规则支持按完整程序路径持久化，核心按 P 核、E 核和逻辑线程拓扑标识；新增定向监控的启动后挂起。</li><li>业务表格增加转到进程详情入口；窗口工具增强全局热键查看；新增 Shell 文件关联管理。</li><li>新增全局自定义主题色与字体，接入多项权限提升提示，并修复启动初始化、设置卡顿、浅色主题和 CPU 监控显示问题。</li><li>增加 Windows 自动化验证、驱动构建和发行目录校验，子项目构建改为按变更触发。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>本条说明该 tag 的历史稳定版本状态。其后的 <code>5.1.4.1-Alpha</code>、<code>5.1.5.0-pre</code>、<code>5.1.4.3Pre</code> 与 <code>5.1.4.3</code> 以及 main 快照均应按预发行或开发状态理解。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>新增 Cheat Engine 可执行插件，提供主题化启动、KSword 内存访问桥接、市场安装进度和更新提示。</li><li>增强 HTTPS 分析：展示关联进程、请求/响应事件、内容类型、TLS/ALPN、耗时及上下行流量，并支持筛选、统计、清空和 CSV 导出；停止后可恢复系统代理。</li><li>进程亲和性规则支持按完整程序路径持久化，核心按 P 核、E 核和逻辑线程拓扑标识；新增定向监控的启动后挂起。</li><li>业务表格增加转到进程详情入口；窗口工具增强全局热键查看；新增 Shell 文件关联管理。</li><li>新增全局自定义主题色与字体，接入多项权限提升提示，并修复启动初始化、设置卡顿、浅色主题和 CPU 监控显示问题。</li><li>增加 Windows 自动化验证、驱动构建和发行目录校验，子项目构建改为按变更触发。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.0" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.3.0...5.1.4.0" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-8f12a6c">
 <header class="release-entry-head"><div><p class="section-number">2026-08-08</p><h2>KswordARK 5.1.5.0-pre</h2></div><strong class="release-badge">5.1.5.0-pre</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.4.0</strong></div><div><span>当前 tag</span><strong>5.1.5.0-pre</strong></div><div><span>Patch</span><code>8f12a6c</code></div><div><span>提交数量</span><strong>304</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>新增 R0 线程挂起/实验性终止、系统线程和 Kernel Work Queue 视图，并强化线程、ETHREAD、APC、回调和驱动卸载生命周期。</li><li>增强 R0 强制卸载、卸载驱动证据、PiDDB 清理、内核模块内存转储、驱动加载策略诊断和签名/Trust Validation。</li><li>扩展 HAL、WDF/KMDF、Legacy File System Filter、i8042prt、IDT/GDT、IOCTL 解码和网络 WFP/DNS/HTTPS 审计。</li><li>增强 MFT 恢复、Shell 文件关联、Window Band/Z-order/DWM/Window Station 诊断、表格冻结、平滑滚动、主题和字体恢复。</li><li>修复高频表格、代理恢复、插件许可证变化、ETW 筛选导入、PID 复用、R0 错误回调和多项内核并发问题。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是预发行快照，不是稳定版；Release 描述还保留了冻结窗格实验性、个别 Error 31 和部分字段提示等已知限制。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>新增 R0 线程挂起/实验性终止、系统线程和 Kernel Work Queue 视图，并强化线程、ETHREAD、APC、回调和驱动卸载生命周期。</li><li>增强 R0 强制卸载、卸载驱动证据、PiDDB 清理、内核模块内存转储、驱动加载策略诊断和签名/Trust Validation。</li><li>扩展 HAL、WDF/KMDF、Legacy File System Filter、i8042prt、IDT/GDT、IOCTL 解码和网络 WFP/DNS/HTTPS 审计。</li><li>增强 MFT 恢复、Shell 文件关联、Window Band/Z-order/DWM/Window Station 诊断、表格冻结、平滑滚动、主题和字体恢复。</li><li>修复高频表格、代理恢复、插件许可证变化、ETW 筛选导入、PID 复用、R0 错误回调和多项内核并发问题。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.5.0-pre" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.4.0...5.1.5.0-pre" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-6631344">
 <header class="release-entry-head"><div><p class="section-number">2026-08-10</p><h2>KswordARK 评估版本 5.1.4.1-Alpha</h2></div><strong class="release-badge">5.1.4.1-Alpha</strong></header>
-<div class="release-meta-grid"><div><span>上一个 tag</span><strong>5.1.5.0-pre</strong></div><div><span>当前 tag</span><strong>5.1.4.1-Alpha</strong></div><div><span>Patch</span><code>6631344</code></div><div><span>提交数量</span><strong>124</strong></div></div>
-<h3>实际变更</h3><ul class="update-list"><li>新增 IDT、代码完整性、VBS/HVCI 姿态、页保护、SLAT/IOMMU、EPT/NPT、Hypervisor CPUID 和 DMAR/IVRS 交叉审计。</li><li>新增 HAL、WDF/KMDF、i8042prt、对象类型、特殊回调、IoTimer、系统线程、工作队列、描述符表和 IOCTL 解码能力。</li><li>新增 MFT/IRP、R0 目录、五档删除、原始文件系统、物理扇区读取和文件恢复实时筛选。</li><li>增强进程列与自定义视图、进程保护、窗口 DWM 合成、剪贴板/捕获保护/层级诊断/热键探测。</li><li>新增 WFP 报文捕获与控制、系统时间和校准时钟、转储归因、BugCheck 保护、CPU 电源控制、渲染基准与 Light 模块。</li><li>补强 METHOD_BUFFERED 快照、驱动卸载、回调、APC、ETW、网络、进程和文件操作的确认、超时、回滚和 fail-closed 语义。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>该 Alpha tag 之后 main 仍继续提交；当前主线的新增内容请看开发快照页面。</p></div>
+
+<h3>更新内容</h3><ul class="update-list"><li>新增 IDT、代码完整性、VBS/HVCI 姿态、页保护、SLAT/IOMMU、EPT/NPT、Hypervisor CPUID 和 DMAR/IVRS 交叉审计。</li><li>新增 HAL、WDF/KMDF、i8042prt、对象类型、特殊回调、IoTimer、系统线程、工作队列、描述符表和 IOCTL 解码能力。</li><li>新增 MFT/IRP、R0 目录、五档删除、原始文件系统、物理扇区读取和文件恢复实时筛选。</li><li>增强进程列与自定义视图、进程保护、窗口 DWM 合成、剪贴板/捕获保护/层级诊断/热键探测。</li><li>新增 WFP 报文捕获与控制、系统时间和校准时钟、转储归因、BugCheck 保护、CPU 电源控制、渲染基准与 Light 模块。</li><li>补强 METHOD_BUFFERED 快照、驱动卸载、回调、APC、ETW、网络、进程和文件操作的确认、超时、回滚和 fail-closed 语义。</li></ul>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.4.1-Alpha" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.5.0-pre...5.1.4.1-Alpha" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-15b2842">
@@ -140,15 +114,10 @@
 <div><p class="section-number">2026-07-16</p><h2>KSwordARK Evaluation Version 5.1.2.4 — Signed R0</h2></div>
 <strong class="release-badge">5.1.2.4</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>5.1.2.3</strong></div>
-<div><span>当前 tag</span><strong>5.1.2.4</strong></div>
-<div><span>Patch</span><code>15b2842</code></div>
-<div><span>提交数量</span><strong>7</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>修复线程列表状态信息过宽：主界面保留紧凑摘要，完整诊断移到 Tooltip。</li><li>重做进程友好视图与父子树视图切换；应用聚合行可展开真实成员，并对整组执行右键与批量操作。</li><li>针对长时间刷新后的渐进卡顿，限制活动样本和图标缓存、清理退出 PID 网络计数，并按绘图区宽度降采样曲线。</li><li>首次启动默认最大化、非置顶、自动请求管理员权限，并启用 Unlocker 右键菜单。</li><li>新增非分页池兼容层：优先运行时解析 ExAllocatePool2，旧版 Windows 回退到 ExAllocatePoolWithTag(NonPagedPoolNx)。</li><li>移除重复的 Kernel/R0 装饰徽标，统一选中态、活动 Dock、深色图表标题与坐标文字。</li><li>重写系统语言检测和回退；修订大量中英文状态、提示和工具栏文本。</li><li>启动图、欢迎页和 README 根据语言使用中英文品牌图；发布包强制包含 LICENSE，并新增 GitHub 菜单入口。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 还强调“签名 R0”，但该能力在 5.1.2.3 已存在，因此本页将其视为延续特性而非本次新增。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.2.4" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.2.3...5.1.2.4" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-214f3fe">
@@ -156,15 +125,10 @@
 <div><p class="section-number">2026-07-15</p><h2>KSwordARK Evaluation Version 5.1.2.3 — Signed R0</h2></div>
 <strong class="release-badge">5.1.2.3</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>5.1.2.2</strong></div>
-<div><span>当前 tag</span><strong>5.1.2.3</strong></div>
-<div><span>Patch</span><code>214f3fe</code></div>
-<div><span>提交数量</span><strong>35</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>正式发行带数字签名的 KswordARK 驱动，R0 功能不再要求 Windows Test Mode。</li><li>加入内核调试输出捕获链路：驱动侧 DbgPrint/DbgPrintEx/KdPrintEx 捕获、IOCTL 协议、用户态缓存和 Driver Dock 展示。</li><li>扩充 LanguageManager 与中英文语言包，覆盖驱动、内核、硬件、文件、日志、启动项等大量运行时文本。</li><li>增强驱动服务、完整性、信任和签名检查页面，并改善驱动错误、证据刷新和操作提示。</li><li>修订 Kernel 对象、回调、DynData、Hook、CID、IPC、设备管理等页面的交互与文本一致性。</li><li>新增 VisibleTableWidget 等界面基础设施，修复多个表格、主题和布局问题。</li><li>修正 i18n 扫描工具，跳过备份目录和发布元数据标记，减少误报。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 将其定义为首个完整翻译版本，并列出内核签名检查器、稳定性修复及 #32–#40。真实 Diff 显示本版重点确实集中在签名、调试输出、国际化和驱动页面。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.2.3" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.2.2...5.1.2.3" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-1744e8f">
@@ -172,15 +136,10 @@
 <div><p class="section-number">2026-07-13</p><h2>KswordARK 评估版本 5.1.2.2-4 — 已签名 R0</h2></div>
 <strong class="release-badge">5.1.2.2</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>5.1.2.1</strong></div>
-<div><span>当前 tag</span><strong>5.1.2.2</strong></div>
-<div><span>Patch</span><code>1744e8f</code></div>
-<div><span>提交数量</span><strong>44</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>加入完整国际化框架与 zh-CN/en-US 语言包，为后续全量翻译建立运行时绑定与回退机制。</li><li>新增插件宿主、插件安装流程与市场一键安装；修复插件安装并加入结构化扫描界面。</li><li>加入 VirusTotal、ThreatBook 与沙箱上传等在线扫描入口及设置页。</li><li>文件锁定器、R0 注入器、文件/句柄/进程操作和相关驱动协议继续扩展。</li><li>新增 HWID Dispatch 页面和驱动派遣 Hook 实现；同时增加网络审计、进程详情、PTE 与内存证据能力。</li><li>完善驱动审计、完整性、DynData、回调、内核 Hook、设备与存储证据。</li><li>新增注册表优化页面和配置加载能力。</li><li>项目官网从主仓库移至独立 KSwordDEV/Website 仓库。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 明确列出有效签名、插件系统、文件锁定器、R0 注入器、市场安装与网站迁移；Diff 进一步确认了国际化、在线扫描和多组 R0 审计扩展。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.2.2" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.2.1...5.1.2.2" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-e8f9b8b">
@@ -188,15 +147,10 @@
 <div><p class="section-number">2026-06-28</p><h2>V5.1.2.1 正式版</h2></div>
 <strong class="release-badge">5.1.2.1</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>5.1.1.1</strong></div>
-<div><span>当前 tag</span><strong>5.1.2.1</strong></div>
-<div><span>Patch</span><code>e8f9b8b</code></div>
-<div><span>提交数量</span><strong>36</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>文件管理器和手工文件系统解析器大幅扩展，补充文件属性、PE 分析和占用扫描。</li><li>新增设备管理器页面与 R0 硬件证据页，统一设备节点、驱动链和底层证据。</li><li>内核对象视图新增 BaseNamedObjects、命名管道、符号链接、通信端点、DriverObject/DeviceObject、递归对象目录和对象类型矩阵。</li><li>增强 Kernel Callback、DynData、Driver Status 与对象查询工作流。</li><li>加入网络防火墙页面与 NIDS 模块。</li><li>新增 Application Control、窗口捕获保护及更多进程详情动作。</li><li>扩展 ArkDriverClient 和共享 IOCTL 协议，为设备、存储、安全、网络和进程审计提供统一入口。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 描述本身没有列功能，只保留了一句开发成本玩笑。因此本节主要依据 36 个提交的真实 Diff 整理。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.2.1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1.1.1...5.1.2.1" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-955981b">
@@ -204,15 +158,10 @@
 <div><p class="section-number">2026-06-16</p><h2>V5.1.1.1 评估版本</h2></div>
 <strong class="release-badge">5.1.1.1</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>α260427</strong></div>
-<div><span>当前 tag</span><strong>5.1.1.1</strong></div>
-<div><span>Patch</span><code>955981b</code></div>
-<div><span>提交数量</span><strong>81</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>将用户态驱动访问拆分为 ArkDriverClient 模块，覆盖 ALPC、回调、文件、句柄、内核、键盘、内存、进程、注册表、Section 与能力查询。</li><li>引入更完整的 DynData v4、驱动能力矩阵、错误模型和协议类型，R0 功能开始按能力安全降级。</li><li>新增设备、网络、存储、安全、Win32k、线程与进程 Cross-view 审计。</li><li>增加进程线程栈、PDB Catalog、内存证据、内核可执行内存扫描和页表翻译。</li><li>加入磁盘编辑器、右键菜单清理、启动项扩展、Direct Kernel Call Monitor 和风险中心。</li><li>新增原生 Win32 的 KswordARKLight 及其进程、文件、驱动、内核、硬件等模块。</li><li>大幅扩展 API Monitor Hook 目标和配置，清理 IDE 临时文件并统一工程结构。</li><li>加入测试签名资产、贡献规范和更多构建/发布支持。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 只写“大量更新，具体看 commit”。实际 81 个提交表明这是从早期评估版向现代 ArkDriverClient、统一协议和 Light 版本迁移的关键节点。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1.1.1" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/α260427...5.1.1.1" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-dede6a1">
@@ -220,15 +169,10 @@
 <div><p class="section-number">2026-04-28</p><h2>KswordARK 评估版本 260427 — 未签名 R0</h2></div>
 <strong class="release-badge">α260427</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>5.1_R3_Advanced</strong></div>
-<div><span>当前 tag</span><strong>α260427</strong></div>
-<div><span>Patch</span><code>dede6a1</code></div>
-<div><span>提交数量</span><strong>37</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>新增 x64 API Monitor Agent、命名管道协议、Hook Engine 和大量 WinAPI Hook 目标。</li><li>加入自定义标题栏、Win32 启动画面和全局主题消息框。</li><li>新增 Kernel 回调拦截、规则序列化与校验、回调移除、SSDT、对象命名空间和运行时控制。</li><li>新增 Boot Editor、Misc Dock、文件占用扫描和更完整的硬件页面。</li><li>建立新的 KswordARKDriver 目录、共享 IOCTL 协议、回调/文件/进程/日志框架。</li><li>新增 Taskbar、HUD、网站页面和功能技术文档。</li><li>Release PR 还包含移除外部驱动回调、解锁器防误触、懒加载、平滑滚动、性能平滑、构建去绝对路径，以及进程 Dump 跳转和更多 CPU/内存时间线。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是预发行版本；Release 明确标为未签名 R0。完整比较范围为 5.1_R3_Advanced...α260427。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/α260427" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/5.1_R3_Advanced...α260427" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-1749d00">
@@ -236,15 +180,10 @@
 <div><p class="section-number">2026-04-04</p><h2>KswordARK 评估版本 5.1.0.4 Alpha</h2></div>
 <strong class="release-badge">5.1.0.4 Alpha</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 Release</span><strong>正式版</strong></div>
-<div><span>当前 tag</span><strong>5.1_R3_Advanced</strong></div>
-<div><span>Patch</span><code>1749d00</code></div>
-<div><span>比较状态</span><strong>历史断开</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>新增 HTTP/HTTPS 监听、HTTPS 解析、本地 HTTPS 代理、证书生成与信任、系统代理切换和解析结果展示。</li><li>HUD 新增并增强进程列表和性能展示。</li><li>启动项模块向 Autoruns 风格扩展，覆盖注册表、WMI、Winsock、计划任务、服务和驱动来源。</li><li>窗口与桌面管理加入 Window Station、Desktop、SessionId、SID、桌面切换与右键操作。</li><li>句柄模块增加对象类型映射、详情解码、访问权限可读化和批量关闭同类型句柄。</li><li>新增文件占用句柄反查，可由路径定位占用进程并跳转到进程详情。</li><li>升级 Hex 编辑器的选择、工具栏、交互和内部逻辑。</li><li>更新 Logo、应用图标、PRE/DEV 资源和发布脚本，并清理测试与构建残留。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>该 tag 与上一个“正式版”tag 没有共同祖先，GitHub 无法生成可靠的 tag-to-tag Diff。本节使用 Release 中记录的 14 个提交、127 个文件和该版本提交内容，不伪造比较统计。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/5.1_R3_Advanced" rel="noreferrer" target="_blank">Release ↗</a></div>
 </article>
 <article class="release-entry" id="release-074f2cb">
@@ -252,15 +191,10 @@
 <div><p class="section-number">2025-10-02</p><h2>Ksword v5.0.9.14 正式版</h2></div>
 <strong class="release-badge">5.0.9.14</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>上一个 tag</span><strong>内部测试发行版</strong></div>
-<div><span>当前 tag</span><strong>正式版</strong></div>
-<div><span>Patch</span><code>074f2cb</code></div>
-<div><span>提交数量</span><strong>10</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>新增用户态驱动控制代码与独立 KswordKernel 工程、INF 和内核入口。</li><li>新增 ETW Monitor，实现事件跟踪和监控页面。</li><li>大幅扩展 DLL 模块、模块信息、线程、内存区域和断点界面。</li><li>扩展进程列表、进程详情、内存查看与指针窗口。</li><li>加入控制台辅助组件和新的 ARK Logo/Console 资源。</li><li>调整 GUI 配置、工程文件、环境版本和支持函数。</li><li>修复 D3D9 设备丢失与图标纹理缓存问题，但提交说明同时承认 BUG 尚未全部解决。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>Release 原文只有“正式版 / BUG并没有改完”。上述内容来自“内部测试发行版 → 正式版”的 10 个提交 Diff。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/正式版" rel="noreferrer" target="_blank">Release ↗</a><a href="https://github.com/KSwordDEV/KSword/compare/内部测试发行版...正式版" rel="noreferrer" target="_blank">完整 Diff ↗</a></div>
 </article>
 <article class="release-entry" id="release-fcd0eb3">
@@ -268,20 +202,15 @@
 <div><p class="section-number">2025-08-15</p><h2>v5.0.0.0-Alpha.0.1 内部测试发行版</h2></div>
 <strong class="release-badge">5.0.0.0 Alpha.0.1</strong>
 </header>
-<div class="release-meta-grid">
-<div><span>发布类型</span><strong>历史起点</strong></div>
-<div><span>当前 tag</span><strong>内部测试发行版</strong></div>
-<div><span>Patch</span><code>fcd0eb3</code></div>
-<div><span>比较状态</span><strong>无上一个 Release</strong></div>
-</div>
-<h3>实际变更</h3>
+
+<h3>更新内容</h3>
 <ul class="update-list"><li>首个公开 Release，作为 5.x ImGui ARK 的内部测试起点。</li><li>Release 主要定义四段式版本号：主版本、大版本、小版本和最小版本。</li><li>规定 Alpha、Beta、LTS、Limit 等可选后缀的用途与示例。</li><li>该版本自身没有单独的功能更新说明；patch 中已经包含早期 DLL、模块、进程、内存和断点相关实现。</li></ul>
-<div class="release-note"><strong>Release 描述与校正</strong><p>这是发布历史起点，没有更早 Release 可进行比较。</p></div>
+
 <div class="release-links"><a href="https://github.com/KSwordDEV/KSword/releases/tag/内部测试发行版" rel="noreferrer" target="_blank">Release ↗</a></div>
 </article>
 
-</div></div></section></main>
-<footer><div class="wrap footer-row"><span>KSWORD / 5.1</span><div class="footer-links"><a href="hvm-topology.html">HVM 拓扑</a>
-<a href="learn/index.html">文档</a><a href="changelog.html">更新日志</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
+</div></div></section>
+</main>
+<footer><div class="wrap footer-row"><span>KSword · Windows x64</span><div class="footer-links"><a href="docs/contact.html">联系</a><a href="docs/credits.html">鸣谢</a><a href="docs/license.html">许可证</a><a href="https://github.com/KSwordDEV/KSword" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer">wangwei-cm</a><a href="https://github.com/Felix3322" target="_blank" rel="noreferrer">OB_BUFF</a></div></div></footer>
 </body>
 </html>

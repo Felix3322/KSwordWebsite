@@ -1,322 +1,40 @@
 <!DOCTYPE html>
-
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="KSword 基于真实代码行为编写的操作顺序、驱动依赖、功能边界和故障排查文档。" name="description"/>
-<title>软件使用文档 — KSword</title>
-<link href="../styles.css?v=20261013-a996d38d" rel="stylesheet"/>
-<link href="../en/docs/index.html" hreflang="en" rel="alternate"/>
-</head>
-<body>
-<header class="site-header">
-<div class="wrap header-row">
-<a aria-label="返回首页" class="wordmark" href="../index.html">KSWORD <span>/ 5.1</span></a>
-<div aria-label="维护者 B 站与 GitHub" class="creator-cards">
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank" title="wangwei-cm 的 B站主页"><img alt="wangwei-cm B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/wangwei-cm.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/00004ab1b94fa8167e4fa215a545f1851406cb9b.jpg"/></a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank" title="wangwei-cm 的 GitHub"><img alt="wangwei-cm GitHub 头像" loading="lazy" src="https://github.com/wangwei-cm.png"/></a>
-</div>
-<div class="creator-info">
-<strong>wangwei-cm</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/1627165457" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/wangwei-cm" rel="noreferrer" target="_blank">GH ↗</a>
-</div>
-</div>
-</article>
-<article class="creator-card">
-<div class="creator-avatars">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank" title="OB_BUFF 的 B站主页"><img alt="OB_BUFF B站头像" decoding="async" loading="lazy" onerror="this.onerror=null;this.src='https://github.com/Felix3322.png'" referrerpolicy="no-referrer" src="https://i1.hdslb.com/bfs/face/9a68fe661986d66f905a1779a24e776d285bdca0.jpg"/></a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank" title="Felix3322 的 GitHub"><img alt="Felix3322 GitHub 头像" loading="lazy" src="https://github.com/Felix3322.png"/></a>
-</div>
-<div class="creator-info">
-<strong>OB_BUFF</strong>
-<div class="creator-links">
-<a href="https://space.bilibili.com/3493268241254936" rel="noreferrer" target="_blank"><img alt="" class="bili-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAyNHB4IiBoZWlnaHQ9IjEwMjRweCIgdmlld0JveD0iMCAwIDE4IDE4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGNsYXNzPSJ6aHV6aGFuLWljb24gcGhvdG9zaG93X190aHVtYm5haWwiIHN0eWxlPSItLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stY29yZS1wb3NpdGlvbjogNTAlIDUwJTsgLS1waG90b3Nob3dfX3RodW1ibmFpbC1tYXNrLWNvcmUtc2l6ZTogMTAwJSAxMDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLXRvcDogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tcmlnaHQ6IDAlOyAtLXBob3Rvc2hvd19fdGh1bWJuYWlsLW1hc2stdmlld3BvcnQtaW5zZXQtLWJvdHRvbTogMCU7IC0tcGhvdG9zaG93X190aHVtYm5haWwtbWFzay12aWV3cG9ydC1pbnNldC0tbGVmdDogMCU7Ij48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTMuNzMyNTIgMi42NzA5NEMzLjMzMjI5IDIuMjg0ODQgMy4zMzIyOSAxLjY0MzczIDMuNzMyNTIgMS4yNTc2NEM0LjExMjkxIDAuODkwNjg0IDQuNzE1NTIgMC44OTA2ODQgNS4wOTU5MSAxLjI1NzY0TDcuMjE3MjMgMy4zMDQwM0M3LjI3NzQ5IDMuMzYyMTggNy4zMjg2OSAzLjQyNjEgNy4zNzA4MSAzLjQ5NDA3SDEwLjU3ODlDMTAuNjIxMSAzLjQ2NjEgMTAuNjcyMyAzLjM2MjE4IDEwLjczMjUgMy4zMDQwM0wxMi44NTM4IDEuMjU3NjRDMTMuMjM0MiAwLjg5MDY4NCAxMy44MzY4IDAuODkwNjg0IDE0LjIxNzIgMS4yNTc2NEMxNC42MTc1IDEuNjQzNzMgMTQuNjE3NSAyLjI4NDg0IDE0LjIxNzIgMi42NzA5NEwxMy4zNjQgMy40OTQwN0gxNEMxNi4yMDkxIDMuNDk0MDcgMTggNS4yODQ5MyAxOCA3LjQ5NDA3VjEyLjk5OTZDMTggMTUuMjA4NyAxNi4yMDkxIDE2Ljk5OTYgMTQgMTYuOTk5Nkg0QzEuNzkwODYgMTYuOTk5NiAwIDE1LjIwODcgMCAxMi45OTk2VjcuNDk0MDZDMCA1LjI4NDkyIDEuNzkwODYgMy40OTQwNyA0IDMuNDk0MDdINC41ODU3OUwzLjczMjUyIDIuNjcwOTRaTTQgNS40MjM0M0MyLjg5NTQzIDUuNDIzNDMgMiA2LjMxODg2IDIgNy40MjM0M1YxMy4wNzAyQzIgMTQuMTc0OCAyLjg5NTQzIDE1LjA3MDIgNCAxNS4wNzAySDE0QzE1LjEwNDYgMTUuMDcwMiAxNiAxNC4xNzQ4IDE2IDEzLjA3MDJWNy40MjM0M0MxNiA2LjMxODg2IDE1LjEwNDYgNS40MjM0MyAxNCA1LjQyMzQzSDRaTTUgOS4zMTc0N0M1IDguNzY1MTkgNS40NDc3MiA4LjMxNzQ3IDYgOC4zMTc0N0M2LjU1MjI4IDguMzE3NDcgNyA4Ljc2NTE5IDcgOS4zMTc0N1YxMC4yMTE1QzcgMTAuNzYzOCA2LjU1MjI4IDExLjIxMTUgNiAxMS4yMTE1QzUuNDQ3NzIgMTEuMjExNSA1IDEwLjc2MzggNSAxMC4yMTE1VjkuMzE3NDdaTTEyIDguMzE3NDdDMTEuNDQ3NyA4LjMxNzQ3IDExIDguNzY1MTkgMTEgOS4zMTc0N1YxMC4yMTE1QzExIDEwLjc2MzggMTEuNDQ3NyAxMS4yMTE1IDEyIDExLjIxMTVDMTIuNTUyMyAxMS4yMTE1IDEzIDEwLjc2MzggMTMgMTAuMjExNVY5LjMxNzQ3QzEzIDguNzY1MTkgMTIuNTUyMyA4LjMxNzQ3IDEyIDguMzE3NDdaIiBmaWxsPSJyZ2IoMjU1LCAyNTUsIDI1NSkiLz48L3N2Zz4="/>B站</a>
-<a href="https://github.com/Felix3322" rel="noreferrer" target="_blank">Felix3322 ↗</a>
-</div>
-</div>
-</article>
-</div>
-<nav aria-label="主导航">
-<a href="../index.html">首页</a>
-<a href="../changelog.html">更新日志</a>
-<a href="../development.html">开发快照</a>
-<a href="../hvm-topology.html">HVM 拓扑</a>
-<a aria-current="page" href="../learn/index.html">文档</a>
-<a href="../en/docs/index.html" hreflang="en">English</a>
-<a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub ↗</a>
-</nav>
-</div>
-</header>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="安装、查找页面，以及常用操作。"/><title>开始使用 — KSword</title><link rel="icon" href="../assets/ksword.ico"/><link rel="stylesheet" href="../styles.css?v=20261013-ui2"/></head><body>
+<header class="site-header"><div class="wrap header-row">
+<a class="wordmark" href="../index.html"><img src="../assets/ksword.ico" width="25" height="25" alt=""/>KSword <span>5.1</span></a>
+<nav aria-label="主导航"><a href="../index.html">首页</a><a href="../changelog.html">更新日志</a><a href="../development.html">功能介绍</a><a href="../hvm-topology.html">HVM 拓扑</a><a href="../learn/index.html" aria-current="page">文档</a><a href="../en/docs/index.html">English</a><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">GitHub</a></nav>
+<form class="header-search" action="../learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="搜索文档" placeholder="搜索文档…"/></form>
+</div></header>
 <main>
-<section class="page-hero compact">
-<div class="wrap">
-<p class="kicker">OPERATOR DOCUMENTATION</p>
-<h1>软件使用文档</h1>
-<p class="lead">按 2026-10-13 主线 a996d38d 核对：MCP、CLI、内存区域 Dump、复杂报告、权限工作台与实验边界。实际发行包以下载说明及配套版本为准。</p>
-</div>
-</section>
-<div class="doc-tabs-shell">
-<div class="wrap">
-<nav aria-label="文档页面" class="doc-tabs">
-<a aria-current="page" href="index.html">软件使用文档</a>
-<a href="credits.html">鸣谢</a>
-<a href="contact.html">联系我们</a>
-<a href="license.html">许可证</a>
-</nav>
-</div>
-</div>
-<section class="section compact-section">
-<div class="wrap docs-layout">
-<aside aria-label="文档目录" class="side-index">
-<strong>本页目录</strong>
-<a href="#choose-mode">先判断是否需要 R0</a>
-<a href="#package">版本与发行包</a>
-<a href="#driver">驱动真正就绪的标准</a>
-<a href="#dyndata">DynData 与 Capability</a>
-<a href="#ce">Cheat Engine</a>
-<a href="#process">进程页</a>
-<a href="#memory">内存操作</a>
-<a href="#file">文件与 Unlocker</a>
-<a href="#kernel">驱动与内核页</a>
-<a href="#network">网络与 HTTPS</a>
-<a href="#plugins">插件与市场</a>
-<a href="#raw-write">注册表、启动项与磁盘写入</a>
-<a href="#shutdown">退出与恢复顺序</a>
-<a href="#diagnostics">按症状排查</a>
-<a href="#monitor">ETW、Syscall 与 WinAPI 会话</a><a href="#hvm">Intel 与实验性 AMD 虚拟化</a><a href="#light">Light 工作台与证据</a><a href="#clipboard">剪贴板保护会话</a><a href="#compatibility">Windows 与精确偏移支持</a><a href="#mcp">MCP 设置与 GUI 连接</a><a href="#cli">CLI 与原始 IOCTL</a><a href="#reports-permissions">复杂报告与权限工作台</a><a href="#navigation">Taskbar 页面总览</a><a href="#cks-research">CKS 免重置研究</a></aside>
+<section class="page-hero"><div class="wrap"><h1>开始使用</h1><p class="lead">安装、查找页面，以及常用操作。</p></div></section>
+<section class="section compact-section"><div class="wrap docs-layout">
+<aside class="side-index"><a href="#choose-mode">选择工作模式</a><a href="#package">安装与启动</a><a href="#driver">连接驱动</a><a href="#dyndata">符号与动态偏移</a><a href="#ce">连接调试器</a><a href="#process">查看进程</a><a href="#memory">内存编辑与区域导出</a><a href="#file">文件管理与占用查询</a><a href="#kernel">内核工具</a><a href="#network">连接与端口</a><a href="#plugins">安装插件</a><a href="#raw-write">注册表与系统设置</a><a href="#shutdown">结束会话</a><a href="#diagnostics">遇到问题</a><a href="#monitor">启动监控</a><a href="#hvm">虚拟化工具</a><a href="#light">使用 Light</a><a href="#clipboard">剪贴板保护</a><a href="#compatibility">系统要求</a><a href="#mcp">接入 MCP</a><a href="#cli">使用命令行</a><a href="#reports-permissions">报告与权限工作台</a><a href="#navigation">查找页面</a><a href="#cks-research">CKS 管理</a></aside>
 <div class="document-content operator-manual">
-<section id="choose-mode">
-<p class="section-number">01</p>
-<h2>先判断这次操作是否需要 R0</h2>
-<div class="status-table">
-<div><strong>不需要先加载驱动</strong><p>浏览普通进程列表、查看基础文件信息、读取大部分系统配置、查看日志和只读 R3 页面。</p></div>
-<div><strong>必须先加载驱动</strong><p>CE 的 R0/HVM 路径、R3/R0 Cross-view、内核内存与页表、驱动对象证据、回调操作以及任何明确标为 R0 的功能。CE 未连接驱动时仍可保留原生函数表；[KSword Connected] 不表示 R0 已启用。</p></div>
-</div>
-<div class="action-rule critical-rule">
-<strong>不要用“按钮能点”判断功能是否真的走 R0。</strong>
-<p>实际标准是客户端能打开 <code>\\.\KswordARKLog</code>，目标 IOCTL 被当前驱动支持，并且该功能所需的 DynData/Capability 已就绪。</p>
-</div>
-</section>
-<section id="package"><p class="section-number">02</p><h2>启动、版本与完整发行包</h2><p>内容按 <strong>2026-10-13 · main a996d38d</strong> 源码核对；新增主线功能不代表旧发布包已包含。下载前查看发行说明，MCP、CLI 与调试器适配器按各自清单核对。完整解压 <code>Release/</code>，保留 Qt/ADS DLL、插件、<code>platforms/</code>、<code>profiles/</code>、<code>languages/</code> 与许可证，然后运行 <code>Launcher.exe</code>。</p><p>完整 Qt 版用于全工作流，Light 是原生 Win32 工作台，CLI 适合脚本和有界查询。Launcher 可显式选择目标：</p><pre><code>Launcher.exe --launcher-main
-Launcher.exe --launcher-light
-Launcher.exe --launcher-check-only</code></pre><p>检查模式仅核对清单，不启动主程序，也不生成采集包。需要 R0 或受保护模块采集时按提示提升权限。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
-<section id="driver">
-<p class="section-number">03</p>
-<h2>“服务已启动”不等于驱动已可用</h2>
-<div class="capability-grid">
-<div><strong>服务层</strong><ul><li>服务存在</li><li>StartService 成功</li><li>ImagePath 指向正确 SYS</li></ul></div>
-<div><strong>通信层</strong><ul><li>能打开 <code>\\.\KswordARKLog</code></li><li>协议/IOCTL 匹配</li><li>功能所需 Capability 可用</li></ul></div>
-</div>
-<p>驱动加载后，先看 Driver Status，再看 DynData。不要先去具体功能页反复点击按钮。</p>
-<div class="status-table">
-<div><strong>设备打不开</strong><p>先查管理员权限、服务状态、签名、SYS 路径和设备创建。此时 DynData 还不是问题。</p></div>
-<div><strong>设备能打开但旧驱动不支持</strong><p>说明通信存在，但当前 SYS 没有该控制码。换回同一 Release 的驱动。</p></div>
-<div><strong>IOCTL 返回失败 NTSTATUS</strong><p>设备和协议都已到达驱动，继续看 R0 日志、目标状态和参数，不要再重装服务。</p></div>
-</div>
-<p class="source-path">依据：<code>DriverClient::open()</code>、<code>deviceIoControl()</code>。</p>
-</section>
-<section id="dyndata">
-<p class="section-number">04</p>
-<h2>DynData 决定的是“哪些 R0 功能能安全运行”</h2>
-<p>设备 Loaded 只代表通道存在。依赖内核结构偏移、全局 RVA、函数 RVA 或类型大小的功能，还要求 profile 与当前内核身份匹配并被驱动接受。</p>
-<div class="status-table">
-<div><strong>Matched</strong><p>本地 profile 与当前模块身份匹配，仍需看 Accepted items 和 Capability。</p></div>
-<div><strong>Missing items</strong><p>只禁用依赖这些字段的功能；不要把单项缺失误判为整个 R0 失效。</p></div>
-<div><strong>旧驱动不支持 V4 查询</strong><p>主程序比驱动新。不要手工复制一个 JSON 试图解决协议缺失。</p></div>
-<div><strong>Profile 不匹配</strong><p>不要套用“相近 Windows 版本”的偏移。错误偏移可能产生比安全降级更严重的结果。</p></div>
-</div>
-<div class="action-rule">
-<strong>Windows 更新后第一次运行，先检查 DynData，再做内核修改。</strong>
-<p>同一主版本的 Windows 也可能更换内核构建和 PDB 身份。</p>
-</div>
-<p class="source-path">依据：<code>KernelDock.DynData.cpp</code> 的 matched、accepted、missing 和 capability 状态。</p>
-</section>
-<section id="ce"><p class="section-number">05</p><h2>CE、TitanEngine 与 x64dbg/x96dbg</h2><p>从 KSword 的进程入口启动配套调试器，核对目标身份、桥接就绪与实际后端。公共 <code>DebuggerBackend/</code> 已覆盖内存、上下文、挂起/恢复、分配/保护及 Windows 调试事件适配，旧版“仅接管四个内存 API”的描述已不适用。</p><ul><li>CE 当前有 15 个 SDK Hook；WOW64 上下文、CE VEH/DBVM 不在本版原生 Windows 调试适配范围。</li><li>HVM/EPT 不可用时，是否允许回退由策略控制；实际路径、回退次数与错误单独展示。</li><li>代码 Shadow 修改只改变执行视图，不能把普通数据冻结当作隐形数据修改；活动补丁/断点限制模式切换和退出。</li><li>R0/HVM 与原生路由均应看运行态诊断，不能凭模式名称断言已启用。</li></ul><p>调试会话保留真实 Windows 停止事件；退出时核对自有断点、补丁与资源的还原。</p><p><a href="../learn/index.html?doc=DebuggerBackend%2FREADME.md">完整文档与限制 →</a></p></section>
-<section id="process">
-<p class="section-number">06</p>
-<h2>进程操作不能只看 PID</h2>
-<div class="action-rule critical-rule">
-<strong>结束、挂起、保护级别、隐藏或批量操作前先刷新。</strong>
-<p>KSword 用 <code>PID + creationTime100ns</code> 识别进程，因为退出后的 PID 会被复用。停留很久的旧行可能已经不是原进程。</p>
-</div>
-<ul>
-<li>应用聚合行的右键和批量动作会作用于组内全部真实成员，不是只操作当前显示的一行。</li>
-<li>“进程友好视图”和父子树视图表达不同关系；在判断父进程链前切回父子树。</li>
-<li>PID 0、PID 4、当前 KSword 进程和关键系统进程不要作为写操作测试目标。</li>
-<li>隐藏进程前记录路径、创建时间和原 PID；恢复依赖驱动保存的记录。恢复完成前不要卸载驱动。</li>
-<li>R3 与 R0 枚举不一致是证据，不要为了“让列表一致”直接删除或隐藏对象。</li>
-</ul>
-<p class="source-path">依据：进程 identity、应用聚合批量动作、R0 visibility 记录。</p>
-</section>
-<section id="memory"><p class="section-number">07</p><h2>读取快照、暂存编辑与实际回读</h2><p>Hex、反汇编、文本和对比视图使用同一份读取快照。修改、汇编、撤销/重做只改变本地缓存；必须通过所属页面显式应用，成功以实际回读为准。</p><ol><li>核对目标身份、R3/R0/R-1/DDMA 后端、地址、CR3 与 x86/x64 位数，再读取。</li><li>选择修改范围，预览旧/新机器码，覆盖完整可解码旧指令。支持常用 Intel 指令和局部标签，不支持 CE alloc/registersymbol 等脚本。</li><li>写前复核原字节和会话，检查每个授权差异块的回读。冲突、partial 或未知回读不得当作整体成功。</li></ol><p>普通进程查看器 DDMA 保持只读。独立 DDMA 入口涉及显式暂存磁盘/LBA、调试器状态、透传和扇区恢复；虚拟机模拟 DMA 不证明绕过宿主翻译。</p><p><a href="../learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md">完整文档与限制 →</a></p><h3>只导出一个内存区域</h3><p>进程详情 → 内存 → 内存区域，或主导航 → 内存 → 内存区域，右键选择“R3导出此区域Dump…”或“R0导出此区域Dump…”。动作固定所选后端，不自动回退；输出是与区域长度一致的原始 <code>.bin</code> 字节，不是整进程 <code>.kmdump</code> 或 Windows minidump。</p><p>每块读取复核进程身份和区域元数据；短读、partial、补零或长度不一致会失败。读取阶段可取消，原子保存不会发布半个目标文件；进入最终提交后不能撤回。运行中进程的分块读取不保证所有字节来自同一时刻。</p><p>已提交记录包含真实 GUI 的受控 R3 导出；R0 固定通道经源码与回归核对，记录中未加载驱动实读。<a href="../learn/index.html?doc=docs%2FIssue-216-%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9FDump%E6%A0%B8%E5%AF%B9.md">入口、保存语义与验证 →</a></p>
-</section>
-<section id="file">
-<p class="section-number">08</p>
-<h2>文件 Unlocker 不是“自动关闭所有占用”</h2>
-<div class="action-rule critical-rule">
-<strong>解锁时必须手动确认具体进程和句柄。</strong>
-<p>项目特意取消了无选择的自动解锁路径，避免关闭错误进程里的同名或相关句柄。关闭远程句柄可能让持有进程崩溃、丢失未写入数据或进入异常状态。</p>
-</div>
-<ol class="procedure numbered-procedure">
-<li><span>1</span><div><strong>先查看文件占用列表。</strong><p>核对进程路径、PID、创建时间和句柄类型。</p></div></li>
-<li><span>2</span><div><strong>优先正常退出持有程序。</strong><p>只有无法正常释放时才使用关闭句柄。</p></div></li>
-<li><span>3</span><div><strong>一次只处理一个确认过的持有者。</strong><p>每次处理后重新刷新占用列表，再决定是否继续。</p></div></li>
-<li><span>4</span><div><strong>再执行移动、删除或替换。</strong><p>不要把“列表暂时为空”当作文件内容已经安全落盘。</p></div></li>
-</ol>
-<ul>
-<li>映射文件反查显示 Unsupported 时，只能说明当前驱动缺接口，不能证明没有进程映射该文件。</li>
-<li>文件恢复、删除、完整性标签和强制操作前，先复制原文件或记录元数据。</li>
-</ul>
-<p class="source-path">依据：Unlocker 必须手动选进程的防误触改动、文件映射 R0 查询。</p>
-</section>
-<section id="kernel">
-<p class="section-number">09</p>
-<h2>内核页先采证，再修改</h2>
-<div class="action-rule critical-rule">
-<strong>回调移除、Hook 修改和驱动卸载都应视为会改变被调查系统。</strong>
-<p>先导出当前地址、所属模块、签名、来源视图和时间，再执行修改。修改后重新刷新，而不是继续使用旧表格判断结果。</p>
-</div>
-<ul>
-<li>回调列表和模块状态会变化；操作前最后刷新一次，并核对目标仍属于同一模块。</li>
-<li>删除第三方安全驱动回调可能破坏其内部状态，测试应放在可回滚虚拟机。</li>
-<li>驱动调试输出页只显示通过当前内核筛选器的消息；“没有日志”不等于代码没有执行。</li>
-<li>页面显示 Partial/Unsupported 时保留原始状态，不要把缺失字段补成“正常”。</li>
-<li>卸载 KswordARK 前，先关闭 CE、停止持续监控并恢复由驱动维护的临时状态。</li>
-</ul>
-</section>
-<section id="network">
-<p class="section-number">10</p>
-<h2>网络页面里有些功能会改变系统状态</h2>
-<div class="status-table">
-<div><strong>抓包与 NIDS</strong><p>主要用于观察。NIDS 告警不是自动阻断结论，需要结合连接、进程和时间线确认。</p></div>
-<div><strong>终止连接与限速</strong><p>会直接影响现有业务连接；执行前记录 PID、端点和协议。</p></div>
-<div><strong>HTTPS 分析</strong><p>可能涉及本地代理、系统代理配置和证书状态，不是纯只读功能。</p></div>
-</div>
-<ol class="procedure">
-<li>启用 HTTPS 分析前记录当前 Windows 代理设置。</li>
-<li>结束后先在 KSword 中停止代理，再检查系统代理是否恢复。</li>
-<li>KSword 异常退出后若浏览器突然无法联网，先查系统代理和本地监听端口。</li>
-<li>不要同时运行多个会修改系统代理的工具。</li>
-</ol>
-</section>
-<section id="plugins">
-<p class="section-number">11</p>
-<h2>插件“安装成功”和“运行协议正常”是两件事</h2>
-<ul>
-<li>市场插件包应完整下载、校验并解压；不要把源码文件当作运行入口，实际入口由 <code>plugin.json</code> 的 runtime/entrypoint 决定。</li>
-<li>可执行插件通过 JSON Lines 报告 ready、进度、结果和完成事件；原始文本或不合法 JSON 不会自动变成结构化扫描结果。</li>
-<li>扫描页长时间停在等待状态时，先看插件进程是否退出、stderr 和协议事件，不要只重开 UI。</li>
-<li>取消任务只保证宿主发出终止/取消流程；插件自身创建的子进程或外部状态仍需检查。</li>
-<li>更新插件时先关闭其运行实例，避免旧 DLL/EXE 仍被占用。</li>
-</ul>
-<div class="action-rule">
-<strong>CE 插件是 hybrid executable，不是普通扫描插件。</strong>
-<p>它有独立的 driver check、launch、tab 和 info 命令；R0/HVM 已连接时维护驱动会话，未连接时可保留原生路由。</p>
-</div>
-<p class="source-path">依据：<code>PluginHost.cpp</code>、插件 manifest 和 scan-table 协议。</p>
-</section>
-<section id="raw-write">
-<p class="section-number">12</p>
-<h2>注册表、启动项、服务和磁盘编辑都先准备回滚材料</h2>
-<div class="status-table">
-<div><strong>注册表</strong><p>修改前导出目标键，不要只截屏。值类型、数据和权限都要保留。</p></div>
-<div><strong>启动项/服务</strong><p>禁用前记录原启动类型、ImagePath、账户和依赖关系。删除服务前先确认不是共用驱动服务。</p></div>
-<div><strong>磁盘编辑</strong><p>任何原始扇区写入前先保存目标范围或完整镜像；不要在系统盘上测试写入。</p></div>
-</div>
-<ul>
-<li>“优化”不代表对所有机器安全。逐项应用，重启验证后再继续下一组。</li>
-<li>服务停止成功不代表其驱动对象、设备或过滤器已安全清理。</li>
-<li>磁盘写入后的撤销依赖你保存的原始字节，不依赖 UI 历史记录。</li>
-</ul>
-<h3>注册表工作台先暂存，再应用</h3><p>当前主线把多值编辑组织成文档与变更计划：按注册表类型编辑并保留原始字节，先预览差异，再核对源值、应用并回读。暂存或计划显示完成不代表系统已改变；源值冲突和回读失败保留为真实错误。修改前仍需导出原键。</p><p><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">注册表功能与边界 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fregistry.md">注册表 CLI 命令 →</a></p>
-</section>
-<section id="shutdown">
-<p class="section-number">13</p>
-<h2>做过 R0 修改时，退出顺序也有要求</h2>
-<ol class="procedure numbered-procedure">
-<li><span>1</span><div><strong>停止新的扫描、监控和插件任务。</strong><p>等待 Current Operations 清空或明确取消。</p></div></li>
-<li><span>2</span><div><strong>关闭 CE 和其他持有 KswordARK 设备句柄的插件。</strong><p>防止旧会话继续调用正在卸载的驱动。</p></div></li>
-<li><span>3</span><div><strong>恢复临时修改。</strong><p>包括隐藏进程、代理设置、已知的测试状态和可恢复的系统改动。</p></div></li>
-<li><span>4</span><div><strong>导出日志和证据。</strong><p>修改后的刷新结果与修改前快照应一起保存。</p></div></li>
-<li><span>5</span><div><strong>最后再卸载驱动或退出 KSword。</strong><p>不要把卸载驱动当作自动恢复所有内核修改的方法。</p></div></li>
-</ol>
-</section>
-<section id="diagnostics">
-<p class="section-number">14</p>
-<h2>按症状定位到正确层级</h2>
-<div class="diagnostic-table">
-<div><strong>所有 R0 页面都不可用</strong><p>先查设备句柄、管理员权限、服务和签名，不要先换 profile。</p></div>
-<div><strong>只有部分 R0 页面不可用</strong><p>查该功能的 IOCTL、Missing items 和 Capability，通常不是整个驱动失败。</p></div>
-<div><strong>CE 能启动但没有自动打开目标</strong><p>桥接 DLL 初始化或延迟 <code>openProcess(pid)</code> 失败。关闭后从 KSword 重启。</p></div>
-<div><strong>CE 读正常但写失败</strong><p>检查驱动策略、页状态、所选后端与实际回退；当前适配器已接入分配/保护接口。</p></div>
-<div><strong>文件仍提示占用</strong><p>刷新占用列表，确认是否还有映射、第二个句柄或新创建的进程实例。</p></div>
-<div><strong>网络工具退出后无法联网</strong><p>先查系统代理、证书和本地代理进程，不要先重置整个网络栈。</p></div>
-<div><strong>插件安装完成但没有结果</strong><p>查看 manifest 入口、插件退出码、stderr 和 JSONL 协议事件。</p></div>
-<div><strong>更新后出现大量 Unsupported</strong><p>检查 EXE、SYS、profiles 和插件是否来自同一个 Release。</p></div>
-</div>
-<h3>提交 Issue 至少附带</h3>
-<div class="evidence-list">
-<div><strong>版本组合</strong><p>KSword、SYS、插件和 profile 来源。</p></div>
-<div><strong>目标身份</strong><p>PID、路径、创建时间和 Windows Build。</p></div>
-<div><strong>R0 状态</strong><p>设备打开结果、协议错误、Missing items 和 Capability。</p></div>
-<div><strong>精确错误</strong><p>Win32 Error、NTSTATUS、事件码和发生时间。</p></div>
-<div><strong>操作顺序</strong><p>驱动、KSword、插件、CE 的启动顺序，以及中途是否替换文件。</p></div>
-</div>
-<p><a href="https://github.com/KSwordDEV/KSword/issues" rel="noreferrer" target="_blank">提交 GitHub Issue ↗</a></p>
-</section>
-<section id="monitor"><p class="section-number">15</p><h2>ETW、Syscall 与 WinAPI 会话</h2><p>监控模块提供进程 ETW、Syscall、x86/x64 API Agent、WMI 和 ETW 会话管理。自动注入按目标位数选 DLL；同一目标的 Agent 会话具有所有权与就绪状态。</p><ul><li>ETW 保留 Provider、事件头 PID/TID 与关联目标身份；映像枚举不伪称加载。</li><li>Syscall 依赖时序/栈关联；兼容桩检测不证明所有直接系统调用均被记录。</li><li>Hook 就绪、版本化覆盖、Raw 入口、异步完成和丢事件分别解读；启动成功不保证所有 API 可观测。</li></ul><p>先选目标与规则，启动后核对覆盖，再解释和导出事件。</p><p><a href="../learn/index.html?doc=APIMonitor_x64%2FREADME.md">完整文档与限制 →</a></p></section>
-<section id="hvm"><p class="section-number">16</p><h2>Intel 与实验性 AMD 虚拟化</h2><p>虚拟化工作区包含 Intel VMX/EPT、嵌套 VMX/EPT 合成、Hook 与 R-1 内存，也接入 AMD SVM/NPT 和嵌套 SVM 的准备、自检、常驻及证据流程。</p><ol><li>先核对硬件、外层 hypervisor、能力与拒绝原因。</li><li>准备 → 全核自检 → 常驻；确认模式、代次和每个 CPU 的实际状态。</li><li>停止后按正常生命周期释放，保留状态和错误。部分常驻不能按完整成功处理。</li></ol><p>AMD 完整内层多核 OS 启动与性能仍待验收。ENFORCE 发布为未实现，不能把策略表存在宣传为全量处置已生效。</p><p><a href="../learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">完整文档与限制 →</a></p></section>
-<section id="light"><p class="section-number">17</p><h2>Light 工作台与证据</h2><p>Light 保持原生 Win32、无 Qt 依赖，提供按需二级页、进程遥测、跨模块实体跳转与证据会话。功能覆盖不承诺与完整版本完全相同。</p><ul><li>命令框默认解释 pid/tid/hwnd/file/reg/net 等导航；前导 <code>!</code> 显式进入命令执行。</li><li>证据会话记录成功导出，支持快照、最近两次行级差异、JSON/TSV 与用户路径脱敏。</li><li>跨进程驱动租约保留预先运行的驱动；只有自行启动且最后租约退出时才请求停止。</li><li>unknown/partial 与真实零值分别保留。</li></ul><p>由 Launcher 选择 Light；实体身份核对与能力状态仍适用。</p><p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">完整文档与限制 →</a></p></section>
-<section id="clipboard"><p class="section-number">18</p><h2>剪贴板保护会话</h2><p>杂项 → 剪贴板保护使用 Agent Hook 与规则热更新。驱动策略表只保存策略，不会单独阻断所有剪贴板访问。</p><ul><li>启动后核对目标位数、注入与 Hook 就绪。</li><li>会话停止、目标退出和规则修订可能改变覆盖范围。</li><li>同目标 Agent 会话互斥，必须保留覆盖/丢事件状态。</li></ul><p>按实际会话覆盖解释阻断与放行结果。</p><p><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">完整文档与限制 →</a></p></section>
-<section id="compatibility"><p class="section-number">19</p><h2>Windows 与精确偏移支持</h2><p>当前 Qt 路径最低 build 17763，R0 启动协议最低 build 16299；两者是不同组件的门槛。产品定位 Windows 10/11 x64。</p><p>2026-10-03 已停用 Launcher 与驱动的 OS build 上限拦截；新系统仍依赖精确 PE/RSDS/PDB profile 及逐功能能力、布局与地址校验。</p><p>collection-only 表示可采集身份，不代表已有完整偏移支持。报告接入先只读校验 valid=true，再进入正式矩阵。</p><p><a href="../learn/index.html?doc=docs%2F%E6%9E%84%E5%BB%BA%E4%B8%8E%E5%8F%91%E5%B8%83.md">完整文档与限制 →</a></p></section>
-<section id="mcp">
-<p class="section-number">20</p><h2>MCP 设置与 GUI 连接</h2>
-<p>当前主线通过外部 stdio sidecar 与同机命名管道连接真实 Qt GUI，提供页面发现、控件树、表格切片、文本读取和原生控件动作；特殊控件按已登记的只读适配器开放。</p>
-<ol class="procedure"><li>确认下载的主程序构建支持 MCP，安装配套 sidecar 与 Python 依赖；旧发布包可能早于该功能。</li><li>在“设置 → MCP”启用本次服务。自动启动默认关闭，路径与启动偏好通过“应用/取消”保存；本次启停立即生效，两者分开。</li><li>客户端配置使用真实 Python、sidecar 与主程序完整路径。<code>--ksword-exe</code> 默认 <code>--startup-policy fail</code>；只有明确选择 auto 才在调用时启动。固定 PID 模式需指定实际 PID。</li><li>先读取 hello、pages 和 snapshot，再操作当前对象。按最新表格 revision 选行；销毁或重新创建的控件需重新获取对象 ID。</li></ol>
-<div class="action-rule"><strong>已注册、工具已发现、GUI 已连接与业务成功分别核对。</strong><p><code>accepted</code> / <code>dispatched</code> 只描述控件调用。后台任务、确认弹窗与结果仍须从原页面回读；动作、字段修改和选行要求明确确认，保留原业务确认流程。</p></div>
-<ul><li>普通复选框用布尔 true/false 指定状态；toggle 反转当前值。同值设置不反向切换，表格单元格勾选需要相应模型能力。</li><li>连接校验用户、会话及完整性级别；UAC 启动例外仅绑定本次客户端真实 PID 与创建时间。没有 TCP 服务，不自动重启已有实例或重试业务请求。</li><li>设置操作日志保留最近 1000 条内存记录，记录方法和回执，不记录参数或读取结果；退出程序后不保留。</li></ul>
-<p>MCP 的 CLI/IOCTL 工具可独立于 GUI 配置运行，按下一节单独核对权限与结果。</p>
-<p><a href="../learn/index.html?doc=tools%2Fksword_mcp%2FREADME.md">MCP 工具与配置 →</a> · <a href="../learn/index.html?doc=tools%2Fksword_mcp%2FINSTALL_FOR_AGENTS.md">安装与分层验收 →</a></p>
-</section>
-<section id="cli">
-<p class="section-number">21</p><h2>CLI 与原始 IOCTL</h2>
-<p>CLI 已接入 Light R3 的 66 项迁移清单，包含进程、文件、注册表、服务、网络、监控、对象命名空间和安全证据。R3 查询是否需要管理员由具体命令决定；R0 命令通常需要已加载的配套驱动。</p>
-<pre><code>KswordCLI.exe help
-KswordCLI.exe help process
-KswordCLI.exe help system ioctl call</code></pre>
-<p><code>--json</code> 保留 backend、success/partial/unsupported/failed、data 与 diagnostics。保留实际退出码，不能把空结果或 partial 当作完整成功；纯 R3 命令默认 R3，不自动切换到 R0。</p>
-<p><code>system ioctl decode</code> 只解析编码，不发送请求。<code>system ioctl call</code> 经既有 ArkDriverClient 向固定 KSword 控制设备发送一次有界请求，全部要求 <code>--confirm</code>，输入与输出各上限 1 MiB。编码和缓冲区 ABI 来自配套 <code>shared/driver/</code>；传输成功不能替代响应中的业务状态。不会自动装驱动、提权或重发。</p>
-<p>MCP 先用 <code>ksword_cli_status</code> 核对路径，再用 <code>ksword_cli_help</code> 读取原生帮助。任意命令和原始 IOCTL 都要求 <code>confirmed=true</code>，原生命令所需的 <code>--confirm</code> 仍需提供。超时可能留下未知业务结果，先回读状态再决定下一步。</p>
-<p><a href="../learn/index.html?doc=docs%2FCLI%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md">CLI 总手册 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fcoverage.md">R3 覆盖清单 →</a> · <a href="../learn/index.html?doc=docs%2Fcli%2Fsystem.md">IOCTL 语法与限制 →</a></p>
-</section>
-<section id="reports-permissions">
-<p class="section-number">22</p><h2>复杂报告与权限工作台</h2>
-<p>进程详情 → Process Detail Evidence → 结构报告保留分区、类型和字段层级。搜索包含折叠后代及完整原始值；分区复制、复制全部和导出基于同一规范文档，不按当前折叠或筛选截断。生产者未载入或已截断的目录项仍保持原限制。</p>
-<p>权限工作台包括账号、组成员、直接 LSA 权利分配、令牌对比、访问诊断、登录会话、身份启动和手动快照。操作前确认 SID、进程创建时间与实际令牌，修改后核对回读。</p>
-<ul><li>直接 LSA 分配不等于当前进程的有效令牌；策略修改不会立即重写已有令牌。</li><li>AccessCheck 是指定令牌、描述符与掩码的诊断证据，不保证真实文件、注册表或服务操作一定成功。</li><li>不可读、缺失与相等分别处理；手动快照不是所有对象在同一时刻的原子系统快照。</li></ul>
-<p><a href="../learn/index.html?doc=docs%2FIssue-223-%E5%A4%8D%E6%9D%82%E6%8A%A5%E5%91%8A%E5%AD%90%E9%A1%B5.md">报告行为与验收 →</a> · <a href="../learn/index.html?doc=docs%2F%E6%9D%83%E9%99%90%E5%B7%A5%E4%BD%9C%E5%8F%B0.md">权限工作台 →</a></p>
-</section>
-<section id="navigation">
-<p class="section-number">23</p><h2>Taskbar 页面总览</h2>
-<p>主窗口标题栏支持页面路径与控件搜索。独立 Taskbar 右侧网格按钮打开页面总览：一级 Dock 分列，二三级页缩进，可搜索名称与完整路径；Enter 跳首项，Esc 收起。</p>
-<p>总览读取主程序真实页面目录，按外到内恢复 Tab 路径，并复核可见与可用状态。过期目录先刷新；RGB 只作辅助强调，模糊不可用时退回可读的透明布局。Taskbar 的 SOS 键盘入口与页面导航是各自独立的功能。</p>
-<p><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">页面搜索、启动与 SOS →</a></p>
-</section>
-<section id="cks-research">
-<p class="section-number">24</p><h2>CKS 免重置研究</h2>
-<p>CKS 的第三个子页“免重置研究”区分两条候选：启动前重新建立登记，以及可能触及登记的保留应用修复安装。它们都未验证成功，不是受支持的免重置启用流程。</p>
-<p>既有关闭登记、启动许可、PK/KEK 信任与基础策略签名分别影响准入。Licensed=1、策略已部署或普通刷新成功不能证明 CKS 已生效；判断需要实际 CKS 状态、目标驱动加载、CI 事件及重启/更新后的持续性证据。</p>
-<p><a href="../learn/index.html?doc=docs%2FCKS%E7%AE%A1%E7%90%86.md">CKS 管理 →</a> · <a href="../learn/index.html?doc=docs%2FCKS%E6%96%B0%E7%89%88%E5%85%8D%E9%87%8D%E7%BD%AE%E5%90%AF%E7%94%A8%E7%A0%94%E7%A9%B6.md">免重置启用研究 →</a> · <a href="../learn/index.html?doc=docs%2FCKS%E6%9C%AC%E6%9C%BA%E7%99%BB%E8%AE%B0%E9%93%BE%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6.md">登记链证据与边界 →</a></p>
-</section>
-</div>
-</div>
-</section>
+<section id="choose-mode"><h2>选择工作模式</h2><p>进程、文件和网络的基础查询可从 R3 开始。需要内核信息时再连接 R0 驱动；页面会显示功能是否可用。</p></section>
+<section id="package"><h2>安装与启动</h2><p>完整解压发行包，保留程序旁的 Qt 依赖、profiles、languages 和插件目录，运行 Launcher.exe 选择入口。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">详细说明 →</a></div></section>
+<section id="driver"><h2>连接驱动</h2><p>打开驱动管理，选择配套驱动并启动。连接后查看状态与功能列表；加载失败时先检查管理员权限、签名和系统配置。</p></section>
+<section id="dyndata"><h2>符号与动态偏移</h2><p>使用与当前系统模块匹配的 PDB/DynData 配置。缺少配置时，可通过 Launcher 收集报告并提交兼容性信息。</p></section>
+<section id="ce"><h2>连接调试器</h2><p>安装匹配的 Cheat Engine 或 x64dbg/x96dbg 插件，在 KSword 中选择后端，再从调试器连接目标。调试器使用自己的窗口，控制与日志保留在 KSword。</p><div class="release-links"><a href="../learn/index.html?doc=DebuggerBackend%2FREADME.md">详细说明 →</a></div></section>
+<section id="process"><h2>查看进程</h2><p>从进程列表打开详情，按线程、模块、句柄、令牌和内存分类查看。操作前确认进程路径与实例，常用操作位于右键菜单。</p></section>
+<section id="memory"><h2>内存编辑与区域导出</h2><p>读取快照后切换 Hex、反汇编或文本视图。编辑先进入暂存区，确认差异后写回。区域列表右键可导出 R3/R0 dump；部分读取会报错，取消或失败会清理未完成文件。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E5%86%85%E5%AD%98%E7%BC%96%E8%BE%91%E5%99%A8%E7%BB%84%E4%BB%B6%E6%B8%85%E5%8D%95.md">详细说明 →</a> <a href="../learn/index.html?doc=docs%2FIssue-216-%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9FDump%E6%A0%B8%E5%AF%B9.md">入口、保存语义与验证 →</a></div></section>
+<section id="file"><h2>文件管理与占用查询</h2><p>在双面板中浏览文件，右键查看属性、计算哈希或查询占用。根据结果定位相关进程，再选择合适的解锁方式。</p></section>
+<section id="kernel"><h2>内核工具</h2><p>连接驱动后查看驱动、设备、回调和内核对象。使用详情、符号和知识中心解释字段；修改类操作请先保存当前结果。</p></section>
+<section id="network"><h2>连接与端口</h2><p>从连接列表定位进程，使用端口诊断查找占用来源。抓包工具提供接口选择、过滤与导出；修改连接或限速设置前确认目标。</p></section>
+<section id="plugins"><h2>安装插件</h2><p>从插件市场或本地目录安装插件，重新加载后从对应页面打开。调试器类插件还需要安装其宿主程序。</p></section>
+<section id="raw-write"><h2>注册表与系统设置</h2><p>注册表支持键值编辑、文档视图和变更预览。应用修改后检查返回结果；调整启动项、服务或原始磁盘前保留原配置与备份。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">注册表功能与边界 →</a> <a href="../learn/index.html?doc=docs%2Fcli%2Fregistry.md">注册表 CLI 命令 →</a></div></section>
+<section id="shutdown"><h2>结束会话</h2><p>停止当前监控和调试任务，再关闭工作区。虚拟化常驻和驱动操作请使用各自页面的停止与卸载入口。</p></section>
+<section id="diagnostics"><h2>遇到问题</h2><p>保留错误提示、系统版本、程序版本和相关日志。先检查页面状态和依赖，再通过 GitHub Issues 提交可复现的问题。</p><div class="release-links"><a href="https://github.com/KSwordDEV/KSword/issues" rel="noreferrer" target="_blank">提交 GitHub Issue ↗</a></div></section>
+<section id="monitor"><h2>启动监控</h2><p>选择目标和事件类型，启动 ETW、Syscall 或 WinAPI 会话。使用过滤与暂停阅读事件，结束后导出需要的记录。</p><div class="release-links"><a href="../learn/index.html?doc=APIMonitor_x64%2FREADME.md">详细说明 →</a></div></section>
+<section id="hvm"><h2>虚拟化工具</h2><p>在 KVM 页面查看硬件与环境检测，按步骤准备、启动和停止。AMD 相关功能仍属实验阶段，详细配置见虚拟化文档。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">详细说明 →</a></div></section>
+<section id="light"><h2>使用 Light</h2><p>Light 提供原生 Win32 查询界面、实体导航和快照比较。查询后可导出 JSON/TSV；功能和插件范围与完整版不同。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">详细说明 →</a></div></section>
+<section id="clipboard"><h2>剪贴板保护</h2><p>按进程或全局设置读取、写入和枚举规则。启动保护后查看 Agent 状态与日志，再按需要调整允许、记录或阻止策略。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E5%8A%9F%E8%83%BD%E6%8A%80%E6%9C%AF%E6%96%87%E6%A1%A3.md">详细说明 →</a></div></section>
+<section id="compatibility"><h2>系统要求</h2><p>完整版使用 Windows 10 1809（build 17763）或更新的 x64 系统。R0 功能另受驱动签名、系统配置和动态偏移支持影响。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E6%9E%84%E5%BB%BA%E4%B8%8E%E5%8F%91%E5%B8%83.md">详细说明 →</a></div></section>
+<section id="mcp"><h2>接入 MCP</h2><p>打开“设置 → MCP”，复制安装提示词或客户端配置。安装时选择 GUI、CLI 或两者，并设置未运行时的启动方式；管理员启动由 Windows UAC 确认。</p><div class="release-links"><a href="../learn/index.html?doc=tools%2Fksword_mcp%2FREADME.md">MCP 工具与配置 →</a> <a href="../learn/index.html?doc=tools%2Fksword_mcp%2FINSTALL_FOR_AGENTS.md">安装与分层验收 →</a></div></section>
+<section id="cli"><h2>使用命令行</h2><p>运行 KswordCLI help 查看命令，也可在文档中心按进程、文件、注册表等分类查找。MCP 可调用 CLI；原始 IOCTL 请求需要明确确认，输入和输出各限 1 MiB。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2FCLI%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md">CLI 总手册 →</a> <a href="../learn/index.html?doc=docs%2Fcli%2Fcoverage.md">R3 覆盖清单 →</a> <a href="../learn/index.html?doc=docs%2Fcli%2Fsystem.md">IOCTL 语法与限制 →</a></div></section>
+<section id="reports-permissions"><h2>报告与权限工作台</h2><p>在进程详情中展开结构报告，搜索字段并复制或导出。权限工作台可查看账号、组成员和令牌，比较快照并诊断访问权限。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2FIssue-223-%E5%A4%8D%E6%9D%82%E6%8A%A5%E5%91%8A%E5%AD%90%E9%A1%B5.md">报告行为与验收 →</a> <a href="../learn/index.html?doc=docs%2F%E6%9D%83%E9%99%90%E5%B7%A5%E4%BD%9C%E5%8F%B0.md">权限工作台 →</a></div></section>
+<section id="navigation"><h2>查找页面</h2><p>使用标题栏搜索页面和控件，或从 Taskbar 右侧网格按钮打开页面总览。输入名称或路径后按 Enter 跳转，Esc 收起总览。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2F%E4%BD%BF%E7%94%A8%E4%B8%8E%E5%85%BC%E5%AE%B9%E6%80%A7.md">页面搜索、启动与 SOS →</a></div></section>
+<section id="cks-research"><h2>CKS 管理</h2><p>从“杂项 → CKS 管理”查看状态和登记流程。第三个子页收录免重置研究，目前两条候选均未验证成功。</p><div class="release-links"><a href="../learn/index.html?doc=docs%2FCKS%E7%AE%A1%E7%90%86.md">CKS 管理 →</a> <a href="../learn/index.html?doc=docs%2FCKS%E6%96%B0%E7%89%88%E5%85%8D%E9%87%8D%E7%BD%AE%E5%90%AF%E7%94%A8%E7%A0%94%E7%A9%B6.md">免重置启用研究 →</a> <a href="../learn/index.html?doc=docs%2FCKS%E6%9C%AC%E6%9C%BA%E7%99%BB%E8%AE%B0%E9%93%BE%E6%B7%B1%E5%85%A5%E7%A0%94%E7%A9%B6.md">登记链证据与边界 →</a></div></section>
+</div></div></section>
 </main>
-<footer><div class="wrap footer-row"><span>KSWORD / 5.1</span><div class="footer-links"><a href="../learn/index.html">文档</a><a href="../hvm-topology.html">HVM 拓扑</a><a href="../changelog.html">更新日志</a></div><a href="https://github.com/KSwordDEV/KSword" rel="noreferrer" target="_blank">KSwordDEV/KSword ↗</a></div></footer>
-</body>
-</html>
+<footer><div class="wrap footer-row"><span>KSword · Windows x64</span><div class="footer-links"><a href="../docs/contact.html">联系</a><a href="../docs/credits.html">鸣谢</a><a href="../docs/license.html">许可证</a><a href="https://github.com/KSwordDEV/KSword" target="_blank" rel="noreferrer">GitHub</a><a href="https://github.com/wangwei-cm" target="_blank" rel="noreferrer">wangwei-cm</a><a href="https://github.com/Felix3322" target="_blank" rel="noreferrer">OB_BUFF</a></div></div></footer>
+</body></html>
