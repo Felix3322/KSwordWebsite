@@ -61,20 +61,54 @@
   const english = document.documentElement.lang.startsWith('en');
   const tabs = [...document.querySelectorAll('[data-showcase-tab]')];
   const panels = [...document.querySelectorAll('[data-showcase-panel]')];
+  const rail = document.querySelector('.showcase-tabs');
+  const filters = [...document.querySelectorAll('[data-showcase-filter]')];
+  const position = document.querySelector('[data-showcase-count]');
+  let selected = tabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+  function visibleTabs() { return tabs.filter(tab => !tab.hidden); }
   function selectTab(index, focus = false) {
+    if (!tabs[index] || tabs[index].hidden) return;
+    selected = index;
     tabs.forEach((tab, i) => {
       tab.setAttribute('aria-selected', String(i === index));
       tab.tabIndex = i === index ? 0 : -1;
     });
     panels.forEach(panel => { panel.hidden = panel.dataset.showcasePanel !== tabs[index].dataset.showcaseTab; });
-    if (focus) tabs[index].focus();
+    const visible = visibleTabs();
+    if (position) position.textContent = (visible.indexOf(tabs[index]) + 1) + ' / ' + visible.length;
+    if (rail) {
+      const item = tabs[index].getBoundingClientRect();
+      const bounds = rail.getBoundingClientRect();
+      if (item.left < bounds.left || item.right > bounds.right) {
+        rail.scrollLeft += item.left - bounds.left - (bounds.width - item.width) / 2;
+      }
+    }
+    if (focus) tabs[index].focus({preventScroll:true});
   }
+  function move(delta, focus = false) {
+    const visible = visibleTabs();
+    if (!visible.length) return;
+    const index = visible.indexOf(tabs[selected]);
+    selectTab(tabs.indexOf(visible[(index + delta + visible.length) % visible.length]), focus);
+  }
+  filters.forEach(filter => filter.addEventListener('click', () => {
+    const group = filter.dataset.showcaseFilter;
+    filters.forEach(item => item.setAttribute('aria-pressed', String(item === filter)));
+    tabs.forEach(tab => { tab.hidden = group !== 'all' && tab.dataset.showcaseGroup !== group; });
+    if (tabs[selected]?.hidden) selected = tabs.indexOf(visibleTabs()[0]);
+    selectTab(selected);
+  }));
+  document.querySelector('[data-showcase-prev]')?.addEventListener('click', () => move(-1));
+  document.querySelector('[data-showcase-next]')?.addEventListener('click', () => move(1));
   tabs.forEach((tab, index) => {
     tab.addEventListener('click', () => selectTab(index));
     tab.addEventListener('keydown', event => {
-      const next = {ArrowLeft: (index - 1 + tabs.length) % tabs.length, ArrowRight: (index + 1) % tabs.length, Home: 0, End: tabs.length - 1}[event.key];
-      if (next === undefined) return;
-      event.preventDefault(); selectTab(next, true);
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      const visible = visibleTabs();
+      if (event.key === 'Home') selectTab(tabs.indexOf(visible[0]), true);
+      else if (event.key === 'End') selectTab(tabs.indexOf(visible.at(-1)), true);
+      else move(event.key === 'ArrowLeft' ? -1 : 1, true);
     });
   });
 
