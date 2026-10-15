@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="七个步骤，查看主机、虚拟机与 KSword 的位置变化。" name="description"/>
+<meta content="以 Hyper-V 嵌套环境为例，看看 KSword 启动 HVM 后，目标 Windows 在哪里运行，VM-exit 由谁处理。" name="description"/>
 <title>Nested HVM 拓扑变化 — KSword</title>
-<link href="styles.css?v=20261014-technical" rel="stylesheet"/>
+<link href="styles.css?v=20261014-links" rel="stylesheet"/>
 <link href="en/hvm-topology.html" hreflang="en" rel="alternate"/>
-<link href="hvm.css?v=20261014-technical" rel="stylesheet"/>
+<link href="hvm.css?v=20261014-links" rel="stylesheet"/>
 <link rel="icon" href="assets/ksword.ico"/></head>
 <body>
 <header class="site-header"><div class="wrap header-row">
@@ -16,7 +16,7 @@
 <form class="header-search" action="learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="搜索文档" placeholder="搜索文档…"/></form>
 </div></header>
 <main>
-<section class="page-hero"><div class="wrap"><h1>Nested HVM 拓扑</h1><p class="lead">七个步骤，查看主机、虚拟机与 KSword 的位置变化。</p></div></section>
+<section class="page-hero"><div class="wrap"><h1>Nested HVM 拓扑</h1><p class="lead">以 Hyper-V 嵌套环境为例，看看 KSword 启动 HVM 后，目标 Windows 在哪里运行，VM-exit 由谁处理。</p></div></section>
 <section class="section compact-section"><div class="wrap"><h2 id="demo-title">拓扑演示</h2><div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
   <div class="hvm-demo-head">
     <div class="hvm-step-label">
@@ -62,7 +62,7 @@
           <span class="hvm-node-mode">VMX root</span>
         </div>
         <div class="hvm-node" data-node="guest" data-tone="guest" style="--depth:3">
-          <div class="hvm-node-main"><strong data-node-title="">来宾 Windows</strong><span data-node-sub="">靶机里唯一那个 Windows，直接跑在子分区上</span></div>
+          <div class="hvm-node-main"><strong data-node-title="">来宾 Windows</strong><span data-node-sub="">目标 Windows，此时直接运行在 Hyper-V 子分区</span></div>
           <span class="hvm-node-mode" data-node-mode="">ring 0 / 3</span>
         </div>
       </div>
@@ -92,18 +92,18 @@
       </section>
 
 <section>
-        <h3>需单独准入的能力</h3>
+        <h3>需要另外通过检查的功能</h3>
         <div class="hvm-caps" data-hvm-caps=""></div>
       </section>
     </div>
   </div>
 
-  <p class="hvm-foot">拓扑与读数为示例。AMD SVM/NPT 支持仍属实验阶段。</p>
+  <p class="hvm-foot">图中按两颗逻辑处理器演示，VM-exit 数量为示例值，不是当前机器的读数。AMD SVM/NPT 仍在实验阶段。</p>
 </div></div></section>
 <section class="section"><div class="wrap feature-grid">
-<article class="feature-card"><h3>宿主机</h3><p>外层系统提供硬件和虚拟化资源。</p></article>
-<article class="feature-card"><h3>客户系统</h3><p>拓扑变化时，Windows 继续执行原有上下文。</p></article>
-<article class="feature-card"><h3>KSword</h3><p>常驻层处理 VM exit，并提供 EPT 与 R-1 工具。</p></article>
+<article class="feature-card"><h3>宿主机</h3><p>宿主开着 VBS 时，Hyper-V 已占用 VMX root。这个示例把 KSword 放进开启嵌套虚拟化的子虚拟机。</p></article>
+<article class="feature-card"><h3>客户系统</h3><p>启动常驻后，原来的 Windows 转到 L2 继续运行；内核与现有进程仍是同一套。</p></article>
+<article class="feature-card"><h3>KSword</h3><p>KSword 在 L1 处理目标 Windows 的 VM-exit。EPT 访问监控、分离视图和 R-1 操作依赖这一层。</p></article>
 </div></section>
 <section class="section"><div class="wrap"><div class="actions"><a href="learn/index.html?doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">虚拟化文档</a><a href="development.html#hvm">HVM 功能</a></div></div></section>
 </main>
@@ -137,7 +137,7 @@
       l0sub: '物理层 hypervisor，独占 VMX root；对根分区隐藏 CPUID.1:ECX[5]',
       calloutKind: 'blocked',
       callout: '当前示例中，Hyper-V 占用硬件虚拟化资源，根分区无法准备 KSword VMX。',
-      detail: '该示例配置无法启动 KSword VMX，可使用符合条件的嵌套来宾。',
+      detail: '根分区没有暴露 VMX 扩展，PREPARE 无法通过；下面改用开启嵌套虚拟化的目标来宾。',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
     },
@@ -148,11 +148,11 @@
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       l0sub: '物理层 hypervisor，独占 VMX root',
       guestTitle: '来宾 Windows',
-      guestSub: '靶机里唯一那个 Windows，直接跑在子分区上',
+      guestSub: '目标 Windows，此时直接运行在 Hyper-V 子分区',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: '为目标虚拟机开启嵌套虚拟化。外层宿主可保留 VBS，目标来宾需要满足自身的虚拟化启动条件。',
-      detail: '检查 VMX、外层虚拟机和嵌套扩展是否可用。',
+      detail: '先确认目标来宾能看到 VMX 扩展；宿主允许嵌套，不等于来宾里的启动检查一定通过。',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
     },
@@ -162,11 +162,11 @@
       title: '准备资源',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: '来宾 Windows',
-      guestSub: '照常运行，完全不知道下面发生了什么',
+      guestSub: '仍直接运行在 Hyper-V 子分区，尚未执行 VMLAUNCH',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: '分配各处理器的 VMXON、VMCS、EPT 与退出处理资源。此时 Windows 的运行位置保持不变。',
-      detail: '准备各处理器资源和 EPT 映射。',
+      detail: '这里只分配资源。RESOURCES_READY 和 EPT_READY 亮起，还不代表 HVM 已经运行。',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
     },
@@ -176,17 +176,17 @@
       title: '全核自检',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: '来宾 Windows',
-      guestSub: '照常运行；自检窗口只有几条指令宽',
+      guestSub: '自检后立即退出 VMX，尚未进入常驻',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: '在每个逻辑处理器上执行短暂的 VMXON / VMXOFF，检查进入、退出和清理流程。',
-      detail: '所有处理器完成自检且 EPT 完整后，可以启动常驻。',
+      detail: '每颗逻辑处理器都要通过自检，并确认 EPT 完整，才允许启动常驻。',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: '允许' }
     },
     {
       tag: 'VMLAUNCH',
-      short: '拓扑在这里改变',
+      short: 'Windows 转入 L2',
       title: '启动常驻',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
       flash: 'ksword',
@@ -195,23 +195,23 @@
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
       callout: '各处理器执行 VMLAUNCH。KSword 进入 VMX root，原有 Windows 上下文继续在其下运行。',
-      detail: '嵌套模式下 KSword 作为 L1 运行，Windows 位于 L2。',
+      detail: '此时 KSword 是 L1，目标 Windows 是 L2。常驻期间 sc stop 返回 1052，不能直接卸载承载 VM-exit 处理代码的驱动。',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       gauges: { vmxe: '1', rpc: '2', exits: '0', unload: 'sc stop → 1052' }
     },
     {
       tag: 'RESIDENT',
-      short: '常驻期能力上线',
+      short: '处理 VM-exit 与 EPT 访问',
       title: '常驻运行',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
-      kswordSub: 'VMX root · EPT 规则、分离视图、策略引擎与 R-1 处置都由这一层兑现',
+      kswordSub: 'VMX root · 处理 EPT 规则、分离视图、MSR/CR 策略与 R-1 操作',
       guestTitle: 'Windows（L2）',
-      guestSub: '桌面上什么都不会发生——这正是它容易被误判成「没生效」的原因',
+      guestSub: '目标 Windows 继续运行，是否启动成功要看常驻状态与 VM-exit 计数',
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
       callout: 'EPT、退出处理与 R-1 工具在常驻期间运行。CR3 等跟踪选项按需开启，以控制运行开销。',
-      detail: '调整 EPT 规则时先停止常驻，完成后重新启动。',
+      detail: '需要修改 EPT 规则时，先停止常驻，改好再启动。CR3 跟踪等选项会增加 VM-exit，按需要开启。',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE'],
       caps: [0, 1, 2, 3, 4, 5],
@@ -219,7 +219,7 @@
     },
     {
       tag: 'STOP',
-      short: '整层消失',
+      short: '全核退出 VMX',
       title: '停止常驻',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: '来宾 Windows',
@@ -227,7 +227,7 @@
       guestMode: 'ring 0 / 3',
       calloutKind: 'blocked',
       callout: '各处理器执行 VMXOFF，结束常驻。依赖 EPT 的功能同时停止。',
-      detail: '所有处理器退出后可卸载驱动。睡眠或唤醒后需要重新自检。',
+      detail: '只有所有逻辑处理器都退出后，才允许卸载驱动。经历睡眠或唤醒后，需要重新自检。',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: '已归零', unload: '允许' }
     }

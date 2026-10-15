@@ -71,7 +71,7 @@ const assetVersion = snapshot.assetVersion;
 for (const file of htmlFiles) {
     for (const match of read(file).matchAll(/\b(?:href|src)="([^"]+)"/g)) {
         const resource = new URL(match[1], 'http://preview.local/');
-        if (['styles.css', 'script.js', 'learn.js', 'learn.css', 'hvm.css'].some(asset => resource.pathname.endsWith('/' + asset))) {
+        if (['styles.css', 'script.js', 'learn.js', 'learn.css', 'hvm.css', 'redirect.js'].some(asset => resource.pathname.endsWith('/' + asset))) {
             assert(resource.searchParams.get('v') === assetVersion, 'Stale asset version in ' + path.relative(site, file) + ': ' + match[1]);
         }
     }

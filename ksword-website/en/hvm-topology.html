@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="An interactive view of the host, guest and KSword through seven stages." name="description"/>
+<meta content="Follow a nested Hyper-V example to see where the target Windows runs after HVM starts and which layer handles its VM exits." name="description"/>
 <title>Nested HVM topology — KSword</title>
-<link href="../styles.css?v=20261014-technical" rel="stylesheet"/>
+<link href="../styles.css?v=20261014-links" rel="stylesheet"/>
 <link href="../hvm-topology.html" hreflang="zh-CN" rel="alternate"/>
-<link href="../hvm.css?v=20261014-technical" rel="stylesheet"/>
+<link href="../hvm.css?v=20261014-links" rel="stylesheet"/>
 <link rel="icon" href="../assets/ksword.ico"/></head>
 <body>
 <header class="site-header"><div class="wrap header-row">
@@ -16,7 +16,7 @@
 <form class="header-search" action="../learn/index.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input type="search" name="q" aria-label="Search documentation" placeholder="Search docs…"/><input type="hidden" name="lang" value="en"/></form>
 </div></header>
 <main>
-<section class="page-hero"><div class="wrap"><h1>Nested HVM topology</h1><p class="lead">An interactive view of the host, guest and KSword through seven stages.</p></div></section>
+<section class="page-hero"><div class="wrap"><h1>Nested HVM topology</h1><p class="lead">Follow a nested Hyper-V example to see where the target Windows runs after HVM starts and which layer handles its VM exits.</p></div></section>
 <section class="section compact-section"><div class="wrap"><h2 id="demo-title">Topology demo</h2><div aria-labelledby="demo-title" class="hvm-demo" data-hvm="">
   <div class="hvm-demo-head">
     <div class="hvm-step-label">
@@ -62,7 +62,7 @@
           <span class="hvm-node-mode">VMX root</span>
         </div>
         <div class="hvm-node" data-node="guest" data-tone="guest" style="--depth:3">
-          <div class="hvm-node-main"><strong data-node-title="">Guest Windows</strong><span data-node-sub="">The only Windows on the target, running directly on the child partition</span></div>
+          <div class="hvm-node-main"><strong data-node-title="">Guest Windows</strong><span data-node-sub="">Target Windows, currently running directly in the Hyper-V child partition</span></div>
           <span class="hvm-node-mode" data-node-mode="">ring 0 / 3</span>
         </div>
       </div>
@@ -92,18 +92,18 @@
       </section>
 
 <section>
-        <h3>Functions requiring separate admission</h3>
+        <h3>Features with additional checks</h3>
         <div class="hvm-caps" data-hvm-caps=""></div>
       </section>
     </div>
   </div>
 
-  <p class="hvm-foot">The diagram and readings are illustrative. AMD SVM/NPT support is experimental.</p>
+  <p class="hvm-foot">The diagram uses two logical processors and example VM-exit counts; these are not readings from your machine. AMD SVM/NPT remains experimental.</p>
 </div></div></section>
 <section class="section"><div class="wrap feature-grid">
-<article class="feature-card"><h3>Host</h3><p>The outer system provides hardware and virtualization resources.</p></article>
-<article class="feature-card"><h3>Guest</h3><p>Windows continues running in its existing context as the topology changes.</p></article>
-<article class="feature-card"><h3>KSword</h3><p>The resident layer handles VM exits and provides EPT and R-1 tools.</p></article>
+<article class="feature-card"><h3>Host</h3><p>With VBS enabled, Hyper-V already owns VMX root. This example runs KSword inside a child VM with nested virtualization enabled.</p></article>
+<article class="feature-card"><h3>Guest</h3><p>After residency starts, the existing Windows runs at L2. Its kernel and processes remain the same.</p></article>
+<article class="feature-card"><h3>KSword</h3><p>KSword handles the target’s VM exits at L1. EPT access monitoring, split views and R-1 operations depend on this layer.</p></article>
 </div></section>
 <section class="section"><div class="wrap"><div class="actions"><a href="../learn/index.html?lang=en&amp;doc=docs%2F%E8%99%9A%E6%8B%9F%E5%8C%96%E8%83%BD%E5%8A%9B%E8%B7%AF%E7%BA%BF%E5%9B%BE.md">Virtualization documentation</a><a href="development.html#hvm">HVM features</a></div></div></section>
 </main>
@@ -137,7 +137,7 @@
       l0sub: 'Physical-layer hypervisor; owns VMX root and hides CPUID.1:ECX[5] from the root partition',
       calloutKind: 'blocked',
       callout: 'In this example, Hyper-V owns the virtualization resources and the root partition cannot prepare KSword VMX.',
-      detail: 'This example cannot start KSword VMX. A compatible nested guest can be used instead.',
+      detail: 'The root partition does not expose VMX, so PREPARE fails. The next step uses a target guest with nested virtualization enabled.',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
@@ -148,11 +148,11 @@
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       l0sub: 'The physical-layer hypervisor; owns VMX root exclusively',
       guestTitle: 'Guest Windows',
-      guestSub: 'The only Windows on the target, running directly on the child partition',
+      guestSub: 'Target Windows, currently running directly in the Hyper-V child partition',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: 'Expose nested virtualization to the target guest. VBS may remain enabled on the outer host; the guest must meet its own startup requirements.',
-      detail: 'Check VMX, the outer hypervisor and exposed nesting extensions.',
+      detail: 'Confirm that the target guest can see VMX. Enabling nesting on the host does not guarantee that the guest passes its startup checks.',
       flags: [],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
@@ -162,11 +162,11 @@
       title: 'Prepare resources',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
-      guestSub: 'Running normally, entirely unaware of what is happening underneath',
+      guestSub: 'Still running in the Hyper-V child partition; VMLAUNCH has not run',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: 'Allocate per-CPU VMXON, VMCS, EPT and exit-handling resources. Windows keeps its current execution context.',
-      detail: 'Prepare per-CPU resources and EPT mappings.',
+      detail: 'This stage only allocates resources. RESOURCES_READY and EPT_READY do not mean that HVM is running.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
@@ -176,17 +176,17 @@
       title: 'Per-CPU self-test',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
-      guestSub: 'Running normally; the self-test window is only a few instructions wide',
+      guestSub: 'The self-test exits VMX immediately; residency has not started',
       guestMode: 'ring 0 / 3',
       calloutKind: 'plain',
       callout: 'Run a short VMXON / VMXOFF cycle on each logical processor to check entry, exit and cleanup.',
-      detail: 'Residency can start once all CPUs pass the self-test and EPT is complete.',
+      detail: 'Every logical processor must pass the self-test, and EPT must be complete, before residency can start.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: '—', unload: 'allowed' }
     },
     {
       tag: 'VMLAUNCH',
-      short: 'The topology changes here',
+      short: 'Windows moves to L2',
       title: 'Start residency',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
       flash: 'ksword',
@@ -195,23 +195,23 @@
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
       callout: 'Each processor executes VMLAUNCH. KSword enters VMX root while the existing Windows context continues beneath it.',
-      detail: 'In nested mode, KSword runs as L1 and Windows runs as L2.',
+      detail: 'KSword now runs at L1 and Windows at L2. During residency, sc stop returns 1052: the driver containing VM-exit handlers cannot be unloaded.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED'],
       gauges: { vmxe: '1', rpc: '2', exits: '0', unload: 'sc stop → 1052' }
     },
     {
       tag: 'RESIDENT',
-      short: 'Capabilities come online',
+      short: 'Handle VM exits and EPT accesses',
       title: 'Resident operation',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, ksword: 3, guest: 4 },
-      kswordSub: 'VMX root · EPT rules, split views, policy engines, and R-1 disposition are all delivered by this layer',
+      kswordSub: 'VMX root · handles EPT rules, split views, MSR/CR policies and R-1 operations',
       guestTitle: 'Windows (L2)',
-      guestSub: 'Nothing happens on the desktop — which is exactly why it is easy to misjudge as ineffective',
+      guestSub: 'Windows keeps running; check resident status and VM-exit counts to confirm HVM started',
       guestMode: 'VMX non-root',
       calloutKind: 'warn',
       callout: 'EPT, exit handling and R-1 tools run during residency. Enable optional tracing such as CR3 tracking only when needed.',
-      detail: 'Stop residency before changing EPT rules, then start it again.',
+      detail: 'Stop residency before changing EPT rules, then restart it. Options such as CR3 tracking add VM exits; enable them when needed.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED', 'UNLOAD_GUARD_ARMED', 'RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE', 'EVENTS_AVAILABLE'],
       accentFlags: ['RESIDENT_ACTIVE', 'RESIDENT_NESTED', 'EPT_RULES_ACTIVE'],
       caps: [0, 1, 2, 3, 4, 5],
@@ -219,15 +219,15 @@
     },
     {
       tag: 'STOP',
-      short: 'The layer is gone',
+      short: 'Exit VMX on every CPU',
       title: 'Stop residency',
       nodes: { cpu: 0, l0: 1, root: 2, child: 2, guest: 3 },
       guestTitle: 'Guest Windows',
-      guestSub: 'Running directly on the child partition again; again no reboot, again nothing visible',
+      guestSub: 'Running directly in the Hyper-V child partition again',
       guestMode: 'ring 0 / 3',
       calloutKind: 'blocked',
       callout: 'Each processor executes VMXOFF to end residency. EPT-dependent functions stop at the same time.',
-      detail: 'The driver can unload after all CPUs exit. Repeat the self-test after sleep or resume.',
+      detail: 'Driver unload is allowed only after every logical processor exits. Repeat the self-test after sleep or resume.',
       flags: ['INITIALIZED', 'RESOURCES_READY', 'EPT_READY', 'SELF_TESTED', 'SELF_TEST_PASSED'],
       gauges: { vmxe: '0', rpc: '0', exits: 'cleared', unload: 'allowed' }
     }

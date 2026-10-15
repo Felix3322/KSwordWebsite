@@ -19,8 +19,8 @@
     {
       id: 'start',
       zh: '开始使用', en: 'Get started',
-      zhDesc: '第一次接触 KSword：它是什么、装什么、从哪个界面开始。',
-      enDesc: 'What KSword is, what to install, and where to start.',
+      zhDesc: '安装、驱动、系统兼容性，以及常用页面和工具。',
+      enDesc: 'Installation, drivers, system compatibility and the main tools.',
       items: [
         { site: '../docs/index.html', zh: '安装与开始使用', en: 'Install and get started' },
         { p: 'docs/README.md', zh: '文档总索引', en: 'Documentation index' },
@@ -34,8 +34,8 @@
     {
       id: 'automation',
       zh: 'MCP 自动化', en: 'MCP automation',
-      zhDesc: '真实 GUI 对象桥、CLI/IOCTL、安装权限与回执边界。',
-      enDesc: 'The real GUI object bridge, CLI/IOCTL tools, privileges and receipt boundaries.',
+      zhDesc: '用 pip/npm 安装 MCP，连接 GUI 或 CLI，配置自动启动与管理员权限。',
+      enDesc: 'Install MCP with pip/npm, connect the GUI or CLI, and configure startup and elevation.',
       items: [
         { p: 'tools/ksword_mcp/README.md', zh: 'MCP 工具与配置', en: 'MCP tools and configuration' },
         { p: 'tools/ksword_mcp/INSTALL_FOR_AGENTS.md', zh: 'MCP 安装指南', en: 'MCP installation guide' },
@@ -48,8 +48,8 @@
     {
       id: 'cli',
       zh: 'CLI 命令参考', en: 'CLI command families',
-      zhDesc: '原生帮助、R3 后端与结构化状态；写操作保留各命令确认与回读。',
-      enDesc: 'Native help, R3 backends and structured status; mutations retain command-specific confirmation and readback.',
+      zhDesc: '命令参数、JSON 输出、批量操作，以及 GUI 与 Light 共用的查询代码。',
+      enDesc: 'Command arguments, JSON output, batch operations and the query code shared by GUI and Light.',
       items: [
         { p: 'docs/cli/coverage.md', zh: 'CLI 功能清单', en: 'CLI feature list' },
         { p: 'docs/cli/process.md', zh: '进程、线程与令牌', en: 'Processes, threads and tokens' },
@@ -71,8 +71,8 @@
     {
       id: 'concepts',
       zh: '功能与概念', en: 'Features and concepts',
-      zhDesc: '每个模块做什么、界面怎么组织、术语怎么理解。',
-      enDesc: 'What each module does, how the UI is organised, and what the terms mean.',
+      zhDesc: '进程、内存、驱动、网络和窗口工具的操作说明与字段解释。',
+      enDesc: 'Process, memory, driver, network and window tools, with field descriptions.',
       items: [
         { p: 'docs/功能技术文档.md', zh: '功能技术文档', en: 'Feature technical reference' },
         { p: 'docs/Issue-216-内存区域Dump核对.md', zh: 'R3/R0 内存区域 Dump', en: 'R3/R0 memory-region dumps' },
@@ -96,8 +96,8 @@
     {
       id: 'hvm',
       zh: '虚拟化 · HVM / R-1', en: 'Virtualization · HVM / R-1',
-      zhDesc: 'Intel VMX/EPT 与实验性 AMD SVM/NPT：实现、嵌套运行与验证边界。',
-      enDesc: 'Intel VMX/EPT and experimental AMD SVM/NPT: implementation, nesting and validation boundaries.',
+      zhDesc: 'Intel VMX/EPT、嵌套虚拟化、影子页，以及 AMD SVM/NPT 实验记录。',
+      enDesc: 'Intel VMX/EPT, nested virtualization, shadow pages and AMD SVM/NPT experiments.',
       items: [
         { site: '../hvm-topology.html', zh: 'Nested HVM 拓扑变化演示', en: 'Nested HVM topology demo' },
         { p: 'docs/next/amd-nested-svm-implementation.md', zh: 'AMD 嵌套 SVM（实验）', en: 'AMD nested SVM (experimental)' },
@@ -116,8 +116,8 @@
     {
       id: 'driver',
       zh: '驱动与 R0 审计', en: 'Driver and R0 audit',
-      zhDesc: 'R0 协议、动态偏移、内存取证与实验后端的设计约束。',
-      enDesc: 'R0 protocol, dynamic offsets, memory forensics, and experimental backend constraints.',
+      zhDesc: '驱动 IOCTL 协议、DynData 偏移、页表和物理内存读取。',
+      enDesc: 'Driver IOCTLs, DynData offsets, page tables and physical memory reads.',
       items: [
         { p: 'docs/driver_ioctl_audit.md', zh: '驱动 IOCTL 审计', en: 'Driver IOCTL audit' },
         { p: 'docs/offset-profile-diagnosis-20261009.md', zh: '偏移 Profile 诊断与回执', en: 'Offset-profile diagnostics and receipts' },
@@ -131,8 +131,8 @@
     {
       id: 'pdb',
       zh: 'PDB / R0 审计准备', en: 'PDB / R0 audit prep',
-      zhDesc: '十一份分域审计准备，从符号清单一直到接入验收矩阵。',
-      enDesc: 'Eleven domain audits, from symbol inventory through the integration acceptance matrix.',
+      zhDesc: '各类内核结构的符号清单、查询方法和测试检查项。',
+      enDesc: 'Symbol lists, query methods and test checklists for kernel structures.',
       items: [
         { p: 'docs/pdb_r0_audit_prep/01_pdb_inventory_and_extractor.md', zh: '01 · PDB 清单与提取器', en: '01 · PDB inventory and extractor' },
         { p: 'docs/pdb_r0_audit_prep/02_multimodule_dyndata_schema.md', zh: '02 · 多模块 DynData 结构', en: '02 · Multi-module DynData schema' },
@@ -150,8 +150,8 @@
     {
       id: 'testing',
       zh: '测试与验收', en: 'Testing and acceptance',
-      zhDesc: '靶机怎么搭、验收判据是什么、哪些结论已经有证据、哪些还没有。',
-      enDesc: 'How the target is built, what the criteria are, and which conclusions actually have evidence.',
+      zhDesc: '测试环境搭建、回归脚本、虚拟机测试和已知限制。',
+      enDesc: 'Test setup, regression scripts, VM tests and known limitations.',
       items: [
         { p: 'docs/next/VM测试机搭建.md', zh: 'VM 测试机搭建', en: 'Building the VM target' },
         { p: 'docs/next/测试机操作手册.md', zh: '测试机操作手册', en: 'Target machine operator manual' },
@@ -166,8 +166,8 @@
     {
       id: 'ui',
       zh: '共享 UI 与工作台设计', en: 'Shared UI and workspace design',
-      zhDesc: '共享框架、主线实现记录与验证边界；设计文档保留原状态。',
-      enDesc: 'Shared frameworks, main-branch records and validation boundaries; designs retain their stated status.',
+      zhDesc: '内存编辑器、主题、表格和详情页的设计与改动记录。',
+      enDesc: 'Design and implementation notes for the memory editor, themes, tables and detail pages.',
       items: [
         { p: 'docs/默认标准主题-20261012.md', zh: '应用级标准控件主题', en: 'Application-wide standard widget theme' },
         { p: 'docs/参数表单框架接入.md', zh: '参数工作区接入', en: 'Parameter workspace integration' },
@@ -182,8 +182,8 @@
     {
       id: 'extend',
       zh: '扩展开发', en: 'Extending KSword',
-      zhDesc: '写插件、加语言包时必须遵守的接口与命名约定。',
-      enDesc: 'Interfaces and naming rules for plugins and language packs.',
+      zhDesc: '插件接口、市场分发、语言包和贡献规范。',
+      enDesc: 'Plugin interfaces, marketplace distribution, language packs and contribution rules.',
       items: [
         { p: 'docs/文档与官网维护.md', zh: '文档与官网维护', en: 'Documentation and website maintenance' },
         { p: 'CONTRIBUTING.md', zh: '贡献与模块边界', en: 'Contributing and module boundaries' },
@@ -194,8 +194,8 @@
     {
       id: 'planning',
       zh: '规划与对照', en: 'Planning and comparisons',
-      zhDesc: '阶段清单与同类工具功能对照，用来判断差距而不是宣传覆盖率。',
-      enDesc: 'Phase manifests and feature comparisons — for judging gaps, not advertising coverage.',
+      zhDesc: '开发计划、阶段进度，以及与同类工具的功能对照。',
+      enDesc: 'Development plans, progress and feature comparisons with related tools.',
       items: [
         { p: 'docs/next_phase_manifests/driver_kernel_integrity.md', zh: '驱动与内核完整性', en: 'Driver and kernel integrity' },
         { p: 'docs/next_phase_manifests/driver_unload_pdb_research.md', zh: '驱动卸载与 PDB 研究', en: 'Driver unload and PDB research' },
@@ -211,8 +211,8 @@
     {
       id: 'cks',
       zh: 'CKS 管理与研究', en: 'CKS management and research',
-      zhDesc: '管理步骤与免重置研究分开；启动前登记和修复安装候选仍未验证。',
-      enDesc: 'Management and reset-free research stay separate; pre-boot enrollment and repair-install candidates remain unverified.',
+      zhDesc: 'CKS 状态查询与登记方法、SSDE 实验，以及尚未成功的免重置研究。',
+      enDesc: 'CKS status and enrollment, SSDE experiments and reset-free research that has not yet succeeded.',
       items: [
         { p: 'docs/CKS管理.md', zh: 'CKS 管理', en: 'CKS management' },
         { p: 'docs/CKS新版免重置启用研究.md', zh: 'CKS 新版免重置研究（未验证）', en: 'Reset-free CKS research (unverified)' },
@@ -222,8 +222,8 @@
     {
       id: 'security',
       zh: '安全研究', en: 'Security research',
-      zhDesc: '具体样本与攻击链的分析记录及对应检测判据。',
-      enDesc: 'Sample-level analysis of attack chains and the detection criteria derived from them.',
+      zhDesc: '样本行为、攻击步骤，以及对应的检测方法。',
+      enDesc: 'Sample behavior, attack steps and the corresponding detection methods.',
       items: [
         { p: 'docs/security/EXIT_GhostSystemDriver_IDA91_分析与检测.md', zh: 'EXIT GhostSystemDriver 分析与检测', en: 'EXIT GhostSystemDriver analysis' }
       ]
@@ -231,8 +231,8 @@
     {
       id: 'project',
       zh: '项目信息', en: 'Project information',
-      zhDesc: '版本、许可证、归属与联系方式。',
-      enDesc: 'Releases, licence, credits, and contact.',
+      zhDesc: '版本记录、许可证、维护者和联系方式。',
+      enDesc: 'Release history, licenses, maintainers and contact details.',
       items: [
         { site: '../changelog.html', zh: '更新日志', en: 'Release history' },
         { site: '../development.html', zh: '功能介绍', en: 'Features' },
@@ -305,9 +305,9 @@
       updated: '最近更新', prev: '上一篇', next: '下一篇', noMatch: '没有匹配的文档。',
       noHeadings: '本文没有二级标题。',
       failTitle: '读取失败',
-      failBody: '无法从 raw.githubusercontent.com 读取该文件。可能是网络受限、文件已改名或分支已变动。',
+      failBody: '这篇文档直接从 GitHub 读取，目前没有取到内容。可以稍后重试，或用上方的 GitHub 链接打开原文。下方是请求地址和返回错误。',
       hubTitle: 'KSword 文档',
-      hubLead: '从安装和常用工具开始，也可以在左侧搜索完整文档。',
+      hubLead: '安装与驱动配置、CLI/MCP 接入，以及进程、内存、监控和 HVM 分析文档。插件开发、设计笔记和实验记录也在这里。',
       hubCount: '篇',
       hubSite: '官网页面',
       site: '官网'
@@ -318,9 +318,9 @@
       updated: 'Last updated', prev: 'Previous', next: 'Next', noMatch: 'No matching document.',
       noHeadings: 'This article has no level-2 headings.',
       failTitle: 'Could not load',
-      failBody: 'Failed to read the file from raw.githubusercontent.com. The network may be restricted, or the file may have been renamed or moved.',
+      failBody: 'This article is fetched directly from GitHub and could not be loaded. Try again later, or open the original using the GitHub link above. The requested address and error are shown below.',
       hubTitle: 'KSword documentation',
-      hubLead: 'Start with installation and everyday tools, or search the full documentation on the left.',
+      hubLead: 'Installation, driver configuration and CLI/MCP setup, plus process, memory, monitoring and HVM analysis. Also includes plugin development, design notes and experiment records.',
       hubCount: 'articles',
       hubSite: 'site pages',
       site: 'Site'
