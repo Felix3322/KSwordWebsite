@@ -242,3 +242,6 @@ footer a { color: var(--muted); }
 .redirect-card .actions button { padding: 7px 13px; }
 .redirect-card button:disabled { cursor: default; opacity: .65; }
 @media(max-width:650px) { .redirect-layout { padding: 24px 12px; } .redirect-header { flex-wrap: nowrap; } }
+
+.header-qq { display: inline-flex; align-items: center; justify-content: center; min-height: 30px; padding: 4px 10px; border-radius: 5px; background: var(--selected); color: var(--link); font-size: 12px; white-space: nowrap; }
+.header-qq:hover { background: var(--control-hover); text-decoration: none; }

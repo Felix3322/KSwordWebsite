@@ -22,7 +22,7 @@
 
 ## 约定
 
-所有页面共用同一块页眉：wordmark + 文档搜索 + 七项主导航（首页 / 更新日志 /
+所有页面共用同一块页眉：wordmark + 文档搜索 + QQ 群按钮 + 七项主导航（首页 / 更新日志 /
 功能介绍 / HVM 拓扑 / 文档 / 语言 / GitHub），当前页用 `aria-current="page"` 标注。
 
 应用图标与主程序保持一致；首页共 14 张真实主程序截图，按进程、内存与 PE、内核筛选；包括反汇编、Hex、内存区域、PE 节区、PDB 结构字段、性能历史、对象目录、符号链接与原子表。PDB 字段目录与现场内存数据分别说明，支持键盘切换与原尺寸查看。
@@ -60,6 +60,7 @@ python tools/preview-site.py --source-root <KSword-checkout>
 | `/pip`、`/pypi` | `https://pypi.org/project/ksword-mcp/` |
 | `/plugins` | `https://github.com/KSwordDEV/Plugins` |
 | `/mcp` | `https://github.com/KSwordDEV/MCP` |
+| `/qq` | QQ 群邀请链接，完整地址保存在 `qq/index.html` |
 | `/download`、`/releases` | `https://github.com/KSwordDEV/KSword/releases` |
 | `/issues` | `https://github.com/KSwordDEV/KSword/issues` |
 

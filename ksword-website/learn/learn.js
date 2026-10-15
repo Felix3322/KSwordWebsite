@@ -725,6 +725,11 @@
     if (nav) Array.prototype.forEach.call(nav.querySelectorAll('a'), function (a, i) {
       if (labels[i]) { a.textContent = labels[i]; a.href = targets[i]; }
     });
+    var qqLink = document.querySelector('[data-header-qq]');
+    if (qqLink) {
+      qqLink.textContent = lang === 'en' ? 'QQ group' : 'QQ 群';
+      qqLink.href = '/qq/?lang=' + lang;
+    }
     var searchForm = document.querySelector('.header-search');
     if (searchForm) {
       var searchInput = searchForm.querySelector('[name="q"]');
